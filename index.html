@@ -23,8 +23,7 @@
 
 body{
   margin:0;
-  background:
-    radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 45%);
+  background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 45%);
   color:var(--text);
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 }
@@ -90,7 +89,8 @@ h1 span{color:var(--gold)}
   transition:.15s
 }
 
-.drop:hover,.drop.drag{
+.drop:hover,
+.drop.drag{
   border-color:var(--gold);
   background:#ffffff03
 }
@@ -437,66 +437,6 @@ button:disabled{
   border:1px solid #ffffff22
 }
 
-.feedback{
-  display:flex;
-  gap:5px;
-  margin-top:8px
-}
-
-.feedback button{
-  flex:1;
-  padding:6px 5px;
-  font-size:10px;
-  background:#171a21;
-  color:#aeb2bc;
-  border:1px solid #ffffff16
-}
-
-.feedback button:hover{
-  border-color:#ffffff35;
-  color:#fff
-}
-
-.feedback-label{
-  font-size:9px;
-  color:#686d78;
-  margin-top:6px;
-  text-align:center
-}
-
-.learning{
-  margin-top:18px;
-  background:#12151b;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap
-}
-
-.learning-text{
-  color:#aeb2bc;
-  font-size:12px;
-  line-height:1.4
-}
-
-.learning-text strong{
-  color:var(--gold)
-}
-
-.learning-actions{
-  display:flex;
-  gap:7px
-}
-
-.learning-actions button{
-  padding:8px 11px;
-  font-size:11px
-}
-
 .pagination{
   display:flex;
   justify-content:center;
@@ -591,11 +531,9 @@ button:disabled{
   </div>
 </header>
 
-
 <section class="card">
 
   <div class="drop" id="drop">
-
     <div class="drop-icon">▧</div>
 
     <div class="drop-title">
@@ -612,8 +550,12 @@ button:disabled{
       images selected
     </div>
 
-    <input id="files" type="file" accept="image/*" multiple>
-
+    <input
+      id="files"
+      type="file"
+      accept="image/*"
+      multiple
+    >
   </div>
 
 
@@ -628,40 +570,36 @@ button:disabled{
             Crop Mode
             <span
               class="help"
-              title="Choose how aggressively the background is detected">
-              ?
-            </span>
+              title="Choose how strongly the detected background is removed"
+            >?</span>
           </span>
         </div>
-
 
         <div class="mode-group">
 
           <button
             type="button"
             class="mode-btn active"
-            id="modeNormal">
-
+            id="modeNormal"
+          >
             Normal
 
             <small>
-              Targets the outer border while protecting real artwork.
+              Removes detected outer background while prioritizing protection of the artwork.
             </small>
-
           </button>
 
 
           <button
             type="button"
             class="mode-btn"
-            id="modeAggressive">
-
+            id="modeAggressive"
+          >
             Aggressive
 
             <small>
-              Searches much harder for large background areas, including gradients and non-white colours.
+              Removes detected background more strongly to recover as much usable artwork as possible.
             </small>
-
           </button>
 
         </div>
@@ -675,11 +613,11 @@ button:disabled{
 
           <span>
             Tolerance
+
             <span
               class="help"
-              title="Controls how different a pixel can be from the detected background">
-              ?
-            </span>
+              title="Controls how much difference from the detected background is accepted"
+            >?</span>
           </span>
 
           <span class="value" id="tolVal">
@@ -693,11 +631,12 @@ button:disabled{
           type="range"
           min="1"
           max="100"
-          value="18">
+          value="18"
+        >
 
         <div class="desc">
-          Higher removes more background.
-          Lower preserves more subtle artwork.
+          Higher values remove more pixels that differ slightly from the detected background.
+          Lower values preserve more subtle details.
         </div>
 
       </div>
@@ -709,11 +648,11 @@ button:disabled{
 
           <span>
             Safety Margin (px)
+
             <span
               class="help"
-              title="Adds a small border around detected artwork">
-              ?
-            </span>
+              title="Adds a small border around the detected artwork"
+            >?</span>
           </span>
 
           <span class="value" id="padVal">
@@ -727,10 +666,11 @@ button:disabled{
           type="range"
           min="0"
           max="20"
-          value="2">
+          value="2"
+        >
 
         <div class="desc">
-          Keeps a small margin around the detected content so important details don't get cut off.
+          Keeps a small margin around the content so important details don't get cut off.
         </div>
 
       </div>
@@ -739,10 +679,9 @@ button:disabled{
       <button
         class="secondary"
         id="reset"
-        style="width:100%;margin-top:18px">
-
+        style="width:100%;margin-top:18px"
+      >
         ↻ Reset Settings
-
       </button>
 
     </div>
@@ -792,20 +731,17 @@ button:disabled{
 
     <button
       class="secondary"
-      id="clean">
-
+      id="clean"
+    >
       ✣ Clean Images
-
     </button>
-
 
     <button
       class="primary"
       id="downloadAll"
-      disabled>
-
+      disabled
+    >
       ⇩ Download All (.ZIP)
-
     </button>
 
   </div>
@@ -820,7 +756,8 @@ button:disabled{
 
 <section
   class="card progress-card"
-  id="progressCard">
+  id="progressCard"
+>
 
   <div class="progress-top">
 
@@ -830,82 +767,37 @@ button:disabled{
 
     <span
       class="percent"
-      id="percent">
-
+      id="percent"
+    >
       0%
-
     </span>
 
   </div>
 
-
   <div class="track">
-
     <div
       class="bar"
-      id="bar">
-    </div>
-
+      id="bar"
+    ></div>
   </div>
-
 
   <div
     class="status"
-    id="status">
-  </div>
+    id="status"
+  ></div>
 
 </section>
 
 
 <div
   class="results"
-  id="results">
-</div>
-
+  id="results"
+></div>
 
 <div
   class="pagination"
-  id="pagination">
-</div>
-
-
-<div
-  class="learning"
-  id="learningPanel"
-  style="display:none">
-
-  <div class="learning-text">
-
-    🧠 <strong>Local improvement</strong><br>
-
-    Your feedback is stored only in this browser.
-    It helps Aggressive mode adjust future crops without uploading your images.
-
-  </div>
-
-
-  <div class="learning-actions">
-
-    <button
-      class="secondary"
-      id="learningStats">
-
-      View learning
-
-    </button>
-
-
-    <button
-      class="secondary"
-      id="clearLearning">
-
-      Reset learning
-
-    </button>
-
-  </div>
-
-</div>
+  id="pagination"
+></div>
 
 </main>
 
@@ -920,7 +812,6 @@ const count=$('count');
 
 const tolEl=$('tol');
 const padEl=$('pad');
-
 const tolVal=$('tolVal');
 const padVal=$('padVal');
 
@@ -942,49 +833,46 @@ const pagination=$('pagination');
 const progressCard=$('progressCard');
 const bar=$('bar');
 const percent=$('percent');
-
 const progressText=$('progressText');
 const status=$('status');
-
-const learningPanel=$('learningPanel');
-const learningStats=$('learningStats');
-const clearLearning=$('clearLearning');
 
 
 let selected=[];
 let outputs=[];
 let previewUrl=null;
-
 let currentPage=1;
 let cropMode='normal';
 
 const PAGE_SIZE=20;
 
 
-/* =========================================================
-   FILE SELECTION
-========================================================= */
+/* =========================
+   FILE UPLOAD
+========================= */
 
-drop.addEventListener('click',()=>filesEl.click());
+drop.addEventListener('click',()=>{
+  filesEl.click();
+});
+
 
 drop.addEventListener('dragover',e=>{
   e.preventDefault();
   drop.classList.add('drag');
 });
 
+
 drop.addEventListener('dragleave',()=>{
   drop.classList.remove('drag');
 });
 
+
 drop.addEventListener('drop',e=>{
-
   e.preventDefault();
-
   drop.classList.remove('drag');
 
   setFiles([...e.dataTransfer.files]);
-
 });
+
 
 filesEl.addEventListener('change',()=>{
   setFiles([...filesEl.files]);
@@ -994,36 +882,24 @@ filesEl.addEventListener('change',()=>{
 function setFiles(arr){
 
   selected=arr.filter(
-    f=>f.type.startsWith('image/')
+    f=>f && f.type && f.type.startsWith('image/')
   );
 
-  outputs=[];
-  currentPage=1;
-
-  results.innerHTML='';
-  pagination.innerHTML='';
-
-  downloadAll.disabled=true;
-
-  learningPanel.style.display='none';
-
   count.innerHTML=
-    `<span style="color:#28d66f">✓</span>
-     <strong>${selected.length}</strong>
-     images selected`;
+    `<span style="color:#28d66f">✓</span>`+
+    `<strong>${selected.length}</strong>`+
+    ` images selected`;
 
   if(selected.length){
-
     showPreview(selected[0]);
-
   }
 
 }
 
 
-/* =========================================================
+/* =========================
    IMAGE LOADING
-========================================================= */
+========================= */
 
 function getImage(file){
 
@@ -1031,7 +907,9 @@ function getImage(file){
 
     const img=new Image();
 
-    img.onload=()=>resolve(img);
+    img.onload=()=>{
+      resolve(img);
+    };
 
     img.onerror=reject;
 
@@ -1042,42 +920,38 @@ function getImage(file){
 }
 
 
-/* =========================================================
+/* =========================
    ORIGINAL NORMAL MODE
    DO NOT CHANGE
-========================================================= */
-
-function isWhite(d,i,tol){
-
-  const cutoff=255-tol;
-
-  return (
-    d[i]>=cutoff &&
-    d[i+1]>=cutoff &&
-    d[i+2]>=cutoff
-  );
-
-}
-
+========================= */
 
 function cropImageNormal(img,tol,pad){
+  return cropWithBackgroundModel(img,tol,pad,false);
+}
 
-  return cropWithBackgroundModel(
-    img,
-    tol,
-    pad,
-    false
-  );
+
+/* =========================
+   AGGRESSIVE MODE
+========================= */
+
+function cropImageAggressive(img,tol,pad){
+
+  return cropWithBackgroundModel(img,tol,pad,true);
 
 }
 
 
-function cropWithBackgroundModel(
-  img,
-  tol,
-  pad,
-  aggressive
-){
+/*
+ Background-aware cropper.
+
+ Normal mode remains the original conservative behavior.
+
+ Aggressive mode uses the same detected background model but
+ allows weaker artwork signals to define the final crop.
+*/
+
+
+function cropWithBackgroundModel(img,tol,pad,aggressive){
 
   const w=img.naturalWidth;
   const h=img.naturalHeight;
@@ -1106,13 +980,31 @@ function cropWithBackgroundModel(
     255*255*3
   );
 
-  const threshold=Math.max(
-    4,
-    Math.min(
-      1,
-      0.25+tol/120
-    )*diag
-  );
+
+  /*
+    Background sensitivity.
+
+    Normal keeps the original behavior.
+
+    Aggressive gets a lower threshold so subtle
+    background differences are more likely to be removed.
+  */
+
+  const threshold=aggressive
+    ? Math.max(
+        3,
+        Math.min(
+          85,
+          28 + (100-tol)*0.42
+        )
+      )
+    : Math.max(
+        4,
+        Math.min(
+          1,
+          0.25 + tol/120
+        )*diag
+      );
 
 
   const marginX=Math.max(
@@ -1239,12 +1131,12 @@ function cropWithBackgroundModel(
   function expectedColor(x,y){
 
     const u=w<=1
-      ?0
-      :x/(w-1);
+      ? 0
+      : x/(w-1);
 
     const v=h<=1
-      ?0
-      :y/(h-1);
+      ? 0
+      : y/(h-1);
 
 
     const top=[
@@ -1295,6 +1187,13 @@ function cropWithBackgroundModel(
 
   }
 
+
+  /*
+    Grid analysis.
+
+    The grid keeps the algorithm fast enough
+    for tablets and large batches.
+  */
 
   const maxGrid=220;
 
@@ -1370,15 +1269,112 @@ function cropWithBackgroundModel(
 
           total++;
 
-          if(isArtwork(x,y))
+          if(isArtwork(x,y)){
             hit++;
+          }
 
         }
 
       }
 
 
-      grid[
-        gy*gw+gx
-      ]=
-        hit/Math.max(1,tota
+      /*
+        Aggressive mode recognizes smaller
+        artwork signals.
+      */
+
+      grid[gy*gw+gx]=
+        hit/Math.max(1,total)>
+        (aggressive ? 0.012 : 0.025)
+          ? 1
+          : 0;
+
+    }
+
+  }
+
+
+  function densityRows(){
+
+    const a=new Float32Array(gh);
+
+    for(
+      let y=0;
+      y<gh;
+      y++
+    ){
+
+      let n=0;
+
+      for(
+        let x=0;
+        x<gw;
+        x++
+      ){
+        n+=grid[y*gw+x];
+      }
+
+      a[y]=n/gw;
+
+    }
+
+    return a;
+
+  }
+
+
+  function densityCols(){
+
+    const a=new Float32Array(gw);
+
+    for(
+      let x=0;
+      x<gw;
+      x++
+    ){
+
+      let n=0;
+
+      for(
+        let y=0;
+        y<gh;
+        y++
+      ){
+        n+=grid[y*gw+x];
+      }
+
+      a[x]=n/gh;
+
+    }
+
+    return a;
+
+  }
+
+
+  function smooth(a,r){
+
+    const out=
+      new Float32Array(a.length);
+
+    for(
+      let i=0;
+      i<a.length;
+      i++
+    ){
+
+      let s=0;
+      let n=0;
+
+      for(
+        let j=Math.max(0,i-r);
+        j<=Math.min(a.length-1,i+r);
+        j++
+      ){
+
+        s+=a[j];
+        n++;
+
+      }
+
+      o
