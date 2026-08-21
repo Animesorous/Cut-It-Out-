@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cut It Out! — Image Border Cleaner</title>
+
+<meta name="description" content="Cut It Out! is a free browser-based image border cleaner that removes unwanted white, black, gray, and other large static backgrounds from images. Your images stay on your device.">
+<meta name="keywords" content="image border remover, crop image borders, remove image background, manga border cropper, comic cropper, image cleaner, remove white border, remove black border, bulk image cropper">
+<meta name="robots" content="index,follow">
+
+<title>Cut It Out! — Free Image Border Cleaner</title>
+
 <style>
 :root{
   --bg:#0b0d12;--panel:#13161d;--panel2:#171a22;--line:#ffffff14;
@@ -11,17 +17,20 @@
   --green:#28d66f;--danger:#ff6464;
 }
 *{box-sizing:border-box}
+
 body{
   margin:0;
   background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 45%);
   color:var(--text);
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 }
+
 main{
   width:min(1180px,calc(100% - 28px));
   margin:auto;
   padding:28px 0 45px
 }
+
 h1{
   font-size:clamp(34px,5vw,50px);
   line-height:1;
@@ -29,18 +38,22 @@ h1{
   font-weight:850;
   letter-spacing:-1.5px
 }
+
 h1 span{color:var(--gold)}
+
 .subtitle{
   font-size:16px;
   color:#c5c8d0;
   margin:0 0 13px
 }
+
 .badges{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
   margin-bottom:18px
 }
+
 .badge{
   background:#191c24;
   border:1px solid var(--line);
@@ -49,7 +62,9 @@ h1 span{color:var(--gold)}
   font-size:13px;
   color:#d8dbe2
 }
+
 .badge b{color:var(--gold)}
+
 .card{
   background:linear-gradient(145deg,#14171e,#11141a);
   border:1px solid var(--line);
@@ -57,6 +72,7 @@ h1 span{color:var(--gold)}
   padding:18px;
   box-shadow:0 12px 40px #0004
 }
+
 .drop{
   min-height:210px;
   border:2px dashed #ffffff24;
@@ -69,13 +85,25 @@ h1 span{color:var(--gold)}
   cursor:pointer;
   transition:.15s
 }
+
 .drop:hover,.drop.drag{
   border-color:var(--gold);
   background:#ffffff03
 }
+
 .drop-icon{font-size:34px;margin-bottom:7px}
-.drop-title{font-size:19px;font-weight:750}
-.drop-sub{font-size:14px;color:var(--muted);margin-top:4px}
+
+.drop-title{
+  font-size:19px;
+  font-weight:750
+}
+
+.drop-sub{
+  font-size:14px;
+  color:var(--muted);
+  margin-top:4px
+}
+
 .count{
   display:inline-flex;
   align-items:center;
@@ -87,7 +115,9 @@ h1 span{color:var(--gold)}
   border-radius:10px;
   color:var(--muted)
 }
+
 .count strong{color:var(--green)}
+
 input[type=file]{display:none}
 
 .settings-preview{
@@ -96,16 +126,20 @@ input[type=file]{display:none}
   gap:18px;
   margin-top:18px
 }
+
 .settings{
   background:#12151c;
   border:1px solid var(--line);
   border-radius:15px;
   padding:18px
 }
+
 .setting{
   margin-bottom:23px
 }
+
 .setting:last-child{margin-bottom:0}
+
 .setting-head{
   display:flex;
   justify-content:space-between;
@@ -113,6 +147,7 @@ input[type=file]{display:none}
   font-weight:750;
   margin-bottom:8px
 }
+
 .value{
   border:1px solid #ffffff1c;
   border-radius:8px;
@@ -121,8 +156,8 @@ input[type=file]{display:none}
   text-align:center;
   color:#f3f3f4
 }
+
 .help{
-  color:#727784;
   border:1px solid #ffffff22;
   border-radius:50%;
   font-size:11px;
@@ -133,25 +168,27 @@ input[type=file]{display:none}
   justify-content:center;
   margin-left:4px
 }
+
 .desc{
   color:var(--muted);
   font-size:13px;
   line-height:1.4;
   margin-top:8px
 }
-.settings.locked{opacity:.55}
-.settings.locked input{cursor:not-allowed}
+
 input[type=range]{
   width:100%;
   accent-color:var(--gold);
   cursor:pointer
 }
+
 .mode-group{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
   margin-top:8px
 }
+
 .mode-btn{
   background:#171a21;
   border:1px solid #ffffff20;
@@ -162,6 +199,7 @@ input[type=range]{
   cursor:pointer;
   font-weight:750
 }
+
 .mode-btn small{
   display:block;
   color:var(--muted);
@@ -170,14 +208,11 @@ input[type=range]{
   margin-top:3px;
   line-height:1.3
 }
+
 .mode-btn.active{
   border-color:var(--gold);
   background:#2a2413;
   box-shadow:0 0 0 1px #f1c33b33 inset
-}
-.mode-btn:disabled{
-  cursor:not-allowed;
-  opacity:.5
 }
 
 .previewbox{
@@ -187,17 +222,21 @@ input[type=range]{
   padding:16px;
   min-width:0
 }
+
 .preview-title{
   text-align:center;
   font-weight:750;
   margin-bottom:12px
 }
+
 .previews{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px
 }
+
 .pane{min-width:0}
+
 .pane label{
   display:block;
   text-align:center;
@@ -205,6 +244,7 @@ input[type=range]{
   font-size:12px;
   margin-bottom:7px
 }
+
 .frame{
   height:270px;
   border:1px solid #ffffff15;
@@ -213,13 +253,13 @@ input[type=range]{
     linear-gradient(45deg,#1a1d24 25%,transparent 25%) 0 0/18px 18px,
     linear-gradient(-45deg,#1a1d24 25%,transparent 25%) 0 9px/18px 18px,
     linear-gradient(45deg,transparent 75%,#1a1d24 75%) 9px -9px/18px 18px,
-    linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,
-    #11141a;
+    linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,#11141a;
   display:flex;
   align-items:center;
   justify-content:center;
   overflow:hidden
 }
+
 .frame img{
   max-width:100%;
   max-height:100%;
@@ -234,6 +274,7 @@ input[type=range]{
   flex-wrap:wrap;
   margin-top:18px
 }
+
 button{
   border:1px solid transparent;
   border-radius:10px;
@@ -242,17 +283,22 @@ button{
   font-size:14px;
   cursor:pointer
 }
+
 .primary{
   background:var(--gold);
   color:#16120a
 }
+
 .primary:hover{background:#ffd14e}
+
 .secondary{
   background:#171a21;
   border-color:#ffffff26;
   color:#f4f4f5
 }
+
 .secondary:hover{background:#1d212a}
+
 button:disabled{
   opacity:.4;
   cursor:not-allowed
@@ -262,6 +308,7 @@ button:disabled{
   margin-top:18px;
   display:none
 }
+
 .progress-top{
   display:flex;
   justify-content:space-between;
@@ -269,22 +316,26 @@ button:disabled{
   margin-bottom:8px;
   color:#d9dce2
 }
+
 .percent{
   color:var(--gold);
   font-weight:800
 }
+
 .track{
   height:9px;
   background:#242832;
   border-radius:99px;
   overflow:hidden
 }
+
 .bar{
   height:100%;
   width:0;
   background:var(--gold);
   transition:width .12s
 }
+
 .status{
   font-size:13px;
   color:var(--muted);
@@ -297,6 +348,7 @@ button:disabled{
   gap:12px;
   margin-top:18px
 }
+
 .result{
   background:#12151b;
   border:1px solid var(--line);
@@ -304,6 +356,7 @@ button:disabled{
   overflow:hidden;
   position:relative
 }
+
 .result img{
   width:100%;
   height:150px;
@@ -311,7 +364,9 @@ button:disabled{
   background:#0d1015;
   display:block
 }
+
 .result-body{padding:9px}
+
 .result-name{
   font-size:11px;
   white-space:nowrap;
@@ -319,11 +374,13 @@ button:disabled{
   text-overflow:ellipsis;
   color:#c8cbd2
 }
+
 .result-size{
   font-size:11px;
   color:#707580;
   margin-top:3px
 }
+
 .done{
   position:absolute;
   top:7px;
@@ -335,6 +392,7 @@ button:disabled{
   font-size:9px;
   font-weight:900
 }
+
 .download-one{
   position:absolute;
   right:7px;
@@ -355,6 +413,7 @@ button:disabled{
   flex-wrap:wrap;
   margin:18px 0 0
 }
+
 .page-btn{
   min-width:38px;
   padding:9px 12px;
@@ -362,12 +421,15 @@ button:disabled{
   color:#ddd;
   border:1px solid #ffffff1c
 }
+
 .page-btn.active{
   background:var(--gold);
   color:#17130a;
   border-color:var(--gold)
 }
+
 .page-btn:disabled{opacity:.35}
+
 .page-info{
   font-size:12px;
   color:var(--muted);
@@ -387,11 +449,13 @@ button:disabled{
   .previews{grid-template-columns:1fr 1fr}
   .frame{height:230px}
 }
+
 @media(max-width:520px){
   main{
     width:min(100% - 18px,1180px);
     padding-top:18px
   }
+
   .previews{grid-template-columns:1fr}
   .frame{height:260px}
   .settings-preview{gap:10px}
@@ -400,13 +464,14 @@ button:disabled{
 </head>
 
 <body>
+
 <main>
 
 <header>
   <h1>Cut It <span>Out!</span> ✂️</h1>
 
   <p class="subtitle">
-    Remove unwanted borders from any images — fast, free, and right in your browser.
+    Remove unwanted borders and large static backgrounds from images — fast, free, and right in your browser.
   </p>
 
   <div class="badges">
@@ -416,861 +481,870 @@ button:disabled{
   </div>
 </header>
 
+
 <section class="card">
 
-  <div class="drop" id="drop">
-    <div class="drop-icon">▧</div>
-    <div class="drop-title">Tap to select images</div>
-    <div class="drop-sub">or drag & drop here</div>
+<div class="drop" id="drop">
 
-    <div class="count" id="count">
-      <span>○</span>
-      <strong>0</strong>
-      images selected
-    </div>
+  <div class="drop-icon">▧</div>
 
-    <input id="files" type="file" accept="image/*" multiple>
+  <div class="drop-title">
+    Tap to select images
   </div>
 
-  <div class="settings-preview">
-
-    <div class="settings" id="settings">
-
-      <div class="setting">
-
-        <div class="setting-head">
-          <span>
-            Crop Mode
-            <span
-              class="help"
-              title="Choose how aggressively the outer background is removed"
-            >?</span>
-          </span>
-        </div>
-
-        <div class="mode-group">
-
-          <button
-            type="button"
-            class="mode-btn active"
-            id="modeNormal"
-          >
-            Safe / Normal
-            <small>
-              Targets the outer white border while protecting light artwork.
-            </small>
-          </button>
-
-          <button
-            type="button"
-            class="mode-btn"
-            id="modeAggressive"
-          >
-            Aggressive / Static BG
-            <small>
-              Removes large connected backgrounds of almost any color.
-            </small>
-          </button>
-
-        </div>
-      </div>
-
-      <div class="setting">
-
-        <div class="setting-head">
-
-          <span>
-            Tolerance
-            <span
-              class="help"
-              title="How close a pixel must be to the detected background color"
-            >?</span>
-          </span>
-
-          <span class="value" id="tolVal">18</span>
-
-        </div>
-
-        <input
-          id="tol"
-          type="range"
-          min="1"
-          max="100"
-          value="18"
-        >
-
-        <div class="desc">
-          Higher removes backgrounds with greater color variation.<br>
-          Lower preserves more colors near the detected background.
-        </div>
-
-      </div>
-
-      <div class="setting">
-
-        <div class="setting-head">
-
-          <span>
-            Safety Margin (px)
-
-            <span
-              class="help"
-              title="Adds a small border back around the content"
-            >?</span>
-          </span>
-
-          <span class="value" id="padVal">2</span>
-
-        </div>
-
-        <input
-          id="pad"
-          type="range"
-          min="0"
-          max="20"
-          value="2"
-        >
-
-        <div class="desc">
-          Keeps a small margin around the content so important details don't get cut off.
-        </div>
-
-      </div>
-
-      <button
-        class="secondary"
-        id="reset"
-        style="width:100%;margin-top:18px"
-      >
-        ↻ Reset Settings
-      </button>
-
-    </div>
-
-    <div class="previewbox">
-
-      <div class="preview-title">
-        Live Preview
-      </div>
-
-      <div class="previews">
-
-        <div class="pane">
-          <label>Original</label>
-
-          <div class="frame">
-            <img id="origPreview">
-          </div>
-        </div>
-
-        <div class="pane">
-          <label>Preview (Current Settings)</label>
-
-          <div class="frame">
-            <img id="cropPreview">
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
+  <div class="drop-sub">
+    or drag & drop here
   </div>
 
-  <div class="actions">
-
-    <button class="secondary" id="clean">
-      ✣ Clean Images
-    </button>
-
-    <button class="primary" id="downloadAll" disabled>
-      ⇩ Download All (.ZIP)
-    </button>
-
+  <div class="count" id="count">
+    <span>○</span>
+    <strong>0</strong>
+    images selected
   </div>
 
-  <div class="note">
-    The processing happens on your device. Your images are not sent anywhere.
-  </div>
+  <input id="files" type="file" accept="image/*" multiple>
+
+</div>
+
+
+<div class="settings-preview">
+
+<div class="settings" id="settings">
+
+<div class="setting">
+
+<div class="setting-head">
+<span>
+Crop Mode
+<span
+class="help"
+title="Choose how aggressively the image borders are detected"
+>?</span>
+</span>
+</div>
+
+
+<div class="mode-group">
+
+<button
+type="button"
+class="mode-btn active"
+id="modeNormal"
+>
+Safe / Normal
+
+<small>
+Targets the outer white border while protecting light artwork.
+</small>
+
+</button>
+
+
+<button
+type="button"
+class="mode-btn"
+id="modeAggressive"
+>
+Aggressive / Large Background
+
+<small>
+Removes large connected backgrounds of white, black, gray, or similar colors.
+</small>
+
+</button>
+
+</div>
+
+</div>
+
+
+<div class="setting">
+
+<div class="setting-head">
+
+<span>
+Tolerance
+<span
+class="help"
+title="How different a background pixel may be from the detected edge color"
+>?</span>
+</span>
+
+<span class="value" id="tolVal">
+18
+</span>
+
+</div>
+
+<input
+id="tol"
+type="range"
+min="1"
+max="100"
+value="18"
+>
+
+<div class="desc">
+Higher removes backgrounds with more color variation.<br>
+Lower preserves more subtle edges.
+</div>
+
+</div>
+
+
+<div class="setting">
+
+<div class="setting-head">
+
+<span>
+Safety Margin (px)
+<span
+class="help"
+title="Adds a small border around detected artwork"
+>?</span>
+</span>
+
+<span class="value" id="padVal">
+2
+</span>
+
+</div>
+
+<input
+id="pad"
+type="range"
+min="0"
+max="20"
+value="2"
+>
+
+<div class="desc">
+Keeps a small margin around the content so important details don't get cut off.
+</div>
+
+</div>
+
+
+<button
+class="secondary"
+id="reset"
+style="width:100%;margin-top:18px"
+>
+↻ Reset Settings
+</button>
+
+</div>
+
+
+<div class="previewbox">
+
+<div class="preview-title">
+Live Preview
+</div>
+
+<div class="previews">
+
+<div class="pane">
+
+<label>Original</label>
+
+<div class="frame">
+<img id="origPreview">
+</div>
+
+</div>
+
+
+<div class="pane">
+
+<label>
+Preview (Current Settings)
+</label>
+
+<div class="frame">
+<img id="cropPreview">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button
+class="secondary"
+id="clean"
+>
+✣ Clean Images
+</button>
+
+<button
+class="primary"
+id="downloadAll"
+disabled
+>
+⇩ Download All (.ZIP)
+</button>
+
+</div>
+
+
+<div class="note">
+The processing happens on your device. Your images are not sent anywhere.
+</div>
 
 </section>
 
-<section class="card progress-card" id="progressCard">
 
-  <div class="progress-top">
-    <span id="progressText">Processing…</span>
-    <span class="percent" id="percent">0%</span>
-  </div>
+<section
+class="card progress-card"
+id="progressCard"
+>
 
-  <div class="track">
-    <div class="bar" id="bar"></div>
-  </div>
+<div class="progress-top">
 
-  <div class="status" id="status"></div>
+<span id="progressText">
+Processing…
+</span>
+
+<span
+class="percent"
+id="percent"
+>
+0%
+</span>
+
+</div>
+
+<div class="track">
+
+<div
+class="bar"
+id="bar"
+></div>
+
+</div>
+
+<div
+class="status"
+id="status"
+></div>
 
 </section>
 
-<div class="results" id="results"></div>
 
-<div class="pagination" id="pagination"></div>
+<div
+class="results"
+id="results"
+></div>
+
+<div
+class="pagination"
+id="pagination"
+></div>
 
 </main>
 
+
 <script>
 
-const $=id=>document.getElementById(id);
+/* =========================================================
+   BASIC ELEMENTS
+========================================================= */
 
-const filesEl=$('files');
-const drop=$('drop');
-const count=$('count');
+const $ = id => document.getElementById(id);
 
-const tolEl=$('tol');
-const padEl=$('pad');
-const tolVal=$('tolVal');
-const padVal=$('padVal');
+const filesEl = $('files');
+const drop = $('drop');
+const count = $('count');
 
-const cleanBtn=$('clean');
-const downloadAll=$('downloadAll');
+const tolEl = $('tol');
+const padEl = $('pad');
 
-const modeNormal=$('modeNormal');
-const modeAggressive=$('modeAggressive');
+const tolVal = $('tolVal');
+const padVal = $('padVal');
 
-const resetBtn=$('reset');
-const settingsBox=$('settings');
+const cleanBtn = $('clean');
+const downloadAll = $('downloadAll');
 
-const origPreview=$('origPreview');
-const cropPreview=$('cropPreview');
+const modeNormal = $('modeNormal');
+const modeAggressive = $('modeAggressive');
 
-const results=$('results');
-const pagination=$('pagination');
+const resetBtn = $('reset');
 
-const progressCard=$('progressCard');
-const bar=$('bar');
-const percent=$('percent');
-const progressText=$('progressText');
-const status=$('status');
+const origPreview = $('origPreview');
+const cropPreview = $('cropPreview');
 
-let selected=[];
-let outputs=[];
-let previewUrl=null;
-let currentPage=1;
-let cropMode='normal';
+const results = $('results');
+const pagination = $('pagination');
 
-const PAGE_SIZE=20;
+const progressCard = $('progressCard');
+const bar = $('bar');
+const percent = $('percent');
+
+const progressText = $('progressText');
+const status = $('status');
 
 
-/* =========================
-   FILE SELECTION
-========================= */
+/* =========================================================
+   STATE
+========================================================= */
 
-drop.addEventListener('click',()=>filesEl.click());
+let selected = [];
+let outputs = [];
 
-drop.addEventListener('dragover',e=>{
+let previewUrl = null;
+
+let currentPage = 1;
+
+let cropMode = 'normal';
+
+const PAGE_SIZE = 20;
+
+
+/* =========================================================
+   FILE INPUT
+========================================================= */
+
+drop.addEventListener('click', () => filesEl.click());
+
+drop.addEventListener('dragover', e => {
   e.preventDefault();
   drop.classList.add('drag');
 });
 
-drop.addEventListener('dragleave',()=>{
+drop.addEventListener('dragleave', () => {
   drop.classList.remove('drag');
 });
 
-drop.addEventListener('drop',e=>{
+drop.addEventListener('drop', e => {
+
   e.preventDefault();
+
   drop.classList.remove('drag');
+
   setFiles([...e.dataTransfer.files]);
+
 });
 
-filesEl.addEventListener('change',()=>{
+filesEl.addEventListener('change', () => {
   setFiles([...filesEl.files]);
 });
 
 
 function setFiles(arr){
 
-  selected=arr.filter(f=>f.type.startsWith('image/'));
+  selected = arr.filter(f =>
+    f.type.startsWith('image/')
+  );
 
-  count.innerHTML=
+  count.innerHTML =
     `<span style="color:#28d66f">✓</span>
      <strong>${selected.length}</strong>
      images selected`;
 
+  outputs = [];
+  results.innerHTML = '';
+  pagination.innerHTML = '';
+  downloadAll.disabled = true;
+
   if(selected.length){
     showPreview(selected[0]);
   }
+
 }
 
 
-/* =========================
+/* =========================================================
    IMAGE LOADING
-========================= */
+========================================================= */
 
 function getImage(file){
 
   return new Promise((resolve,reject)=>{
 
-    const img=new Image();
+    const img = new Image();
 
-    img.onload=()=>resolve(img);
+    img.onload = () => resolve(img);
 
-    img.onerror=reject;
+    img.onerror = reject;
 
-    img.src=URL.createObjectURL(file);
+    img.src = URL.createObjectURL(file);
 
   });
 
 }
 
 
-/* =========================
+/* =========================================================
+   COLOR HELPERS
+========================================================= */
+
+/*
+  Euclidean RGB distance.
+
+  This is deliberately used instead of simply asking:
+  "Is this pixel white?"
+
+  That allows aggressive mode to detect:
+  white
+  black
+  gray
+  beige
+  dark gray
+  colored static backgrounds
+*/
+
+function colorDistance(r1,g1,b1,r2,g2,b2){
+
+  const dr = r1-r2;
+  const dg = g1-g2;
+  const db = b1-b2;
+
+  return Math.sqrt(
+    dr*dr +
+    dg*dg +
+    db*db
+  );
+
+}
+
+
+/* =========================================================
    NORMAL MODE
-========================= */
+========================================================= */
 
 function cropImageNormal(img,tol,pad){
 
-  const w=img.naturalWidth;
-  const h=img.naturalHeight;
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
 
-  const c=document.createElement('canvas');
+  const c = document.createElement('canvas');
 
-  c.width=w;
-  c.height=h;
+  c.width = w;
+  c.height = h;
 
-  const ctx=c.getContext(
+  const ctx = c.getContext(
     '2d',
     {willReadFrequently:true}
   );
 
   ctx.drawImage(img,0,0);
 
-  const d=ctx.getImageData(
-    0,
-    0,
-    w,
-    h
-  ).data;
+  const d =
+    ctx.getImageData(0,0,w,h).data;
 
-  const cutoff=Math.max(
-    70,
-    255-tol
-  );
+  const cutoff = 255 - tol;
 
-  const lumAt=(x,y)=>{
 
-    const i=(y*w+x)*4;
+  function isBackground(i){
 
-    if(d[i+3]<10)return 255;
-
-    return(
-      0.2126*d[i]+
-      0.7152*d[i+1]+
-      0.0722*d[i+2]
+    return (
+      d[i] >= cutoff &&
+      d[i+1] >= cutoff &&
+      d[i+2] >= cutoff
     );
-
-  };
-
-
-  const sx=Math.max(
-    1,
-    Math.ceil(w/240)
-  );
-
-  const sy=Math.max(
-    1,
-    Math.ceil(h/240)
-  );
-
-  const gw=Math.ceil(w/sx);
-  const gh=Math.ceil(h/sy);
-
-  const grid=new Uint8Array(
-    gw*gh
-  );
-
-
-  for(let gy=0;gy<gh;gy++){
-
-    const y0=gy*sy;
-    const y1=Math.min(
-      h,
-      y0+sy
-    );
-
-    for(let gx=0;gx<gw;gx++){
-
-      const x0=gx*sx;
-      const x1=Math.min(
-        w,
-        x0+sx
-      );
-
-      let dark=0;
-      let total=0;
-
-      for(let y=y0;y<y1;y++){
-
-        for(let x=x0;x<x1;x++){
-
-          total++;
-
-          if(
-            lumAt(x,y)<cutoff
-          ){
-            dark++;
-          }
-
-        }
-
-      }
-
-      grid[
-        gy*gw+gx
-      ]=
-        dark/
-        Math.max(1,total)>0.035
-        ?1
-        :0;
-
-    }
 
   }
 
 
-  const rowDensity=
-    new Float32Array(gh);
+  /*
+    Scan the outside border.
 
-  const colDensity=
-    new Float32Array(gw);
+    Normal mode intentionally remains conservative.
+  */
 
+  let top = 0;
+  let bottom = h-1;
+  let left = 0;
+  let right = w-1;
 
-  for(let gy=0;gy<gh;gy++){
 
-    let n=0;
+  function rowHasContent(y){
 
-    for(let gx=0;gx<gw;gx++){
-      n+=grid[
-        gy*gw+gx
-      ];
-    }
-
-    rowDensity[gy]=n/gw;
-
-  }
-
-
-  for(let gx=0;gx<gw;gx++){
-
-    let n=0;
-
-    for(let gy=0;gy<gh;gy++){
-      n+=grid[
-        gy*gw+gx
-      ];
-    }
-
-    colDensity[gx]=n/gh;
-
-  }
-
-
-  function smooth(arr,r){
-
-    const out=
-      new Float32Array(
-        arr.length
-      );
-
-    for(let i=0;i<arr.length;i++){
-
-      let sum=0;
-      let n=0;
-
-      for(
-        let j=Math.max(0,i-r);
-        j<=Math.min(arr.length-1,i+r);
-        j++
-      ){
-
-        sum+=arr[j];
-        n++;
-
-      }
-
-      out[i]=sum/n;
-
-    }
-
-    return out;
-
-  }
-
-
-  const rs=smooth(
-    rowDensity,
-    Math.max(
-      2,
-      Math.round(gh*0.015)
-    )
-  );
-
-  const cs=smooth(
-    colDensity,
-    Math.max(
-      2,
-      Math.round(gw*0.015)
-    )
-  );
-
-
-  const threshold=0.075;
-
-
-  function longestRun(arr){
-
-    let bestStart=0;
-    let bestEnd=-1;
-    let bestScore=-1;
-
-    let start=-1;
-    let score=0;
-
-
-    for(let i=0;i<arr.length;i++){
-
-      if(arr[i]>=threshold){
-
-        if(start<0){
-          start=i;
-          score=0;
-        }
-
-        score+=arr[i];
-
-      }else if(start>=0){
-
-        const end=i-1;
-
-        const len=
-          end-start+1;
-
-        const value=
-          len*0.65+
-          score*0.35;
-
-        if(value>bestScore){
-
-          bestScore=value;
-          bestStart=start;
-          bestEnd=end;
-
-        }
-
-        start=-1;
-        score=0;
-
-      }
-
-    }
-
-
-    if(start>=0){
-
-      const end=
-        arr.length-1;
-
-      const len=
-        end-start+1;
-
-      const value=
-        len*0.65+
-        score*0.35;
-
-      if(value>bestScore){
-
-        bestStart=start;
-        bestEnd=end;
-
-      }
-
-    }
-
-
-    return{
-      start:bestStart,
-      end:bestEnd
-    };
-
-  }
-
-
-  let yr=longestRun(rs);
-  let xr=longestRun(cs);
-
-
-  if(
-    yr.end<yr.start||
-    xr.end<xr.start
-  ){
-
-    const darkAt=(x,y)=>
-      lumAt(x,y)<cutoff;
-
-    let top=0;
-    let bottom=h-1;
-    let left=0;
-    let right=w-1;
-
-
-    const rowHas=y=>{
-
-      let hits=0;
-      let total=0;
-
-      const step=
-        Math.max(
-          1,
-          Math.floor(w/180)
-        );
-
-      for(let x=0;x<w;x+=step){
-
-        total++;
-
-        if(darkAt(x,y)){
-          hits++;
-        }
-
-      }
-
-      return hits/
-        Math.max(1,total)>0.006;
-
-    };
-
-
-    const colHas=x=>{
-
-      let hits=0;
-      let total=0;
-
-      const step=
-        Math.max(
-          1,
-          Math.floor(h/180)
-        );
-
-      for(let y=0;y<h;y+=step){
-
-        total++;
-
-        if(darkAt(x,y)){
-          hits++;
-        }
-
-      }
-
-      return hits/
-        Math.max(1,total)>0.006;
-
-    };
-
-
-    while(
-      top<h&&!rowHas(top)
-    )top++;
-
-    while(
-      bottom>=0&&!rowHas(bottom)
-    )bottom--;
-
-    while(
-      left<w&&!colHas(left)
-    )left++;
-
-    while(
-      right>=0&&!colHas(right)
-    )right--;
-
-
-    if(
-      top>bottom||
-      left>right
-    ){
-      return c;
-    }
-
-
-    left=Math.max(
-      0,
-      left-pad
-    );
-
-    top=Math.max(
-      0,
-      top-pad
-    );
-
-    right=Math.min(
-      w-1,
-      right+pad
-    );
-
-    bottom=Math.min(
-      h-1,
-      bottom+pad
-    );
-
-
-    const out=
-      document.createElement(
-        'canvas'
-      );
-
-    out.width=
-      right-left+1;
-
-    out.height=
-      bottom-top+1;
-
-    out.getContext('2d')
-      .drawImage(
-        c,
-        left,
-        top,
-        out.width,
-        out.height,
-        0,
-        0,
-        out.width,
-        out.height
-      );
-
-    return out;
-
-  }
-
-
-  let top=yr.start*sy;
-
-  let bottom=Math.min(
-    h-1,
-    (yr.end+1)*sy-1
-  );
-
-  let left=xr.start*sx;
-
-  let right=Math.min(
-    w-1,
-    (xr.end+1)*sx-1
-  );
-
-
-  const rowReal=y=>{
-
-    const step=Math.max(
-      1,
-      Math.floor(w/220)
-    );
-
-    let hits=0;
-    let total=0;
+    const step =
+      Math.max(1,Math.floor(w/300));
 
     for(
-      let x=left;
-      x<=right;
+      let x=0;
+      x<w;
       x+=step
     ){
 
-      total++;
+      const i=(y*w+x)*4;
 
-      if(
-        lumAt(x,y)<cutoff
-      ){
-        hits++;
+      if(!isBackground(i)){
+        return true;
       }
 
     }
 
-    return hits/
-      Math.max(1,total)>=0.012;
+    return false;
 
-  };
+  }
 
 
-  const colReal=x=>{
+  function colHasContent(x){
 
-    const step=Math.max(
-      1,
-      Math.floor(h/220)
-    );
-
-    let hits=0;
-    let total=0;
+    const step =
+      Math.max(1,Math.floor(h/300));
 
     for(
-      let y=top;
-      y<=bottom;
+      let y=0;
+      y<h;
       y+=step
     ){
 
-      total++;
+      const i=(y*w+x)*4;
 
-      if(
-        lumAt(x,y)<cutoff
-      ){
-        hits++;
+      if(!isBackground(i)){
+        return true;
       }
 
     }
 
-    return hits/
-      Math.max(1,total)>=0.012;
+    return false;
 
-  };
+  }
 
 
   while(
-    top<bottom&&!rowReal(top)
-  )top++;
+    top < bottom &&
+    !rowHasContent(top)
+  ){
+    top++;
+  }
+
 
   while(
-    bottom>top&&!rowReal(bottom)
-  )bottom--;
+    bottom > top &&
+    !rowHasContent(bottom)
+  ){
+    bottom--;
+  }
+
 
   while(
-    left<right&&!colReal(left)
-  )left++;
+    left < right &&
+    !colHasContent(left)
+  ){
+    left++;
+  }
+
 
   while(
-    right>left&&!colReal(right)
-  )right--;
+    right > left &&
+    !colHasContent(right)
+  ){
+    right--;
+  }
 
 
-  left=Math.max(
+  left = Math.max(0,left-pad);
+  top = Math.max(0,top-pad);
+
+  right = Math.min(w-1,right+pad);
+  bottom = Math.min(h-1,bottom+pad);
+
+
+  const out =
+    document.createElement('canvas');
+
+  out.width =
+    Math.max(1,right-left+1);
+
+  out.height =
+    Math.max(1,bottom-top+1);
+
+
+  out.getContext('2d').drawImage(
+    c,
+    left,
+    top,
+    out.width,
+    out.height,
     0,
-    left-pad
-  );
-
-  top=Math.max(
     0,
-    top-pad
-  );
-
-  right=Math.min(
-    w-1,
-    right+pad
-  );
-
-  bottom=Math.min(
-    h-1,
-    bottom+pad
+    out.width,
+    out.height
   );
 
 
-  const out=
-    document.createElement(
-      'canvas'
+  return out;
+
+}
+
+
+/* =========================================================
+   AGGRESSIVE MODE
+   LARGE STATIC BACKGROUND DETECTOR
+========================================================= */
+
+/*
+  This is the important part.
+
+  Instead of asking:
+
+      "Is this pixel white?"
+
+  we ask:
+
+      "Does this large region connected to the OUTSIDE
+       look like the same background?"
+
+  This means a black manga character on a white background
+  isn't automatically removed just because it is black.
+
+  Likewise, black text sitting inside a white area remains
+  because it is not part of a huge connected black background.
+*/
+
+
+function cropImageAggressive(img,tol,pad){
+
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
+
+
+  const canvas =
+    document.createElement('canvas');
+
+  canvas.width = w;
+  canvas.height = h;
+
+  const ctx =
+    canvas.getContext(
+      '2d',
+      {willReadFrequently:true}
     );
 
-  out.width=
+  ctx.drawImage(img,0,0);
+
+
+  const data =
+    ctx.getImageData(
+      0,
+      0,
+      w,
+      h
+    ).data;
+
+
+  /*
+    We process a reduced grid.
+
+    This makes the algorithm practical on phones/tablets
+    while still preserving the large-scale structure.
+  */
+
+  const MAX_GRID = 360;
+
+  const sx =
     Math.max(
       1,
+      Math.ceil(w/MAX_GRID)
+    );
+
+  const sy =
+    Math.max(
+      1,
+      Math.ceil(h/MAX_GRID)
+    );
+
+
+  const gw =
+    Math.ceil(w/sx);
+
+  const gh =
+    Math.ceil(h/sy);
+
+
+  /*
+    Each grid cell gets its average RGB color.
+  */
+
+  const colors =
+    new Uint8Array(
+      gw*gh*3
+    );
+
+
+  for(let gy=0;gy<gh;gy++){
+
+    const y0 = gy*sy;
+    const y1 = Math.min(h,y0+sy);
+
+    for(let gx=0;gx<gw;gx++){
+
+      const x0 = gx*sx;
+      const x1 = Math.min(w,x0+sx);
+
+
+      let rr=0;
+      let gg=0;
+      let bb=0;
+      let n=0;
+
+
+      /*
+        Sample instead of reading every pixel
+        in huge cells.
+      */
+
+      const yStep =
+        Math.max(
+          1,
+          Math.floor((y1-y0)/4)
+        );
+
+      const xStep =
+        Math.max(
+          1,
+          Math.floor((x1-x0)/4)
+        );
+
+
+      for(
+        let y=y0;
+        y<y1;
+        y+=yStep
+      ){
+
+        for(
+          let x=x0;
+          x<x1;
+          x+=xStep
+        ){
+
+          const i=(y*w+x)*4;
+
+          rr += data[i];
+          gg += data[i+1];
+          bb += data[i+2];
+
+          n++;
+
+        }
+
+      }
+
+
+      const p =
+        (gy*gw+gx)*3;
+
+      colors[p] =
+        Math.round(rr/n);
+
+      colors[p+1] =
+        Math.round(gg/n);
+
+      colors[p+2] =
+        Math.round(bb/n);
+
+    }
+
+  }
+
+
+  /*
+    Estimate background colors from the OUTER EDGES.
+
+    We use multiple samples rather than one corner because
+    a corner may contain artwork.
+  */
+
+  const edgeSamples = [];
+
+
+  function addEdgeSample(gx,gy){
+
+    if(
+      gx<0 ||
+      gy<0 ||
+      gx>=gw ||
+      gy>=gh
+    ){
+      return;
+    }
+
+
+    const p=(gy*gw+gx)*3;
+
+
+    edgeSamples.push([
+      colors[p],
+      colors[p+1],
+      colors[p+2]
+    ]);
+
+  }
+
+
+  /*
+    Sample several points around each side.
+  */
+
+  const edgeCount = 12;
+
+
+  for(let i=0;i<edgeCount;i++){
+
+    const t =
+      i/(edgeCount-1);
+
+    const x =
+      Math.round(
+        t*(gw-1)
+      );
+
+    const y =
+      Math.round(
+        t*(gh-1)
+      );
+
+
+    addEdgeSample(x,0);
+    addEdgeSample(x,gh-1);
+
+    addEdgeSample(0,y);
+    addEdgeSample(gw-1,y);
+
+  }
+
+
+  /*
+    Find the dominant edge color.
+
+    Similar edge colors are grouped together.
+
+    This is especially useful for slightly compressed
+    screenshots where a supposedly black background may
+    actually contain values like:
+
+        0,0,0
+        2,2,2
+        4,4,4
+        7,7,7
+  */
+
+  const groupingDistance =
+    32 + tol*0.65;
+
+
+  let bestColor =
+    [255,255,255];
+
+  let bestCount = 0;
+
+
+  for(
+    const candidate of edgeSamples
+  ){
+
+    let count=0;
+  
