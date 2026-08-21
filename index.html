@@ -113,8 +113,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
             <span>Crop Mode <span class="help" title="Choose how aggressively white background is removed">?</span></span>
           </div>
           <div class="mode-group">
-            <button type="button" class="mode-btn active" id="modeNormal">Normal<small>Targets the outer border while protecting real artwork.</small></button>
-            <button type="button" class="mode-btn" id="modeAggressive">Aggressive<small>Trims background more aggressively, including very light areas.</small></button>
+            <button type="button" class="mode-btn active" id="modeNormal">Safe / Normal<small>Targets the outer border while protecting real artwork.</small></button>
+            <button type="button" class="mode-btn" id="modeAggressive">Aggressive / All White<small>Trims any background more aggressively, including very light areas.</small></button>
           </div>
         </div>
 
@@ -232,13 +232,9 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   const c=document.createElement('canvas');c.width=w;c.height=h;
   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
   const d=ctx.getImageData(0,0,w,h).data;
+
   const diag=Math.sqrt(255*255*3);
-
-const baseThreshold=(0.25 + tol/120)*diag;
-
-const threshold=aggressive
-  ? Math.min(diag, baseThreshold*1.35)
-  : baseThreshold;
+  const threshold=Math.max(4,Math.min(1,0.25 + tol/120)*diag);
   const sampleN=Math.max(10,Math.min(36,Math.floor(Math.min(w,h)/40)));
   const marginX=Math.max(1,Math.floor(w*0.035));
   const marginY=Math.max(1,Math.floor(h*0.035));
