@@ -232,9 +232,13 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   const c=document.createElement('canvas');c.width=w;c.height=h;
   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
   const d=ctx.getImageData(0,0,w,h).data;
-
   const diag=Math.sqrt(255*255*3);
-  const threshold=Math.max(4,Math.min(1,0.25 + tol/120)*diag);
+
+const baseThreshold=(0.25 + tol/120)*diag;
+
+const threshold=aggressive
+  ? Math.min(diag, baseThreshold*1.35)
+  : baseThreshold;
   const sampleN=Math.max(10,Math.min(36,Math.floor(Math.min(w,h)/40)));
   const marginX=Math.max(1,Math.floor(w*0.035));
   const marginY=Math.max(1,Math.floor(h*0.035));
