@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free Image Tools Online | Cut It Out!</title>
+<style>
+:root{
+--bg:#0b0d12;
+--panel:#13161d;
+--panel2:#171a22;
+--line:#ffffff14;
+--text:#f5f5f7;
+--muted:#9297a3;
+--gold:#f1c33b;
+--gold2:#dcae27;
+--green:#28d66f;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+margin:0;
+background:
+radial-gradient(circle at 50% -15%,#252936 0,#0b0d12 48%);
+color:var(--text);
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+min-height:100vh;
+}
+main{
+width:min(1050px,calc(100% - 30px));
+margin:auto;
+padding:55px 0 35px;
+}
+.hero{text-align:center;padding:25px 0 42px}
+.logo{
+font-size:clamp(42px,8vw,70px);
+font-weight:900;
+letter-spacing:-3px;
+line-height:1;
+margin:0;
+}
+.logo span{color:var(--gold)}
+.tagline{
+font-size:clamp(16px,2.5vw,20px);
+color:#c3c6ce;
+margin:18px auto 0;
+max-width:650px;
+line-height:1.5;
+}
+.badges{
+display:flex;
+justify-content:center;
+gap:9px;
+flex-wrap:wrap;
+margin-top:22px;
+}
+.badge{
+background:#171a21;
+border:1px solid var(--line);
+border-radius:9px;
+padding:7px 12px;
+font-size:13px;
+color:#d7dae1;
+}
+.badge b{color:var(--gold)}
+.tools{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:18px;
+}
+.tool{
+position:relative;
+background:linear-gradient(145deg,#151820,#11141a);
+border:1px solid var(--line);
+border-radius:20px;
+padding:27px;
+min-height:310px;
+display:flex;
+flex-direction:column;
+box-shadow:0 15px 45px #0005;
+transition:transform .18s,border-color .18s,box-shadow .18s;
+overflow:hidden;
+}
+.tool:before{
+content:"";
+position:absolute;
+width:180px;
+height:180px;
+right:-70px;
+top:-70px;
+background:#f1c33b0c;
+border-radius:50%;
+pointer-events:none;
+}
+.tool:hover{
+transform:translateY(-5px);
+border-color:#f1c33b55;
+box-shadow:0 20px 55px #0007;
+}
+.icon{
+width:62px;
+height:62px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:15px;
+background:#201d13;
+border:1px solid #f1c33b25;
+font-size:32px;
+margin-bottom:20px;
+}
+.tool h2{
+font-size:25px;
+margin:0 0 9px;
+letter-spacing:-.5px;
+}
+.tool p{
+font-size:14px;
+line-height:1.55;
+color:var(--muted);
+margin:0;
+max-width:430px;
+}
+.tool-btn{
+margin-top:auto;
+padding-top:23px;
+}
+.tool-btn button{
+width:100%;
+border:0;
+border-radius:11px;
+padding:13px 18px;
+font-size:14px;
+font-weight:850;
+cursor:pointer;
+background:var(--gold);
+color:#16120a;
+transition:.15s;
+}
+.tool-btn button:hover{
+background:#ffd451;
+transform:translateY(-1px);
+}
+.tool-btn button:active{transform:translateY(0)}
+.features{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:18px;
+}
+.feature{
+text-align:center;
+background:#12151b;
+border:1px solid var(--line);
+border-radius:13px;
+padding:15px 10px;
+}
+.feature-icon{font-size:20px}
+.feature-title{
+font-size:12px;
+font-weight:800;
+margin-top:5px;
+}
+.feature-text{
+font-size:11px;
+color:#777d88;
+margin-top:2px;
+}
+footer{
+text-align:center;
+color:#686e79;
+font-size:12px;
+margin-top:30px;
+line-height:1.6;
+}
+@media(max-width:700px){
+main{padding:30px 0 25px}
+.hero{padding:18px 0 30px}
+.logo{letter-spacing:-2px}
+.tools{grid-template-columns:1fr}
+.tool{min-height:285px}
+}
+@media(max-width:430px){
+main{width:calc(100% - 18px)}
+.tool{padding:22px}
+.features{grid-template-columns:1fr}
+.feature{display:flex;align-items:center;text-align:left;gap:10px}
+.feature-text{margin-top:1px}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<h1 class="logo">Cut It <span>Out!</span> ✂️</h1>
+<p class="tagline">Free image tools that make editing simple, fast, and completely browser-based.</p>
+<div class="badges">
+<div class="badge">🔒 <b>Private</b></div>
+<div class="badge">☁️ <b>No Uploads</b></div>
+<div class="badge">💸 <b>100% Free</b></div>
+</div>
+</section>
+
+<section class="tools">
+<article class="tool">
+<div class="icon">✂️</div>
+<h2>Image Border Cropper</h2>
+<p>Automatically detect and remove unwanted borders around your images. Choose between Normal and Aggressive modes and fine-tune the result.</p>
+<div class="tool-btn">
+<button type="button" onclick="openTool('cropper.html')">Open Border Cropper →</button>
+</div>
+</article>
+
+<article class="tool">
+<div class="icon">🪄</div>
+<h2>Background Remover</h2>
+<p>Remove unwanted backgrounds from your images and keep the main subject. A simple tool for creating clean, transparent images.</p>
+<div class="tool-btn">
+<button type="button" onclick="openTool('background-remover.html')">Open Background Remover →</button>
+</div>
+</article>
+</section>
+
+<section class="features">
+<div class="feature">
+<div class="feature-icon">🔒</div>
+<div>
+<div class="feature-title">Private</div>
+<div class="feature-text">Process images locally</div>
+</div>
+</div>
+<div class="feature">
+<div class="feature-icon">⚡</div>
+<div>
+<div class="feature-title">Fast</div>
+<div class="feature-text">No account required</div>
+</div>
+</div>
+<div class="feature">
+<div class="feature-icon">💸</div>
+<div>
+<div class="feature-title">Free</div>
+<div class="feature-text">No paid tools</div>
+</div>
+</div>
+</section>
+
+<footer>
+Cut It Out! — Simple image tools for everyone.<br>
+Your images stay on your device.
+</footer>
+</main>
+
+<script>
+function openTool(page){
+window.location.href=page;
+}
+</script>
+</body>
+</html>
