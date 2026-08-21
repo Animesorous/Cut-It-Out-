@@ -72,6 +72,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .done{position:absolute;top:7px;left:7px;background:#0b8d43;color:white;border-radius:6px;padding:3px 6px;font-size:9px;font-weight:900}
 .download-one{position:absolute;right:7px;top:7px;width:27px;height:27px;padding:0;background:#171a20;color:white;border:1px solid #ffffff22}
 
+
 .pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:18px 0 0}
 .page-btn{min-width:38px;padding:9px 12px;background:#171a21;color:#ddd;border:1px solid #ffffff1c}
 .page-btn.active{background:var(--gold);color:#17130a;border-color:var(--gold)}
@@ -90,8 +91,9 @@ button:disabled{opacity:.4;cursor:not-allowed}
     <p class="subtitle">Remove unwanted borders from any images — fast, free, and right in your browser.</p>
     <div class="badges">
       <div class="badge">🔒 <b>100% Private</b></div>
+      
       <div class="badge">☁️ <b>No Uploads</b></div>
-      <div class="badge">🪙 <b>100% Free</b></div>
+      <div class="badge">💸 <b>100% Free</b></div>
     </div>
   </header>
 
@@ -111,8 +113,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
             <span>Crop Mode <span class="help" title="Choose how aggressively white background is removed">?</span></span>
           </div>
           <div class="mode-group">
-            <button type="button" class="mode-btn active" id="modeNormal">Safe / Normal<small>Targets the outer white border while protecting light artwork.</small></button>
-            <button type="button" class="mode-btn" id="modeAggressive">Aggressive / All White<small>Trims white background more aggressively, including very light areas.</small></button>
+            <button type="button" class="mode-btn active" id="modeNormal">Normal<small>Targets the outer border while protecting real artwork.</small></button>
+            <button type="button" class="mode-btn" id="modeAggressive">Aggressive<small>Trims background more aggressively, including very light areas.</small></button>
           </div>
         </div>
 
@@ -214,6 +216,17 @@ function cropImageAggressive(img,tol,pad){
   return cropWithBackgroundModel(img,tol,pad,true);
 }
 
+/*
+ * Background-aware cropper.
+ * Instead of assuming "white", it estimates the image's OUTER background
+ * from the edge pixels. Four corner regions are used to build a smooth
+ * bilinear RGB background model, which works for solid colours as well as
+ * many horizontal/vertical/diagonal gradients.
+ *
+ * Normal: conservative connected-background removal.
+ * Aggressive: art-first density crop; sparse text/lines inside a mostly
+ * background-coloured area do not keep that area from being removed.
+ */
 function cropWithBackgroundModel(img,tol,pad,aggressive){
   const w=img.naturalWidth,h=img.naturalHeight;
   const c=document.createElement('canvas');c.width=w;c.height=h;
@@ -242,6 +255,8 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
     return [median(rs),median(gs),median(bs)];
   }
 
+  // Use corner patches, not single pixels, so tiny artwork touching a corner
+  // is less likely to poison the estimated background colour.
   const c00=patchColor(0,0),c10=patchColor(w-1,0),c01=patchColor(0,h-1),c11=patchColor(w-1,h-1);
 
   function expectedColor(x,y){
@@ -258,6 +273,7 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   }
   function isArtwork(x,y){return bgDistance(x,y)>threshold;}
 
+  // Work on a small grid for predictable tablet performance.
   const maxGrid=220,sx=Math.max(1,Math.ceil(w/maxGrid)),sy=Math.max(1,Math.ceil(h/maxGrid));
   const gw=Math.ceil(w/sx),gh=Math.ceil(h/sy),grid=new Uint8Array(gw*gh);
   for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){
@@ -300,6 +316,7 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   let top=yr.start*sy,bottom=Math.min(h-1,(yr.end+1)*sy-1);
   let left=xr.start*sx,right=Math.min(w-1,(xr.end+1)*sx-1);
 
+  // Pixel-level tightening against the estimated background.
   const rowDensity=(y)=>{let hit=0,total=0,step=Math.max(1,Math.floor(w/320));for(let x=left;x<=right;x+=step){total++;if(isArtwork(x,y))hit++;}return hit/Math.max(1,total)};
   const colDensity=(x)=>{let hit=0,total=0,step=Math.max(1,Math.floor(h/320));for(let y=top;y<=bottom;y+=step){total++;if(isArtwork(x,y))hit++;}return hit/Math.max(1,total)};
   const realThreshold=aggressive?0.012:0.022;
@@ -309,6 +326,8 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   guard=0;while(left<right&&colDensity(left)<realThreshold&&guard++<w)left++;
   guard=0;while(right>left&&colDensity(right)<realThreshold&&guard++<w)right--;
 
+  // If the gradient model is poor (for example, a highly textured edge),
+  // avoid returning an absurdly tiny crop. Fall back to a conservative scan.
   const area=(right-left+1)*(bottom-top+1),full=w*h;
   if(area<full*0.015){left=0;top=0;right=w-1;bottom=h-1;}
 
@@ -318,6 +337,7 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
 }
 
 function cropImage(img,tol,pad,mode=cropMode){
+  // Correct mapping: Normal is conservative; Aggressive is art-first.
   return mode==='aggressive' ? cropImageAggressive(img,tol,pad) : cropImageNormal(img,tol,pad);
 }
 
@@ -419,4 +439,172 @@ function renderPage(){
 
   const prev=document.createElement('button');
   prev.className='page-btn';
-  pre
+  prev.textContent='‹';
+  prev.disabled=currentPage===1;
+  prev.onclick=()=>{currentPage--;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
+  pagination.append(prev);
+
+  const maxButtons=7;
+  let first=1,last=totalPages;
+  if(totalPages>maxButtons){
+    first=Math.max(1,currentPage-3);
+    last=Math.min(totalPages,first+6);
+    if(last-first<6)first=last-6;
+  }
+
+  for(let p=first;p<=last;p++){
+    const btn=document.createElement('button');
+    btn.className='page-btn'+(p===currentPage?' active':'');
+    btn.textContent=p;
+    btn.onclick=()=>{currentPage=p;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
+    pagination.append(btn);
+  }
+
+  const next=document.createElement('button');
+  next.className='page-btn';
+  next.textContent='›';
+  next.disabled=currentPage===totalPages;
+  next.onclick=()=>{currentPage++;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
+  pagination.append(next);
+
+  const info=document.createElement('span');
+  info.className='page-info';
+  info.textContent=`Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
+  pagination.append(info);
+}
+
+/* Minimal ZIP writer using STORE compression.
+   This puts every processed image into ONE ZIP, avoiding browser
+   multi-download limits. */
+function crc32(buf){
+  let table=crc32.table;
+  if(!table){
+    table=crc32.table=new Uint32Array(256);
+    for(let n=0;n<256;n++){
+      let c=n;
+      for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;
+      table[n]=c>>>0;
+    }
+  }
+  let c=0xffffffff;
+  for(let i=0;i<buf.length;i++)c=table[(c^buf[i])&255]^(c>>>8);
+  return (c^0xffffffff)>>>0;
+}
+function u16(a,n){a.push(n&255,(n>>>8)&255)}
+function u32(a,n){a.push(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255)}
+function strBytes(s){return new TextEncoder().encode(s)}
+
+async function makeZip(items){
+  const chunks=[],central=[];
+  let offset=0;
+
+  for(const item of items){
+    const data=new Uint8Array(await item.blob.arrayBuffer());
+    const name=strBytes(item.name);
+    const crc=crc32(data);
+    const local=[];
+
+    u32(local,0x04034b50);u16(local,20);u16(local,0);u16(local,0);
+    u16(local,0);u16(local,0);u32(local,crc);
+    u32(local,data.length);u32(local,data.length);
+    u16(local,name.length);u16(local,0);
+
+    chunks.push(new Uint8Array(local),name,data);
+
+    const cen=[];
+    u32(cen,0x02014b50);u16(cen,20);u16(cen,20);u16(cen,0);u16(cen,0);
+    u16(cen,0);u16(cen,0);u32(cen,crc);
+    u32(cen,data.length);u32(cen,data.length);
+    u16(cen,name.length);u16(cen,0);u16(cen,0);u16(cen,0);u16(cen,0);
+    u32(cen,0);u32(cen,offset);
+
+    central.push(new Uint8Array(cen),name);
+    offset+=local.length+name.length+data.length;
+  }
+
+  const centralOffset=offset;
+  let centralSize=0;
+  for(const c of central){chunks.push(c);centralSize+=c.length}
+
+  const end=[];
+  u32(end,0x06054b50);u16(end,0);u16(end,0);
+  u16(end,items.length);u16(end,items.length);
+  u32(end,centralSize);u32(end,centralOffset);u16(end,0);
+  chunks.push(new Uint8Array(end));
+
+  return new Blob(chunks,{type:'application/zip'});
+}
+
+cleanBtn.onclick=async()=>{
+  if(!selected.length){
+    alert('Select some images first.');
+    return;
+  }
+
+  outputs=[];
+  currentPage=1;
+  results.innerHTML='';
+  pagination.innerHTML='';
+  downloadAll.disabled=true;
+  cleanBtn.disabled=true;
+  setLocked(true);
+
+  progressCard.style.display='block';
+  bar.style.width='0%';
+  percent.textContent='0%';
+
+  const tol=+tolEl.value,pad=+padEl.value,mode=cropMode;
+
+  try{
+    for(let i=0;i<selected.length;i++){
+      progressText.textContent=`Processing ${i+1} of ${selected.length} images…`;
+      status.textContent=selected[i].name;
+
+      const img=await getImage(selected[i]);
+      const out=cropImage(img,tol,pad,mode);
+      const blob=await new Promise(r=>out.toBlob(r,'image/png'));
+      const name=selected[i].name.replace(/\.[^.]+$/,'')+'_clean.png';
+
+      outputs.push({
+        blob,name,width:out.width,height:out.height
+      });
+
+      const p=((i+1)/selected.length)*100;
+      bar.style.width=p+'%';
+      percent.textContent=Math.round(p)+'%';
+
+      // Don't render hundreds of cards while processing.
+      // Render only once at the end, in pages of 20.
+      await new Promise(r=>setTimeout(r,0));
+    }
+
+    progressText.textContent=`Finished ${selected.length} images`;
+    status.textContent='All processed images are ready.';
+    renderPage();
+    downloadAll.disabled=false;
+  }catch(err){
+    status.textContent='Something went wrong while processing an image.';
+    console.error(err);
+  }finally{
+    cleanBtn.disabled=false;
+    setLocked(false);
+  }
+};
+
+downloadAll.onclick=async()=>{
+  if(!outputs.length)return;
+
+  downloadAll.disabled=true;
+  downloadAll.textContent='Creating ZIP…';
+
+  try{
+    const zip=await makeZip(outputs);
+    downloadBlob(zip,'cut-it-out-cleaned-images.zip');
+  }finally{
+    downloadAll.disabled=false;
+    downloadAll.textContent='⇩ Download All (.ZIP)';
+  }
+};
+</script>
+</body>
+</html>
