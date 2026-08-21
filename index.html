@@ -109,19 +109,24 @@ button:disabled{opacity:.4;cursor:not-allowed}
     <div class="settings-preview">
       <div class="settings" id="settings">
         <div class="setting">
-          <div class="setting-head">
-            <span>Crop Mode <span class="help" title="Choose how aggressively white background is removed">?</span></span>
-          </div>
-          <div class="mode-group">
-            <button type="button" class="mode-btn active" id="modeNormal">Safe / Normal<small>Targets the outer white border while protecting light artwork.</small></button>
-            <button type="button" class="mode-btn" id="modeAggressive">Aggressive / All White<small>Trims white background more aggressively, including very light areas.</small></button>
-          </div>
-        </div>
+<div class="setting">
+  <div class="setting-head">
+    <span>Crop Mode <span class="help" title="Choose how aggressively background colors are removed">?</span></span>
+  </div>
+  <div class="mode-group">
+    <button type="button" class="mode-btn active" id="modeNormal">Normal<small>Targets outer border colors while protecting core artwork.</small></button>
+    <button type="button" class="mode-btn" id="modeAggressive">Aggressive<small>Trims background colors more aggressively, including lighter shades.</small></button>
+  </div>
+</div>
 
-        <div class="setting">
-          <div class="setting-head">
-            <span>Tolerance <span class="help" title="How close a pixel must be to white before it is treated as background">?</span></span>
-            <span class="value" id="tolVal">18</span>
+<div class="setting">
+  <div class="setting-head">
+    <span>Tolerance <span class="help" title="How closely a pixel must match the background color to be removed">?</span></span>
+    <span class="value" id="tolVal">18</span>
+  </div>
+  <input id="tol" type="range" min="1" max="100" value="18">
+  <div class="desc">Higher removes more background color variance.<br>Lower preserves more delicate artwork details.</div>
+</div>            <span class="value" id="tolVal">18</span>
           </div>
           <input id="tol" type="range" min="1" max="100" value="18">
           <div class="desc">Higher removes more near-white background.<br>Lower preserves more very light artwork.</div>
