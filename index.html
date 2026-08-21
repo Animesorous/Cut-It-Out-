@@ -109,27 +109,22 @@ button:disabled{opacity:.4;cursor:not-allowed}
     <div class="settings-preview">
       <div class="settings" id="settings">
         <div class="setting">
-<div class="setting">
-  <div class="setting-head">
-    <span>Crop Mode <span class="help" title="Choose how aggressively background colors are removed">?</span></span>
-  </div>
-  <div class="mode-group">
-    <button type="button" class="mode-btn active" id="modeNormal">Normal<small>Targets outer border colors while protecting core artwork.</small></button>
-    <button type="button" class="mode-btn" id="modeAggressive">Aggressive<small>Trims background colors more aggressively, including lighter shades.</small></button>
-  </div>
-</div>
+          <div class="setting-head">
+            <span>Crop Mode <span class="help" title="Choose how aggressively background colors are removed">?</span></span>
+          </div>
+          <div class="mode-group">
+            <button type="button" class="mode-btn active" id="modeNormal">Normal<small>Targets outer border colors while protecting core artwork.</small></button>
+            <button type="button" class="mode-btn" id="modeAggressive">Aggressive<small>Trims background colors more aggressively, including lighter shades.</small></button>
+          </div>
+        </div>
 
-<div class="setting">
-  <div class="setting-head">
-    <span>Tolerance <span class="help" title="How closely a pixel must match the background color to be removed">?</span></span>
-    <span class="value" id="tolVal">18</span>
-  </div>
-  <input id="tol" type="range" min="1" max="100" value="18">
-  <div class="desc">Higher removes more background color variance.<br>Lower preserves more delicate artwork details.</div>
-</div>            <span class="value" id="tolVal">18</span>
+        <div class="setting">
+          <div class="setting-head">
+            <span>Tolerance <span class="help" title="How closely a pixel must match the background color to be removed">?</span></span>
+            <span class="value" id="tolVal">18</span>
           </div>
           <input id="tol" type="range" min="1" max="100" value="18">
-          <div class="desc">Higher removes more near-white background.<br>Lower preserves more very light artwork.</div>
+          <div class="desc">Higher removes more background color variance.<br>Lower preserves more delicate artwork details.</div>
         </div>
 
         <div class="setting">
@@ -295,7 +290,7 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   }
   function densityCols(){
     const a=new Float32Array(gw);
-    for(let x=0;x<gw;x++){let n=0;for(let y=0;y<gh;y++)n+=grid[y*gw+x];a[x]=n/gh;}return a;
+    for(let x=0;x<gw;x++){let n=0;for(let y=0;y<gh;y++)n+=grid[y*gw+x];a[x]=n/gw;}return a;
   }
   function smooth(a,r){
     const out=new Float32Array(a.length);
@@ -411,205 +406,4 @@ function renderPage(){
   if(currentPage>totalPages)currentPage=totalPages;
 
   const start=(currentPage-1)*PAGE_SIZE;
-  const pageItems=outputs.slice(start,start+PAGE_SIZE);
-
-  for(const item of pageItems){
-    const div=document.createElement('div');
-    div.className='result';
-
-    const im=document.createElement('img');
-    im.src=URL.createObjectURL(item.blob);
-
-    const done=document.createElement('div');
-    done.className='done';
-    done.textContent='DONE';
-
-    const one=document.createElement('button');
-    one.className='download-one';
-    one.textContent='⇩';
-    one.onclick=()=>downloadBlob(item.blob,item.name);
-
-    const body=document.createElement('div');
-    body.className='result-body';
-    body.innerHTML=
-      `<div class="result-name" title="${item.name.replace(/"/g,'&quot;')}">${item.name}</div>`+
-      `<div class="result-size">${item.width} × ${item.height}</div>`;
-
-    div.append(im,done,one,body);
-    results.append(div);
-  }
-
-  pagination.innerHTML='';
-  if(totalPages<=1)return;
-
-  const prev=document.createElement('button');
-  prev.className='page-btn';
-  prev.textContent='‹';
-  prev.disabled=currentPage===1;
-  prev.onclick=()=>{currentPage--;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
-  pagination.append(prev);
-
-  const maxButtons=7;
-  let first=1,last=totalPages;
-  if(totalPages>maxButtons){
-    first=Math.max(1,currentPage-3);
-    last=Math.min(totalPages,first+6);
-    if(last-first<6)first=last-6;
-  }
-
-  for(let p=first;p<=last;p++){
-    const btn=document.createElement('button');
-    btn.className='page-btn'+(p===currentPage?' active':'');
-    btn.textContent=p;
-    btn.onclick=()=>{currentPage=p;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
-    pagination.append(btn);
-  }
-
-  const next=document.createElement('button');
-  next.className='page-btn';
-  next.textContent='›';
-  next.disabled=currentPage===totalPages;
-  next.onclick=()=>{currentPage++;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
-  pagination.append(next);
-
-  const info=document.createElement('span');
-  info.className='page-info';
-  info.textContent=`Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
-  pagination.append(info);
-}
-
-/* Minimal ZIP writer using STORE compression.
-   This puts every processed image into ONE ZIP, avoiding browser
-   multi-download limits. */
-function crc32(buf){
-  let table=crc32.table;
-  if(!table){
-    table=crc32.table=new Uint32Array(256);
-    for(let n=0;n<256;n++){
-      let c=n;
-      for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;
-      table[n]=c>>>0;
-    }
-  }
-  let c=0xffffffff;
-  for(let i=0;i<buf.length;i++)c=table[(c^buf[i])&255]^(c>>>8);
-  return (c^0xffffffff)>>>0;
-}
-function u16(a,n){a.push(n&255,(n>>>8)&255)}
-function u32(a,n){a.push(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255)}
-function strBytes(s){return new TextEncoder().encode(s)}
-
-async function makeZip(items){
-  const chunks=[],central=[];
-  let offset=0;
-
-  for(const item of items){
-    const data=new Uint8Array(await item.blob.arrayBuffer());
-    const name=strBytes(item.name);
-    const crc=crc32(data);
-    const local=[];
-
-    u32(local,0x04034b50);u16(local,20);u16(local,0);u16(local,0);
-    u16(local,0);u16(local,0);u32(local,crc);
-    u32(local,data.length);u32(local,data.length);
-    u16(local,name.length);u16(local,0);
-
-    chunks.push(new Uint8Array(local),name,data);
-
-    const cen=[];
-    u32(cen,0x02014b50);u16(cen,20);u16(cen,20);u16(cen,0);u16(cen,0);
-    u16(cen,0);u16(cen,0);u32(cen,crc);
-    u32(cen,data.length);u32(cen,data.length);
-    u16(cen,name.length);u16(cen,0);u16(cen,0);u16(cen,0);u16(cen,0);
-    u32(cen,0);u32(cen,offset);
-
-    central.push(new Uint8Array(cen),name);
-    offset+=local.length+name.length+data.length;
-  }
-
-  const centralOffset=offset;
-  let centralSize=0;
-  for(const c of central){chunks.push(c);centralSize+=c.length}
-
-  const end=[];
-  u32(end,0x06054b50);u16(end,0);u16(end,0);
-  u16(end,items.length);u16(end,items.length);
-  u32(end,centralSize);u32(end,centralOffset);u16(end,0);
-  chunks.push(new Uint8Array(end));
-
-  return new Blob(chunks,{type:'application/zip'});
-}
-
-cleanBtn.onclick=async()=>{
-  if(!selected.length){
-    alert('Select some images first.');
-    return;
-  }
-
-  outputs=[];
-  currentPage=1;
-  results.innerHTML='';
-  pagination.innerHTML='';
-  downloadAll.disabled=true;
-  cleanBtn.disabled=true;
-  setLocked(true);
-
-  progressCard.style.display='block';
-  bar.style.width='0%';
-  percent.textContent='0%';
-
-  const tol=+tolEl.value,pad=+padEl.value,mode=cropMode;
-
-  try{
-    for(let i=0;i<selected.length;i++){
-      progressText.textContent=`Processing ${i+1} of ${selected.length} images…`;
-      status.textContent=selected[i].name;
-
-      const img=await getImage(selected[i]);
-      const out=cropImage(img,tol,pad,mode);
-      const blob=await new Promise(r=>out.toBlob(r,'image/png'));
-      const name=selected[i].name.replace(/\.[^.]+$/,'')+'_clean.png';
-
-      outputs.push({
-        blob,name,width:out.width,height:out.height
-      });
-
-      const p=((i+1)/selected.length)*100;
-      bar.style.width=p+'%';
-      percent.textContent=Math.round(p)+'%';
-
-      // Don't render hundreds of cards while processing.
-      // Render only once at the end, in pages of 20.
-      await new Promise(r=>setTimeout(r,0));
-    }
-
-    progressText.textContent=`Finished ${selected.length} images`;
-    status.textContent='All processed images are ready.';
-    renderPage();
-    downloadAll.disabled=false;
-  }catch(err){
-    status.textContent='Something went wrong while processing an image.';
-    console.error(err);
-  }finally{
-    cleanBtn.disabled=false;
-    setLocked(false);
-  }
-};
-
-downloadAll.onclick=async()=>{
-  if(!outputs.length)return;
-
-  downloadAll.disabled=true;
-  downloadAll.textContent='Creating ZIP…';
-
-  try{
-    const zip=await makeZip(outputs);
-    downloadBlob(zip,'cut-it-out-cleaned-images.zip');
-  }finally{
-    downloadAll.disabled=false;
-    downloadAll.textContent='⇩ Download All (.ZIP)';
-  }
-};
-</script>
-</body>
-</html>
+ 
