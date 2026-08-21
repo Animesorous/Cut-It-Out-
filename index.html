@@ -3,13 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<meta name="description" content="Cut It Out! is a free browser-based image border cleaner that removes unwanted white, black, gray, and other large static backgrounds from images. Your images stay on your device.">
-<meta name="keywords" content="image border remover, crop image borders, remove image background, manga border cropper, comic cropper, image cleaner, remove white border, remove black border, bulk image cropper">
-<meta name="robots" content="index,follow">
-
-<title>Cut It Out! — Free Image Border Cleaner</title>
-
+<title>Cut It Out! — Image Border Cleaner</title>
 <style>
 :root{
   --bg:#0b0d12;--panel:#13161d;--panel2:#171a22;--line:#ffffff14;
@@ -17,1334 +11,759 @@
   --green:#28d66f;--danger:#ff6464;
 }
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 45%);
-  color:var(--text);
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
-}
-
-main{
-  width:min(1180px,calc(100% - 28px));
-  margin:auto;
-  padding:28px 0 45px
-}
-
-h1{
-  font-size:clamp(34px,5vw,50px);
-  line-height:1;
-  margin:0 0 12px;
-  font-weight:850;
-  letter-spacing:-1.5px
-}
-
+body{margin:0;background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 45%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{width:min(1180px,calc(100% - 28px));margin:auto;padding:28px 0 45px}
+h1{font-size:clamp(34px,5vw,50px);line-height:1;margin:0 0 12px;font-weight:850;letter-spacing:-1.5px}
 h1 span{color:var(--gold)}
-
-.subtitle{
-  font-size:16px;
-  color:#c5c8d0;
-  margin:0 0 13px
-}
-
-.badges{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:18px
-}
-
-.badge{
-  background:#191c24;
-  border:1px solid var(--line);
-  padding:7px 11px;
-  border-radius:9px;
-  font-size:13px;
-  color:#d8dbe2
-}
-
+.subtitle{font-size:16px;color:#c5c8d0;margin:0 0 13px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.badge{background:#191c24;border:1px solid var(--line);padding:7px 11px;border-radius:9px;font-size:13px;color:#d8dbe2}
 .badge b{color:var(--gold)}
-
-.card{
-  background:linear-gradient(145deg,#14171e,#11141a);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:18px;
-  box-shadow:0 12px 40px #0004
-}
-
-.drop{
-  min-height:210px;
-  border:2px dashed #ffffff24;
-  border-radius:15px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  cursor:pointer;
-  transition:.15s
-}
-
-.drop:hover,.drop.drag{
-  border-color:var(--gold);
-  background:#ffffff03
-}
-
+.card{background:linear-gradient(145deg,#14171e,#11141a);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 40px #0004}
+.drop{min-height:210px;border:2px dashed #ffffff24;border-radius:15px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;transition:.15s}
+.drop:hover,.drop.drag{border-color:var(--gold);background:#ffffff03}
 .drop-icon{font-size:34px;margin-bottom:7px}
-
-.drop-title{
-  font-size:19px;
-  font-weight:750
-}
-
-.drop-sub{
-  font-size:14px;
-  color:var(--muted);
-  margin-top:4px
-}
-
-.count{
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  margin-top:15px;
-  padding:8px 13px;
-  border:1px solid #ffffff18;
-  background:#171a21;
-  border-radius:10px;
-  color:var(--muted)
-}
-
+.drop-title{font-size:19px;font-weight:750}.drop-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.count{display:inline-flex;align-items:center;gap:7px;margin-top:15px;padding:8px 13px;border:1px solid #ffffff18;background:#171a21;border-radius:10px;color:var(--muted)}
 .count strong{color:var(--green)}
-
 input[type=file]{display:none}
 
-.settings-preview{
-  display:grid;
-  grid-template-columns:390px 1fr;
-  gap:18px;
-  margin-top:18px
-}
+.settings-preview{display:grid;grid-template-columns:390px 1fr;gap:18px;margin-top:18px}
+.settings{background:#12151c;border:1px solid var(--line);border-radius:15px;padding:18px}
+.setting{margin-bottom:23px}.setting:last-child{margin-bottom:0}
+.setting-head{display:flex;justify-content:space-between;align-items:center;font-weight:750;margin-bottom:8px}
+.value{border:1px solid #ffffff1c;border-radius:8px;padding:6px 11px;min-width:52px;text-align:center;color:#f3f3f4}
+.help{color:#727784;border:1px solid #ffffff22;border-radius:50%;font-size:11px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
+.desc{color:var(--muted);font-size:13px;line-height:1.4;margin-top:8px}.settings.locked{opacity:.55}.settings.locked input{cursor:not-allowed}
+input[type=range]{width:100%;accent-color:var(--gold);cursor:pointer}
+.mode-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.mode-btn{background:#171a21;border:1px solid #ffffff20;color:#dfe2e8;border-radius:10px;padding:10px 9px;text-align:left;cursor:pointer;font-weight:750}
+.mode-btn small{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-top:3px;line-height:1.3}
+.mode-btn.active{border-color:var(--gold);background:#2a2413;box-shadow:0 0 0 1px #f1c33b33 inset}
+.mode-btn:disabled{cursor:not-allowed;opacity:.5}
 
-.settings{
-  background:#12151c;
-  border:1px solid var(--line);
-  border-radius:15px;
-  padding:18px
-}
+.previewbox{background:#10131a;border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}
+.preview-title{text-align:center;font-weight:750;margin-bottom:12px}
+.previews{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pane{min-width:0}.pane label{display:block;text-align:center;color:#aeb2bc;font-size:12px;margin-bottom:7px}
+.frame{height:270px;border:1px solid #ffffff15;border-radius:10px;background:
+  linear-gradient(45deg,#1a1d24 25%,transparent 25%) 0 0/18px 18px,
+  linear-gradient(-45deg,#1a1d24 25%,transparent 25%) 0 9px/18px 18px,
+  linear-gradient(45deg,transparent 75%,#1a1d24 75%) 9px -9px/18px 18px,
+  linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,#11141a;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.frame img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+button{border:1px solid transparent;border-radius:10px;padding:12px 20px;font-weight:800;font-size:14px;cursor:pointer}
+.primary{background:var(--gold);color:#16120a}.primary:hover{background:#ffd14e}
+.secondary{background:#171a21;border-color:#ffffff26;color:#f4f4f5}.secondary:hover{background:#1d212a}
+button:disabled{opacity:.4;cursor:not-allowed}
 
-.setting{
-  margin-bottom:23px
-}
+.progress-card{margin-top:18px;display:none}
+.progress-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;color:#d9dce2}
+.percent{color:var(--gold);font-weight:800}
+.track{height:9px;background:#242832;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:var(--gold);transition:width .12s}
+.status{font-size:13px;color:var(--muted);margin-top:8px}
 
-.setting:last-child{margin-bottom:0}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:18px}
+.result{background:#12151b;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+.result img{width:100%;height:150px;object-fit:contain;background:#0d1015;display:block}
+.result-body{padding:9px}.result-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c8cbd2}.result-size{font-size:11px;color:#707580;margin-top:3px}
+.done{position:absolute;top:7px;left:7px;background:#0b8d43;color:white;border-radius:6px;padding:3px 6px;font-size:9px;font-weight:900}
+.download-one{position:absolute;right:7px;top:7px;width:27px;height:27px;padding:0;background:#171a20;color:white;border:1px solid #ffffff22}
 
-.setting-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-weight:750;
-  margin-bottom:8px
-}
 
-.value{
-  border:1px solid #ffffff1c;
-  border-radius:8px;
-  padding:6px 11px;
-  min-width:52px;
-  text-align:center;
-  color:#f3f3f4
-}
-
-.help{
-  border:1px solid #ffffff22;
-  border-radius:50%;
-  font-size:11px;
-  width:18px;
-  height:18px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  margin-left:4px
-}
-
-.desc{
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.4;
-  margin-top:8px
-}
-
-input[type=range]{
-  width:100%;
-  accent-color:var(--gold);
-  cursor:pointer
-}
-
-.mode-group{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:8px
-}
-
-.mode-btn{
-  background:#171a21;
-  border:1px solid #ffffff20;
-  color:#dfe2e8;
-  border-radius:10px;
-  padding:10px 9px;
-  text-align:left;
-  cursor:pointer;
-  font-weight:750
-}
-
-.mode-btn small{
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:500;
-  margin-top:3px;
-  line-height:1.3
-}
-
-.mode-btn.active{
-  border-color:var(--gold);
-  background:#2a2413;
-  box-shadow:0 0 0 1px #f1c33b33 inset
-}
-
-.previewbox{
-  background:#10131a;
-  border:1px solid var(--line);
-  border-radius:15px;
-  padding:16px;
-  min-width:0
-}
-
-.preview-title{
-  text-align:center;
-  font-weight:750;
-  margin-bottom:12px
-}
-
-.previews{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px
-}
-
-.pane{min-width:0}
-
-.pane label{
-  display:block;
-  text-align:center;
-  color:#aeb2bc;
-  font-size:12px;
-  margin-bottom:7px
-}
-
-.frame{
-  height:270px;
-  border:1px solid #ffffff15;
-  border-radius:10px;
-  background:
-    linear-gradient(45deg,#1a1d24 25%,transparent 25%) 0 0/18px 18px,
-    linear-gradient(-45deg,#1a1d24 25%,transparent 25%) 0 9px/18px 18px,
-    linear-gradient(45deg,transparent 75%,#1a1d24 75%) 9px -9px/18px 18px,
-    linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,#11141a;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden
-}
-
-.frame img{
-  max-width:100%;
-  max-height:100%;
-  object-fit:contain;
-  display:block
-}
-
-.actions{
-  display:flex;
-  gap:12px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-top:18px
-}
-
-button{
-  border:1px solid transparent;
-  border-radius:10px;
-  padding:12px 20px;
-  font-weight:800;
-  font-size:14px;
-  cursor:pointer
-}
-
-.primary{
-  background:var(--gold);
-  color:#16120a
-}
-
-.primary:hover{background:#ffd14e}
-
-.secondary{
-  background:#171a21;
-  border-color:#ffffff26;
-  color:#f4f4f5
-}
-
-.secondary:hover{background:#1d212a}
-
-button:disabled{
-  opacity:.4;
-  cursor:not-allowed
-}
-
-.progress-card{
-  margin-top:18px;
-  display:none
-}
-
-.progress-top{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:8px;
-  color:#d9dce2
-}
-
-.percent{
-  color:var(--gold);
-  font-weight:800
-}
-
-.track{
-  height:9px;
-  background:#242832;
-  border-radius:99px;
-  overflow:hidden
-}
-
-.bar{
-  height:100%;
-  width:0;
-  background:var(--gold);
-  transition:width .12s
-}
-
-.status{
-  font-size:13px;
-  color:var(--muted);
-  margin-top:8px
-}
-
-.results{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-  gap:12px;
-  margin-top:18px
-}
-
-.result{
-  background:#12151b;
-  border:1px solid var(--line);
-  border-radius:12px;
-  overflow:hidden;
-  position:relative
-}
-
-.result img{
-  width:100%;
-  height:150px;
-  object-fit:contain;
-  background:#0d1015;
-  display:block
-}
-
-.result-body{padding:9px}
-
-.result-name{
-  font-size:11px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  color:#c8cbd2
-}
-
-.result-size{
-  font-size:11px;
-  color:#707580;
-  margin-top:3px
-}
-
-.done{
-  position:absolute;
-  top:7px;
-  left:7px;
-  background:#0b8d43;
-  color:white;
-  border-radius:6px;
-  padding:3px 6px;
-  font-size:9px;
-  font-weight:900
-}
-
-.download-one{
-  position:absolute;
-  right:7px;
-  top:7px;
-  width:27px;
-  height:27px;
-  padding:0;
-  background:#171a20;
-  color:white;
-  border:1px solid #ffffff22
-}
-
-.pagination{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:7px;
-  flex-wrap:wrap;
-  margin:18px 0 0
-}
-
-.page-btn{
-  min-width:38px;
-  padding:9px 12px;
-  background:#171a21;
-  color:#ddd;
-  border:1px solid #ffffff1c
-}
-
-.page-btn.active{
-  background:var(--gold);
-  color:#17130a;
-  border-color:var(--gold)
-}
-
+.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:18px 0 0}
+.page-btn{min-width:38px;padding:9px 12px;background:#171a21;color:#ddd;border:1px solid #ffffff1c}
+.page-btn.active{background:var(--gold);color:#17130a;border-color:var(--gold)}
 .page-btn:disabled{opacity:.35}
+.page-info{font-size:12px;color:var(--muted);margin:0 8px}
 
-.page-info{
-  font-size:12px;
-  color:var(--muted);
-  margin:0 8px
-}
-
-.note{
-  font-size:12px;
-  color:#747985;
-  text-align:center;
-  margin-top:16px;
-  line-height:1.5
-}
-
-@media(max-width:820px){
-  .settings-preview{grid-template-columns:1fr}
-  .previews{grid-template-columns:1fr 1fr}
-  .frame{height:230px}
-}
-
-@media(max-width:520px){
-  main{
-    width:min(100% - 18px,1180px);
-    padding-top:18px
-  }
-
-  .previews{grid-template-columns:1fr}
-  .frame{height:260px}
-  .settings-preview{gap:10px}
-}
+.note{font-size:12px;color:#747985;text-align:center;margin-top:16px;line-height:1.5}
+@media(max-width:820px){.settings-preview{grid-template-columns:1fr}.previews{grid-template-columns:1fr 1fr}.frame{height:230px}}
+@media(max-width:520px){main{width:min(100% - 18px,1180px);padding-top:18px}.previews{grid-template-columns:1fr}.frame{height:260px}.settings-preview{gap:10px}}
 </style>
 </head>
-
 <body>
-
 <main>
-
-<header>
-  <h1>Cut It <span>Out!</span> ✂️</h1>
-
-  <p class="subtitle">
-    Remove unwanted borders and large static backgrounds from images — fast, free, and right in your browser.
-  </p>
-
-  <div class="badges">
-    <div class="badge">🔒 <b>100% Private</b></div>
-    <div class="badge">☁️ <b>No Uploads</b></div>
-    <div class="badge">🪙 <b>100% Free</b></div>
-  </div>
-</header>
-
-
-<section class="card">
-
-<div class="drop" id="drop">
-
-  <div class="drop-icon">▧</div>
-
-  <div class="drop-title">
-    Tap to select images
-  </div>
-
-  <div class="drop-sub">
-    or drag & drop here
-  </div>
-
-  <div class="count" id="count">
-    <span>○</span>
-    <strong>0</strong>
-    images selected
-  </div>
-
-  <input id="files" type="file" accept="image/*" multiple>
-
-</div>
-
-
-<div class="settings-preview">
-
-<div class="settings" id="settings">
-
-<div class="setting">
-
-<div class="setting-head">
-<span>
-Crop Mode
-<span
-class="help"
-title="Choose how aggressively the image borders are detected"
->?</span>
-</span>
-</div>
-
-
-<div class="mode-group">
-
-<button
-type="button"
-class="mode-btn active"
-id="modeNormal"
->
-Safe / Normal
-
-<small>
-Targets the outer white border while protecting light artwork.
-</small>
-
-</button>
-
-
-<button
-type="button"
-class="mode-btn"
-id="modeAggressive"
->
-Aggressive / Large Background
-
-<small>
-Removes large connected backgrounds of white, black, gray, or similar colors.
-</small>
-
-</button>
-
-</div>
-
-</div>
-
-
-<div class="setting">
-
-<div class="setting-head">
-
-<span>
-Tolerance
-<span
-class="help"
-title="How different a background pixel may be from the detected edge color"
->?</span>
-</span>
-
-<span class="value" id="tolVal">
-18
-</span>
-
-</div>
-
-<input
-id="tol"
-type="range"
-min="1"
-max="100"
-value="18"
->
-
-<div class="desc">
-Higher removes backgrounds with more color variation.<br>
-Lower preserves more subtle edges.
-</div>
-
-</div>
-
-
-<div class="setting">
-
-<div class="setting-head">
-
-<span>
-Safety Margin (px)
-<span
-class="help"
-title="Adds a small border around detected artwork"
->?</span>
-</span>
-
-<span class="value" id="padVal">
-2
-</span>
-
-</div>
-
-<input
-id="pad"
-type="range"
-min="0"
-max="20"
-value="2"
->
-
-<div class="desc">
-Keeps a small margin around the content so important details don't get cut off.
-</div>
-
-</div>
-
-
-<button
-class="secondary"
-id="reset"
-style="width:100%;margin-top:18px"
->
-↻ Reset Settings
-</button>
-
-</div>
-
-
-<div class="previewbox">
-
-<div class="preview-title">
-Live Preview
-</div>
-
-<div class="previews">
-
-<div class="pane">
-
-<label>Original</label>
-
-<div class="frame">
-<img id="origPreview">
-</div>
-
-</div>
-
-
-<div class="pane">
-
-<label>
-Preview (Current Settings)
-</label>
-
-<div class="frame">
-<img id="cropPreview">
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="actions">
-
-<button
-class="secondary"
-id="clean"
->
-✣ Clean Images
-</button>
-
-<button
-class="primary"
-id="downloadAll"
-disabled
->
-⇩ Download All (.ZIP)
-</button>
-
-</div>
-
-
-<div class="note">
-The processing happens on your device. Your images are not sent anywhere.
-</div>
-
-</section>
-
-
-<section
-class="card progress-card"
-id="progressCard"
->
-
-<div class="progress-top">
-
-<span id="progressText">
-Processing…
-</span>
-
-<span
-class="percent"
-id="percent"
->
-0%
-</span>
-
-</div>
-
-<div class="track">
-
-<div
-class="bar"
-id="bar"
-></div>
-
-</div>
-
-<div
-class="status"
-id="status"
-></div>
-
-</section>
-
-
-<div
-class="results"
-id="results"
-></div>
-
-<div
-class="pagination"
-id="pagination"
-></div>
-
+  <header>
+    <h1>Cut It <span>Out!</span> ✂️</h1>
+    <p class="subtitle">Remove unwanted borders from any images — fast, free, and right in your browser.</p>
+    <div class="badges">
+      <div class="badge">🔒 <b>100% Private</b></div>
+      
+      <div class="badge">☁️ <b>No Uploads</b></div>
+      <div class="badge">🪙 <b>100% Free</b></div>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="drop" id="drop">
+      <div class="drop-icon">▧</div>
+      <div class="drop-title">Tap to select images</div>
+      <div class="drop-sub">or drag & drop here</div>
+      <div class="count" id="count"><span>○</span><strong>0</strong> images selected</div>
+      <input id="files" type="file" accept="image/*" multiple>
+    </div>
+
+    <div class="settings-preview">
+      <div class="settings" id="settings">
+        <div class="setting">
+          <div class="setting-head">
+            <span>Crop Mode <span class="help" title="Choose how aggressively white background is removed">?</span></span>
+          </div>
+          <div class="mode-group">
+            <button type="button" class="mode-btn active" id="modeNormal">Safe / Normal<small>Targets the outer white border while protecting light artwork.</small></button>
+            <button type="button" class="mode-btn" id="modeAggressive">Aggressive / All White<small>Trims white background more aggressively, including very light areas.</small></button>
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="setting-head">
+            <span>Tolerance <span class="help" title="How close a pixel must be to white before it is treated as background">?</span></span>
+            <span class="value" id="tolVal">18</span>
+          </div>
+          <input id="tol" type="range" min="1" max="100" value="18">
+          <div class="desc">Higher removes more near-white background.<br>Lower preserves more very light artwork.</div>
+        </div>
+
+        <div class="setting">
+          <div class="setting-head">
+            <span>Safety Margin (px) <span class="help" title="Adds a small border back around the detected artwork">?</span></span>
+            <span class="value" id="padVal">2</span>
+          </div>
+          <input id="pad" type="range" min="0" max="20" value="2">
+          <div class="desc">Keeps a small margin around the content so important details don't get cut off.</div>
+        </div>
+
+        <button class="secondary" id="reset" style="width:100%;margin-top:18px">↻ Reset Settings</button>
+      </div>
+
+      <div class="previewbox">
+        <div class="preview-title">Live Preview</div>
+        <div class="previews">
+          <div class="pane"><label>Original</label><div class="frame"><img id="origPreview"></div></div>
+          <div class="pane"><label>Preview (Current Settings)</label><div class="frame"><img id="cropPreview"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="secondary" id="clean">✣ Clean Images</button>
+      <button class="primary" id="downloadAll" disabled>⇩ Download All (.ZIP)</button>
+    </div>
+    <div class="note">The processing happens on your device. Your images are not sent anywhere.</div>
+  </section>
+
+  <section class="card progress-card" id="progressCard">
+    <div class="progress-top"><span id="progressText">Processing…</span><span class="percent" id="percent">0%</span></div>
+    <div class="track"><div class="bar" id="bar"></div></div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <div class="results" id="results"></div><div class="pagination" id="pagination"></div>
 </main>
 
-
 <script>
+const $=id=>document.getElementById(id);
+const filesEl=$('files'),drop=$('drop'),count=$('count');
+const tolEl=$('tol'),padEl=$('pad'),tolVal=$('tolVal');
+const padVal=$('padVal'),cleanBtn=$('clean'),downloadAll=$('downloadAll');
+const modeNormal=$('modeNormal'),modeAggressive=$('modeAggressive');
+const resetBtn=$('reset'),settingsBox=$('settings');
+const origPreview=$('origPreview'),cropPreview=$('cropPreview');
+const results=$('results'),pagination=$('pagination');
+const progressCard=$('progressCard'),bar=$('bar'),percent=$('percent');
+const progressText=$('progressText'),status=$('status');
 
-/* =========================================================
-   BASIC ELEMENTS
-========================================================= */
+let selected=[],outputs=[],previewUrl=null,currentPage=1,cropMode='normal';
+const PAGE_SIZE=20;
 
-const $ = id => document.getElementById(id);
-
-const filesEl = $('files');
-const drop = $('drop');
-const count = $('count');
-
-const tolEl = $('tol');
-const padEl = $('pad');
-
-const tolVal = $('tolVal');
-const padVal = $('padVal');
-
-const cleanBtn = $('clean');
-const downloadAll = $('downloadAll');
-
-const modeNormal = $('modeNormal');
-const modeAggressive = $('modeAggressive');
-
-const resetBtn = $('reset');
-
-const origPreview = $('origPreview');
-const cropPreview = $('cropPreview');
-
-const results = $('results');
-const pagination = $('pagination');
-
-const progressCard = $('progressCard');
-const bar = $('bar');
-const percent = $('percent');
-
-const progressText = $('progressText');
-const status = $('status');
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let selected = [];
-let outputs = [];
-
-let previewUrl = null;
-
-let currentPage = 1;
-
-let cropMode = 'normal';
-
-const PAGE_SIZE = 20;
-
-
-/* =========================================================
-   FILE INPUT
-========================================================= */
-
-drop.addEventListener('click', () => filesEl.click());
-
-drop.addEventListener('dragover', e => {
-  e.preventDefault();
-  drop.classList.add('drag');
-});
-
-drop.addEventListener('dragleave', () => {
-  drop.classList.remove('drag');
-});
-
-drop.addEventListener('drop', e => {
-
-  e.preventDefault();
-
-  drop.classList.remove('drag');
-
+drop.addEventListener('click',()=>filesEl.click());
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+drop.addEventListener('drop',e=>{
+  e.preventDefault();drop.classList.remove('drag');
   setFiles([...e.dataTransfer.files]);
-
 });
-
-filesEl.addEventListener('change', () => {
-  setFiles([...filesEl.files]);
-});
-
+filesEl.addEventListener('change',()=>setFiles([...filesEl.files]));
 
 function setFiles(arr){
-
-  selected = arr.filter(f =>
-    f.type.startsWith('image/')
-  );
-
-  count.innerHTML =
-    `<span style="color:#28d66f">✓</span>
-     <strong>${selected.length}</strong>
-     images selected`;
-
-  outputs = [];
-  results.innerHTML = '';
-  pagination.innerHTML = '';
-  downloadAll.disabled = true;
-
-  if(selected.length){
-    showPreview(selected[0]);
-  }
-
+  selected=arr.filter(f=>f.type.startsWith('image/'));
+  count.innerHTML=`<span style="color:#28d66f">✓</span><strong>${selected.length}</strong> images selected`;
+  if(selected.length)showPreview(selected[0]);
 }
-
-
-/* =========================================================
-   IMAGE LOADING
-========================================================= */
 
 function getImage(file){
-
   return new Promise((resolve,reject)=>{
-
-    const img = new Image();
-
-    img.onload = () => resolve(img);
-
-    img.onerror = reject;
-
-    img.src = URL.createObjectURL(file);
-
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=reject;
+    img.src=URL.createObjectURL(file);
   });
-
 }
 
-
-/* =========================================================
-   COLOR HELPERS
-========================================================= */
-
-/*
-  Euclidean RGB distance.
-
-  This is deliberately used instead of simply asking:
-  "Is this pixel white?"
-
-  That allows aggressive mode to detect:
-  white
-  black
-  gray
-  beige
-  dark gray
-  colored static backgrounds
-*/
-
-function colorDistance(r1,g1,b1,r2,g2,b2){
-
-  const dr = r1-r2;
-  const dg = g1-g2;
-  const db = b1-b2;
-
-  return Math.sqrt(
-    dr*dr +
-    dg*dg +
-    db*db
-  );
-
+function isWhite(d,i,tol){
+  const cutoff=255-tol;
+  return d[i]>=cutoff && d[i+1]>=cutoff && d[i+2]>=cutoff;
 }
-
-
-/* =========================================================
-   NORMAL MODE
-========================================================= */
 
 function cropImageNormal(img,tol,pad){
-
-  const w = img.naturalWidth;
-  const h = img.naturalHeight;
-
-  const c = document.createElement('canvas');
-
-  c.width = w;
-  c.height = h;
-
-  const ctx = c.getContext(
-    '2d',
-    {willReadFrequently:true}
-  );
-
+  const w=img.naturalWidth,h=img.naturalHeight;
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d',{willReadFrequently:true});
   ctx.drawImage(img,0,0);
-
-  const d =
-    ctx.getImageData(0,0,w,h).data;
-
-  const cutoff = 255 - tol;
-
-
-  function isBackground(i){
-
-    return (
-      d[i] >= cutoff &&
-      d[i+1] >= cutoff &&
-      d[i+2] >= cutoff
-    );
-
-  }
-
-
-  /*
-    Scan the outside border.
-
-    Normal mode intentionally remains conservative.
-  */
-
-  let top = 0;
-  let bottom = h-1;
-  let left = 0;
-  let right = w-1;
-
-
-  function rowHasContent(y){
-
-    const step =
-      Math.max(1,Math.floor(w/300));
-
-    for(
-      let x=0;
-      x<w;
-      x+=step
-    ){
-
-      const i=(y*w+x)*4;
-
-      if(!isBackground(i)){
-        return true;
-      }
-
-    }
-
-    return false;
-
-  }
-
-
-  function colHasContent(x){
-
-    const step =
-      Math.max(1,Math.floor(h/300));
-
-    for(
-      let y=0;
-      y<h;
-      y+=step
-    ){
-
-      const i=(y*w+x)*4;
-
-      if(!isBackground(i)){
-        return true;
-      }
-
-    }
-
-    return false;
-
-  }
-
-
-  while(
-    top < bottom &&
-    !rowHasContent(top)
-  ){
-    top++;
-  }
-
-
-  while(
-    bottom > top &&
-    !rowHasContent(bottom)
-  ){
-    bottom--;
-  }
-
-
-  while(
-    left < right &&
-    !colHasContent(left)
-  ){
-    left++;
-  }
-
-
-  while(
-    right > left &&
-    !colHasContent(right)
-  ){
-    right--;
-  }
-
-
-  left = Math.max(0,left-pad);
-  top = Math.max(0,top-pad);
-
-  right = Math.min(w-1,right+pad);
-  bottom = Math.min(h-1,bottom+pad);
-
-
-  const out =
-    document.createElement('canvas');
-
-  out.width =
-    Math.max(1,right-left+1);
-
-  out.height =
-    Math.max(1,bottom-top+1);
-
-
-  out.getContext('2d').drawImage(
-    c,
-    left,
-    top,
-    out.width,
-    out.height,
-    0,
-    0,
-    out.width,
-    out.height
-  );
-
-
-  return out;
-
-}
-
-
-/* =========================================================
-   AGGRESSIVE MODE
-   LARGE STATIC BACKGROUND DETECTOR
-========================================================= */
-
-/*
-  This is the important part.
-
-  Instead of asking:
-
-      "Is this pixel white?"
-
-  we ask:
-
-      "Does this large region connected to the OUTSIDE
-       look like the same background?"
-
-  This means a black manga character on a white background
-  isn't automatically removed just because it is black.
-
-  Likewise, black text sitting inside a white area remains
-  because it is not part of a huge connected black background.
-*/
-
-
-function cropImageAggressive(img,tol,pad){
-
-  const w = img.naturalWidth;
-  const h = img.naturalHeight;
-
-
-  const canvas =
-    document.createElement('canvas');
-
-  canvas.width = w;
-  canvas.height = h;
-
-  const ctx =
-    canvas.getContext(
-      '2d',
-      {willReadFrequently:true}
-    );
-
-  ctx.drawImage(img,0,0);
-
-
-  const data =
-    ctx.getImageData(
-      0,
-      0,
-      w,
-      h
-    ).data;
-
-
-  /*
-    We process a reduced grid.
-
-    This makes the algorithm practical on phones/tablets
-    while still preserving the large-scale structure.
-  */
-
-  const MAX_GRID = 360;
-
-  const sx =
-    Math.max(
-      1,
-      Math.ceil(w/MAX_GRID)
-    );
-
-  const sy =
-    Math.max(
-      1,
-      Math.ceil(h/MAX_GRID)
-    );
-
-
-  const gw =
-    Math.ceil(w/sx);
-
-  const gh =
-    Math.ceil(h/sy);
-
-
-  /*
-    Each grid cell gets its average RGB color.
-  */
-
-  const colors =
-    new Uint8Array(
-      gw*gh*3
-    );
-
+  const d=ctx.getImageData(0,0,w,h).data;
+
+  // The important difference from the old algorithm:
+  // we look for the MAIN ARTWORK BAND instead of treating every tiny
+  // black mark (speech-bubble outlines, text, etc.) as the image edge.
+  // This is what removes cases like a huge white area below a panel.
+  const cutoff=Math.max(70,255-tol);
+  const lumAt=(x,y)=>{
+    const i=(y*w+x)*4;
+    if(d[i+3]<10)return 255;
+    return 0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2];
+  };
+
+  // Work on a small grid so hundreds of large images stay fast on tablets.
+  const sx=Math.max(1,Math.ceil(w/240));
+  const sy=Math.max(1,Math.ceil(h/240));
+  const gw=Math.ceil(w/sx), gh=Math.ceil(h/sy);
+  const grid=new Uint8Array(gw*gh);
 
   for(let gy=0;gy<gh;gy++){
-
-    const y0 = gy*sy;
-    const y1 = Math.min(h,y0+sy);
-
+    const y0=gy*sy, y1=Math.min(h,y0+sy);
     for(let gx=0;gx<gw;gx++){
-
-      const x0 = gx*sx;
-      const x1 = Math.min(w,x0+sx);
-
-
-      let rr=0;
-      let gg=0;
-      let bb=0;
-      let n=0;
-
-
-      /*
-        Sample instead of reading every pixel
-        in huge cells.
-      */
-
-      const yStep =
-        Math.max(
-          1,
-          Math.floor((y1-y0)/4)
-        );
-
-      const xStep =
-        Math.max(
-          1,
-          Math.floor((x1-x0)/4)
-        );
-
-
-      for(
-        let y=y0;
-        y<y1;
-        y+=yStep
-      ){
-
-        for(
-          let x=x0;
-          x<x1;
-          x+=xStep
-        ){
-
-          const i=(y*w+x)*4;
-
-          rr += data[i];
-          gg += data[i+1];
-          bb += data[i+2];
-
-          n++;
-
+      const x0=gx*sx, x1=Math.min(w,x0+sx);
+      let dark=0,total=0;
+      for(let y=y0;y<y1;y++){
+        for(let x=x0;x<x1;x++){
+          total++;
+          if(lumAt(x,y)<cutoff)dark++;
         }
-
       }
+      grid[gy*gw+gx]=dark/Math.max(1,total)>0.035?1:0;
+    }
+  }
 
+  // Density of each row/column. A small amount of ink such as a speech
+  // bubble at the very top/bottom should NOT define the artwork boundary.
+  const rowDensity=new Float32Array(gh);
+  const colDensity=new Float32Array(gw);
+  for(let gy=0;gy<gh;gy++){
+    let n=0;
+    for(let gx=0;gx<gw;gx++)n+=grid[gy*gw+gx];
+    rowDensity[gy]=n/gw;
+  }
+  for(let gx=0;gx<gw;gx++){
+    let n=0;
+    for(let gy=0;gy<gh;gy++)n+=grid[gy*gw+gx];
+    colDensity[gx]=n/gh;
+  }
 
-      const p =
-        (gy*gw+gx)*3;
+  // Smooth density so a single horizontal panel line or isolated text
+  // cannot create a fake boundary.
+  function smooth(arr,r){
+    const out=new Float32Array(arr.length);
+    let sum=0;
+    for(let i=0;i<arr.length;i++){
+      sum+=arr[i];
+      if(i-r-1>=0)sum-=arr[i-r-1];
+      const a=Math.max(0,i-r),b=Math.min(arr.length-1,i+r);
+      // Recompute edge windows simply; arrays are tiny (<=240 cells).
+      if(i<r){let q=0;for(let j=a;j<=b;j++)q+=arr[j];out[i]=q/(b-a+1)}
+      else out[i]=sum/Math.min(arr.length,2*r+1);
+    }
+    return out;
+  }
 
-      colors[p] =
-        Math.round(rr/n);
+  const rs=smooth(rowDensity,Math.max(2,Math.round(gh*0.015)));
+  const cs=smooth(colDensity,Math.max(2,Math.round(gw*0.015)));
 
-      colors[p+1] =
-        Math.round(gg/n);
+  // Adaptive threshold: artwork usually occupies a substantial fraction
+  // of a row/column, while blank margins and stray speech-bubble ink do not.
+  const threshold=0.075;
 
-      colors[p+2] =
-        Math.round(bb/n);
+  function longestRun(arr){
+    let bestStart=0,bestEnd=-1,bestScore=-1;
+    let start=-1,score=0;
+    for(let i=0;i<arr.length;i++){
+      if(arr[i]>=threshold){
+        if(start<0){start=i;score=0}
+        score+=arr[i];
+      }else if(start>=0){
+        const end=i-1;
+        const len=end-start+1;
+        const value=len*0.65+score*0.35;
+        if(value>bestScore){bestScore=value;bestStart=start;bestEnd=end}
+        start=-1;score=0;
+      }
+    }
+    if(start>=0){
+      const end=arr.length-1,len=end-start+1,value=len*0.65+score*0.35;
+      if(value>bestScore){bestStart=start;bestEnd=end}
+    }
+    return {start:bestStart,end:bestEnd};
+  }
 
+  let yr=longestRun(rs),xr=longestRun(cs);
+
+  // If an unusually light image defeats the density test, fall back to the
+  // old conservative edge scan rather than returning a broken crop.
+  if(yr.end<yr.start || xr.end<xr.start){
+    const darkAt=(x,y)=>lumAt(x,y)<cutoff;
+    let top=0,bottom=h-1,left=0,right=w-1;
+    const rowHas=(y)=>{let hits=0;for(let x=0;x<w;x+=Math.max(1,Math.floor(w/180))){if(darkAt(x,y))hits++}return hits/Math.ceil(w/Math.max(1,Math.floor(w/180)))>0.006};
+    const colHas=(x)=>{let hits=0;for(let y=0;y<h;y+=Math.max(1,Math.floor(h/180))){if(darkAt(x,y))hits++}return hits/Math.ceil(h/Math.max(1,Math.floor(h/180)))>0.006};
+    while(top<h&&!rowHas(top))top++;
+    while(bottom>=0&&!rowHas(bottom))bottom--;
+    while(left<w&&!colHas(left))left++;
+    while(right>=0&&!colHas(right))right--;
+    if(top>bottom||left>right)return c;
+    left=Math.max(0,left-pad);top=Math.max(0,top-pad);right=Math.min(w-1,right+pad);bottom=Math.min(h-1,bottom+pad);
+    const out=document.createElement('canvas');out.width=right-left+1;out.height=bottom-top+1;
+    out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
+    return out;
+  }
+
+  // Convert grid coordinates back to pixels.
+  let top=yr.start*sy;
+  let bottom=Math.min(h-1,(yr.end+1)*sy-1);
+  let left=xr.start*sx;
+  let right=Math.min(w-1,(xr.end+1)*sx-1);
+
+  // Tighten each side using the actual pixels, but only inside the detected
+  // main artwork band. This removes the final thin white slivers.
+  const rowReal=(y)=>{
+    const step=Math.max(1,Math.floor(w/220));let hits=0,total=0;
+    for(let x=left;x<=right;x+=step){total++;if(lumAt(x,y)<cutoff)hits++}
+    return hits/Math.max(1,total)>=0.012;
+  };
+  const colReal=(x)=>{
+    const step=Math.max(1,Math.floor(h/220));let hits=0,total=0;
+    for(let y=top;y<=bottom;y+=step){total++;if(lumAt(x,y)<cutoff)hits++}
+    return hits/Math.max(1,total)>=0.012;
+  };
+
+  while(top<bottom&&!rowReal(top))top++;
+  while(bottom>top&&!rowReal(bottom))bottom--;
+  while(left<right&&!colReal(left))left++;
+  while(right>left&&!colReal(right))right--;
+
+  // Safety margin is intentionally applied only after the aggressive crop.
+  left=Math.max(0,left-pad);
+  top=Math.max(0,top-pad);
+  right=Math.min(w-1,right+pad);
+  bottom=Math.min(h-1,bottom+pad);
+
+  const out=document.createElement('canvas');
+  out.width=Math.max(1,right-left+1);
+  out.height=Math.max(1,bottom-top+1);
+  out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
+  return out;
+}
+
+function cropImageAggressive(img,tol,pad){
+  const w=img.naturalWidth,h=img.naturalHeight;
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(img,0,0);
+  const d=ctx.getImageData(0,0,w,h).data;
+
+  // Aggressive mode is intentionally ART-FIRST.  Dark dialogue text,
+  // speech-bubble outlines and tiny lettering sitting in an otherwise white
+  // margin should NOT keep that margin.  We therefore measure how much
+  // non-white artwork occupies each row/column and ignore sparse ink.
+  const cutoff=Math.max(70,255-tol);
+  const isNonWhite=(x,y)=>{
+    const i=(y*w+x)*4;
+    if(d[i+3]<10)return false;
+    return !(d[i]>=cutoff && d[i+1]>=cutoff && d[i+2]>=cutoff);
+  };
+
+  // A 300px-ish sampling grid keeps this practical for hundreds of images.
+  const sx=Math.max(1,Math.ceil(w/300));
+  const sy=Math.max(1,Math.ceil(h/300));
+  const gw=Math.ceil(w/sx), gh=Math.ceil(h/sy);
+  const rowDensity=new Float32Array(gh);
+  const colDensity=new Float32Array(gw);
+
+  for(let gy=0;gy<gh;gy++){
+    const y0=gy*sy,y1=Math.min(h,y0+sy);
+    let dark=0,total=0;
+    for(let y=y0;y<y1;y++){
+      for(let x=0;x<w;x+=Math.max(1,Math.floor(w/260))){
+        total++; if(isNonWhite(x,y))dark++;
+      }
+    }
+    rowDensity[gy]=dark/Math.max(1,total);
+  }
+  for(let gx=0;gx<gw;gx++){
+    const x0=gx*sx,x1=Math.min(w,x0+sx);
+    let dark=0,total=0;
+    for(let x=x0;x<x1;x++){
+      for(let y=0;y<h;y+=Math.max(1,Math.floor(h/260))){
+        total++; if(isNonWhite(x,y))dark++;
+      }
+    }
+    colDensity[gx]=dark/Math.max(1,total);
+  }
+
+  function smooth(arr,r){
+    const out=new Float32Array(arr.length);
+    for(let i=0;i<arr.length;i++){
+      let sum=0,n=0;
+      for(let j=Math.max(0,i-r);j<=Math.min(arr.length-1,i+r);j++){sum+=arr[j];n++;}
+      out[i]=sum/n;
+    }
+    return out;
+  }
+
+  // Sparse text/bubble strokes are normally below this density.  Actual
+  // artwork occupies a much larger fraction of a boundary row/column.
+  const rs=smooth(rowDensity,Math.max(2,Math.round(gh*0.012)));
+  const cs=smooth(colDensity,Math.max(2,Math.round(gw*0.012)));
+  const ART_DENSITY=0.025;
+  const MIN_RUN=Math.max(2,Math.round(Math.min(gh,gw)*0.025));
+
+  function findStart(arr){
+    let start=-1,run=0;
+    for(let i=0;i<arr.length;i++){
+      if(arr[i]>=ART_DENSITY){
+        if(start<0)start=i;
+        if(++run>=MIN_RUN)return start;
+      }else{
+        start=-1;run=0;
+      }
+    }
+    return 0;
+  }
+  function findEnd(arr){
+    let end=-1,run=0;
+    for(let i=arr.length-1;i>=0;i--){
+      if(arr[i]>=ART_DENSITY){
+        if(end<0)end=i;
+        if(++run>=MIN_RUN)return end;
+      }else{
+        end=-1;run=0;
+      }
+    }
+    return arr.length-1;
+  }
+
+  let top=findStart(rs),bottom=findEnd(rs),left=findStart(cs),right=findEnd(cs);
+  if(bottom<=top||right<=left)return c;
+
+  top*=sy;
+  bottom=Math.min(h-1,(bottom+1)*sy-1);
+  left*=sx;
+  right=Math.min(w-1,(right+1)*sx-1);
+
+  // Final pixel-level tightening. Again, sparse bubble/text ink is ignored.
+  const rowDensityReal=(y)=>{
+    const step=Math.max(1,Math.floor(w/320));
+    let dark=0,total=0;
+    for(let x=left;x<=right;x+=step){total++;if(isNonWhite(x,y))dark++;}
+    return dark/Math.max(1,total);
+  };
+  const colDensityReal=(x)=>{
+    const step=Math.max(1,Math.floor(h/320));
+    let dark=0,total=0;
+    for(let y=top;y<=bottom;y+=step){total++;if(isNonWhite(x,y))dark++;}
+    return dark/Math.max(1,total);
+  };
+
+  const realThreshold=0.018;
+  let guard=0;
+  while(top<bottom && rowDensityReal(top)<realThreshold && guard++<h)top++;
+  guard=0;
+  while(bottom>top && rowDensityReal(bottom)<realThreshold && guard++<h)bottom--;
+  guard=0;
+  while(left<right && colDensityReal(left)<realThreshold && guard++<w)left++;
+  guard=0;
+  while(right>left && colDensityReal(right)<realThreshold && guard++<w)right--;
+
+  left=Math.max(0,left-pad);top=Math.max(0,top-pad);
+  right=Math.min(w-1,right+pad);bottom=Math.min(h-1,bottom+pad);
+
+  const out=document.createElement('canvas');
+  out.width=Math.max(1,right-left+1);
+  out.height=Math.max(1,bottom-top+1);
+  out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
+  return out;
+}
+function cropImage(img,tol,pad,mode=cropMode){
+  // The two algorithms were wired to the opposite UI modes.
+  // Safe / Normal uses the conservative border crop; Aggressive / All White
+  // uses the art-first crop that removes more white space.
+  return mode==='aggressive' ? cropImageNormal(img,tol,pad) : cropImageAggressive(img,tol,pad);
+}
+
+async function showPreview(file){
+  if(previewUrl)URL.revokeObjectURL(previewUrl);
+  previewUrl=URL.createObjectURL(file);
+  origPreview.src=previewUrl;
+  previewCrop();
+}
+
+async function previewCrop(){
+  if(!selected.length)return;
+  try{
+    const img=await getImage(selected[0]);
+    const out=cropImage(img,+tolEl.value,+padEl.value);
+    const url=out.toDataURL('image/png');
+    cropPreview.src=url;
+  }catch(e){}
+}
+
+function setLocked(locked){
+  settingsBox.classList.toggle('locked',locked);
+  tolEl.disabled=locked;
+  padEl.disabled=locked;
+  resetBtn.disabled=locked;
+  modeNormal.disabled=locked;
+  modeAggressive.disabled=locked;
+}
+
+function setMode(mode){
+  cropMode=mode;
+  modeNormal.classList.toggle('active',mode==='normal');
+  modeAggressive.classList.toggle('active',mode==='aggressive');
+  previewCrop();
+}
+modeNormal.onclick=()=>{if(!modeNormal.disabled)setMode('normal')};
+modeAggressive.onclick=()=>{if(!modeAggressive.disabled)setMode('aggressive')};
+
+tolEl.oninput=()=>{
+  tolVal.textContent=tolEl.value;
+  previewCrop();
+};
+padEl.oninput=()=>{
+  padVal.textContent=padEl.value;
+  previewCrop();
+};
+resetBtn.onclick=()=>{
+  tolEl.value=18;
+  padEl.value=2;
+  tolVal.textContent='18';
+  padVal.textContent='2';
+  previewCrop();
+};
+
+function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
+
+function renderPage(){
+  results.innerHTML='';
+  const totalPages=Math.max(1,Math.ceil(outputs.length/PAGE_SIZE));
+  if(currentPage>totalPages)currentPage=totalPages;
+
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageItems=outputs.slice(start,start+PAGE_SIZE);
+
+  for(const item of pageItems){
+    const div=document.createElement('div');
+    div.className='result';
+
+    const im=document.createElement('img');
+    im.src=URL.createObjectURL(item.blob);
+
+    const done=document.createElement('div');
+    done.className='done';
+    done.textContent='DONE';
+
+    const one=document.createElement('button');
+    one.className='download-one';
+    one.textContent='⇩';
+    one.onclick=()=>downloadBlob(item.blob,item.name);
+
+    const body=document.createElement('div');
+    body.className='result-body';
+    body.innerHTML=
+      `<div class="result-name" title="${item.name.replace(/"/g,'&quot;')}">${item.name}</div>`+
+      `<div class="result-size">${item.width} × ${item.height}</div>`;
+
+    div.append(im,done,one,body);
+    results.append(div);
+  }
+
+  pagination.innerHTML='';
+  if(totalPages<=1)return;
+
+  const prev=document.createElement('button');
+  prev.className='page-btn';
+  prev.textContent='‹';
+  prev.disabled=currentPage===1;
+  prev.onclick=()=>{currentPage--;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
+  pagination.append(prev);
+
+  const maxButtons=7;
+  let first=1,last=totalPages;
+  if(totalPages>maxButtons){
+    first=Math.max(1,currentPage-3);
+    last=Math.min(totalPages,first+6);
+    if(last-first<6)first=last-6;
+  }
+
+  for(let p=first;p<=last;p++){
+    const btn=document.createElement('button');
+    btn.className='page-btn'+(p===currentPage?' active':'');
+    btn.textContent=p;
+    btn.onclick=()=>{currentPage=p;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
+    pagination.append(btn);
+  }
+
+  const next=document.createElement('button');
+  next.className='page-btn';
+  next.textContent='›';
+  next.disabled=currentPage===totalPages;
+  next.onclick=()=>{currentPage++;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
+  pagination.append(next);
+
+  const info=document.createElement('span');
+  info.className='page-info';
+  info.textContent=`Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
+  pagination.append(info);
+}
+
+/* Minimal ZIP writer using STORE compression.
+   This puts every processed image into ONE ZIP, avoiding browser
+   multi-download limits. */
+function crc32(buf){
+  let table=crc32.table;
+  if(!table){
+    table=crc32.table=new Uint32Array(256);
+    for(let n=0;n<256;n++){
+      let c=n;
+      for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;
+      table[n]=c>>>0;
+    }
+  }
+  let c=0xffffffff;
+  for(let i=0;i<buf.length;i++)c=table[(c^buf[i])&255]^(c>>>8);
+  return (c^0xffffffff)>>>0;
+}
+function u16(a,n){a.push(n&255,(n>>>8)&255)}
+function u32(a,n){a.push(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255)}
+function strBytes(s){return new TextEncoder().encode(s)}
+
+async function makeZip(items){
+  const chunks=[],central=[];
+  let offset=0;
+
+  for(const item of items){
+    const data=new Uint8Array(await item.blob.arrayBuffer());
+    const name=strBytes(item.name);
+    const crc=crc32(data);
+    const local=[];
+
+    u32(local,0x04034b50);u16(local,20);u16(local,0);u16(local,0);
+    u16(local,0);u16(local,0);u32(local,crc);
+    u32(local,data.length);u32(local,data.length);
+    u16(local,name.length);u16(local,0);
+
+    chunks.push(new Uint8Array(local),name,data);
+
+    const cen=[];
+    u32(cen,0x02014b50);u16(cen,20);u16(cen,20);u16(cen,0);u16(cen,0);
+    u16(cen,0);u16(cen,0);u32(cen,crc);
+    u32(cen,data.length);u32(cen,data.length);
+    u16(cen,name.length);u16(cen,0);u16(cen,0);u16(cen,0);u16(cen,0);
+    u32(cen,0);u32(cen,offset);
+
+    central.push(new Uint8Array(cen),name);
+    offset+=local.length+name.length+data.length;
+  }
+
+  const centralOffset=offset;
+  let centralSize=0;
+  for(const c of central){chunks.push(c);centralSize+=c.length}
+
+  const end=[];
+  u32(end,0x06054b50);u16(end,0);u16(end,0);
+  u16(end,items.length);u16(end,items.length);
+  u32(end,centralSize);u32(end,centralOffset);u16(end,0);
+  chunks.push(new Uint8Array(end));
+
+  return new Blob(chunks,{type:'application/zip'});
+}
+
+cleanBtn.onclick=async()=>{
+  if(!selected.length){
+    alert('Select some images first.');
+    return;
+  }
+
+  outputs=[];
+  currentPage=1;
+  results.innerHTML='';
+  pagination.innerHTML='';
+  downloadAll.disabled=true;
+  cleanBtn.disabled=true;
+  setLocked(true);
+
+  progressCard.style.display='block';
+  bar.style.width='0%';
+  percent.textContent='0%';
+
+  const tol=+tolEl.value,pad=+padEl.value,mode=cropMode;
+
+  try{
+    for(let i=0;i<selected.length;i++){
+      progressText.textContent=`Processing ${i+1} of ${selected.length} images…`;
+      status.textContent=selected[i].name;
+
+      const img=await getImage(selected[i]);
+      const out=cropImage(img,tol,pad,mode);
+      const blob=await new Promise(r=>out.toBlob(r,'image/png'));
+      const name=selected[i].name.replace(/\.[^.]+$/,'')+'_clean.png';
+
+      outputs.push({
+        blob,name,width:out.width,height:out.height
+      });
+
+      const p=((i+1)/selected.length)*100;
+      bar.style.width=p+'%';
+      percent.textContent=Math.round(p)+'%';
+
+      // Don't render hundreds of cards while processing.
+      // Render only once at the end, in pages of 20.
+      await new Promise(r=>setTimeout(r,0));
     }
 
+    progressText.textContent=`Finished ${selected.length} images`;
+    status.textContent='All processed images are ready.';
+    renderPage();
+    downloadAll.disabled=false;
+  }catch(err){
+    status.textContent='Something went wrong while processing an image.';
+    console.error(err);
+  }finally{
+    cleanBtn.disabled=false;
+    setLocked(false);
   }
+};
 
+downloadAll.onclick=async()=>{
+  if(!outputs.length)return;
 
-  /*
-    Estimate background colors from the OUTER EDGES.
+  downloadAll.disabled=true;
+  downloadAll.textContent='Creating ZIP…';
 
-    We use multiple samples rather than one corner because
-    a corner may contain artwork.
-  */
-
-  const edgeSamples = [];
-
-
-  function addEdgeSample(gx,gy){
-
-    if(
-      gx<0 ||
-      gy<0 ||
-      gx>=gw ||
-      gy>=gh
-    ){
-      return;
-    }
-
-
-    const p=(gy*gw+gx)*3;
-
-
-    edgeSamples.push([
-      colors[p],
-      colors[p+1],
-      colors[p+2]
-    ]);
-
+  try{
+    const zip=await makeZip(outputs);
+    downloadBlob(zip,'cut-it-out-cleaned-images.zip');
+  }finally{
+    downloadAll.disabled=false;
+    downloadAll.textContent='⇩ Download All (.ZIP)';
   }
-
-
-  /*
-    Sample several points around each side.
-  */
-
-  const edgeCount = 12;
-
-
-  for(let i=0;i<edgeCount;i++){
-
-    const t =
-      i/(edgeCount-1);
-
-    const x =
-      Math.round(
-        t*(gw-1)
-      );
-
-    const y =
-      Math.round(
-        t*(gh-1)
-      );
-
-
-    addEdgeSample(x,0);
-    addEdgeSample(x,gh-1);
-
-    addEdgeSample(0,y);
-    addEdgeSample(gw-1,y);
-
-  }
-
-
-  /*
-    Find the dominant edge color.
-
-    Similar edge colors are grouped together.
-
-    This is especially useful for slightly compressed
-    screenshots where a supposedly black background may
-    actually contain values like:
-
-        0,0,0
-        2,2,2
-        4,4,4
-        7,7,7
-  */
-
-  const groupingDistance =
-    32 + tol*0.65;
-
-
-  let bestColor =
-    [255,255,255];
-
-  let bestCount = 0;
-
-
-  for(
-    const candidate of edgeSamples
-  ){
-
-    let count=0;
-  
+};
+</script>
+</body>
+</html>
