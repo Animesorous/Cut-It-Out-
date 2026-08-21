@@ -5,83 +5,46 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Free Image Border Cropper & Background Remover Online | Cut It Out!</title>
 <style>
-:root{--bg:#0b0d12;--panel:#13161d;--panel2:#171a22;--line:#ffffff14;--text:#f5f5f7;--muted:#9297a3;--gold:#f1c33b;--gold2:#dcae27;--green:#28d66f;--danger:#ff6464}
+:root{--bg:#0b0d12;--panel:#13161d;--line:#ffffff14;--text:#f5f5f7;--muted:#9297a3;--gold:#f1c33b;--green:#28d66f}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 45%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 main{width:min(1180px,calc(100% - 28px));margin:auto;padding:28px 0 45px}
-h1{font-size:clamp(34px,5vw,50px);line-height:1;margin:0 0 12px;font-weight:850;letter-spacing:-1.5px}
-h1 span{color:var(--gold)}
+h1{font-size:clamp(34px,5vw,50px);line-height:1;margin:0 0 12px;font-weight:850;letter-spacing:-1.5px}h1 span{color:var(--gold)}
 .subtitle{font-size:16px;color:#c5c8d0;margin:0 0 13px}
-.badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.badge{background:#191c24;border:1px solid var(--line);padding:7px 11px;border-radius:9px;font-size:13px;color:#d8dbe2}
-.badge b{color:var(--gold)}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.badge{background:#191c24;border:1px solid var(--line);padding:7px 11px;border-radius:9px;font-size:13px;color:#d8dbe2}.badge b{color:var(--gold)}
 .card{background:linear-gradient(145deg,#14171e,#11141a);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 40px #0004}
-.drop{min-height:210px;border:2px dashed #ffffff24;border-radius:15px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;transition:.15s}
-.drop:hover,.drop.drag{border-color:var(--gold);background:#ffffff03}
-.drop-icon{font-size:34px;margin-bottom:7px}
-.drop-title{font-size:19px;font-weight:750}
-.drop-sub{font-size:14px;color:var(--muted);margin-top:4px}
-.count{display:inline-flex;align-items:center;gap:7px;margin-top:15px;padding:8px 13px;border:1px solid #ffffff18;background:#171a21;border-radius:10px;color:var(--muted)}
-.count strong{color:var(--green)}
+.drop{min-height:210px;border:2px dashed #ffffff24;border-radius:15px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;transition:.15s}.drop:hover,.drop.drag{border-color:var(--gold);background:#ffffff03}
+.drop-icon{font-size:34px;margin-bottom:7px}.drop-title{font-size:19px;font-weight:750}.drop-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.count{display:inline-flex;align-items:center;gap:7px;margin-top:15px;padding:8px 13px;border:1px solid #ffffff18;background:#171a21;border-radius:10px;color:var(--muted)}.count strong{color:var(--green)}
 input[type=file]{display:none}
 .settings-preview{display:grid;grid-template-columns:390px 1fr;gap:18px;margin-top:18px}
-.settings{background:#12151c;border:1px solid var(--line);border-radius:15px;padding:18px}
-.setting{margin-bottom:23px}
-.setting:last-child{margin-bottom:0}
+.settings{background:#12151c;border:1px solid var(--line);border-radius:15px;padding:18px}.setting{margin-bottom:23px}.setting:last-child{margin-bottom:0}
 .setting-head{display:flex;justify-content:space-between;align-items:center;font-weight:750;margin-bottom:8px}
 .value{border:1px solid #ffffff1c;border-radius:8px;padding:6px 11px;min-width:52px;text-align:center;color:#f3f3f4}
 .help{color:#727784;border:1px solid #ffffff22;border-radius:50%;font-size:11px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
-.desc{color:var(--muted);font-size:13px;line-height:1.4;margin-top:8px}
-.settings.locked{opacity:.55}
-.settings.locked input{cursor:not-allowed}
-input[type=range]{width:100%;accent-color:var(--gold);cursor:pointer}
-input[type=range]::-webkit-slider-runnable-track{background:#302a18;height:6px;border-radius:99px}
-input[type=range]::-moz-range-track{background:#302a18;height:6px;border-radius:99px}
-input[type=range]::-webkit-slider-thumb{accent-color:var(--gold)}
-input[type=range]::-moz-range-thumb{background:var(--gold);border:0}
+.desc{color:var(--muted);font-size:13px;line-height:1.4;margin-top:8px}.settings.locked{opacity:.55}
 .mode-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .mode-btn{background:#171a21;border:1px solid #ffffff20;color:#dfe2e8;border-radius:10px;padding:10px 9px;text-align:left;cursor:pointer;font-weight:750}
-.mode-btn small{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-top:3px;line-height:1.3}
-.mode-btn.active{border-color:var(--gold);background:#2a2413;box-shadow:0 0 0 1px #f1c33b33 inset}
-.mode-btn:disabled{cursor:not-allowed;opacity:.5}
-.learning{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:9px 10px;border:1px solid #ffffff14;background:#171a21;border-radius:9px;font-size:12px;color:#aeb2bc}
-.learning b{color:var(--green)}
-.previewbox{background:#10131a;border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}
-.preview-title{text-align:center;font-weight:750;margin-bottom:12px}
-.previews{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pane{min-width:0}
-.pane label{display:block;text-align:center;color:#aeb2bc;font-size:12px;margin-bottom:7px}
+.mode-btn small{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-top:3px;line-height:1.3}.mode-btn.active{border-color:var(--gold);background:#2a2413;box-shadow:0 0 0 1px #f1c33b33 inset}.mode-btn:disabled{cursor:not-allowed;opacity:.5}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:7px;background:#2b2f38;border-radius:99px;outline:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:7px;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:19px;height:19px;margin-top:-6px;border-radius:50%;background:var(--gold);border:2px solid #0b0d12;box-shadow:0 0 0 2px #f1c33b55}
+input[type=range]::-moz-range-track{height:7px;background:#2b2f38;border-radius:99px}
+input[type=range]::-moz-range-progress{height:7px;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px}
+input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:var(--gold);border:2px solid #0b0d12}
+input[type=range]:disabled{cursor:not-allowed;opacity:.5}
+.previewbox{background:#10131a;border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}.preview-title{text-align:center;font-weight:750;margin-bottom:12px}
+.previews{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pane{min-width:0}.pane label{display:block;text-align:center;color:#aeb2bc;font-size:12px;margin-bottom:7px}
 .frame{height:270px;border:1px solid #ffffff15;border-radius:10px;background:linear-gradient(45deg,#1a1d24 25%,transparent 25%) 0 0/18px 18px,linear-gradient(-45deg,#1a1d24 25%,transparent 25%) 0 9px/18px 18px,linear-gradient(45deg,transparent 75%,#1a1d24 75%) 9px -9px/18px 18px,linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,#11141a;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .frame img{max-width:100%;max-height:100%;object-fit:contain;display:block}
 .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
-button{border:1px solid transparent;border-radius:10px;padding:12px 20px;font-weight:800;font-size:14px;cursor:pointer}
-.primary{background:var(--gold);color:#16120a}
-.primary:hover{background:#ffd14e}
-.secondary{background:#171a21;border-color:#ffffff26;color:#f4f4f5}
-.secondary:hover{background:#1d212a}
-button:disabled{opacity:.4;cursor:not-allowed}
-.progress-card{margin-top:18px;display:none}
-.progress-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;color:#d9dce2}
-.percent{color:var(--gold);font-weight:800}
-.track{height:9px;background:#242832;border-radius:99px;overflow:hidden}
-.bar{height:100%;width:0;background:var(--gold);transition:width .12s}
-.status{font-size:13px;color:var(--muted);margin-top:8px}
-.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:18px}
-.result{background:#12151b;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
-.result img{width:100%;height:150px;object-fit:contain;background:#0d1015;display:block}
-.result-body{padding:9px}
-.result-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c8cbd2}
-.result-size{font-size:11px;color:#707580;margin-top:3px}
-.done{position:absolute;top:7px;left:7px;background:#0b8d43;color:white;border-radius:6px;padding:3px 6px;font-size:9px;font-weight:900}
-.download-one{position:absolute;right:7px;top:7px;width:27px;height:27px;padding:0;background:#171a20;color:white;border:1px solid #ffffff22}
-.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:18px 0 0}
-.page-btn{min-width:38px;padding:9px 12px;background:#171a21;color:#ddd;border:1px solid #ffffff1c}
-.page-btn.active{background:var(--gold);color:#17130a;border-color:var(--gold)}
-.page-btn:disabled{opacity:.35}
-.page-info{font-size:12px;color:var(--muted);margin:0 8px}
-.note{font-size:12px;color:#747985;text-align:center;margin-top:16px;line-height:1.5}
-@media(max-width:820px){.settings-preview{grid-template-columns:1fr}.previews{grid-template-columns:1fr 1fr}.frame{height:230px}}
-@media(max-width:520px){main{width:min(100% - 18px,1180px);padding-top:18px}.previews{grid-template-columns:1fr}.frame{height:260px}.settings-preview{gap:10px}}
+button{border:1px solid transparent;border-radius:10px;padding:12px 20px;font-weight:800;font-size:14px;cursor:pointer}.primary{background:var(--gold);color:#16120a}.primary:hover{background:#ffd14e}.secondary{background:#171a21;border-color:#ffffff26;color:#f4f4f5}.secondary:hover{background:#1d212a}button:disabled{opacity:.4;cursor:not-allowed}
+.progress-card{margin-top:18px;display:none}.progress-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;color:#d9dce2}.percent{color:var(--gold);font-weight:800}
+.track{height:9px;background:#242832;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .12s}.status{font-size:13px;color:var(--muted);margin-top:8px}
+.learn{font-size:12px;color:#777d89;text-align:center;margin-top:10px}.learn b{color:var(--green)}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:18px}.result{background:#12151b;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}.result img{width:100%;height:150px;object-fit:contain;background:#0d1015;display:block}.result-body{padding:9px}.result-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c8cbd2}.result-size{font-size:11px;color:#707580;margin-top:3px}.done{position:absolute;top:7px;left:7px;background:#0b8d43;color:white;border-radius:6px;padding:3px 6px;font-size:9px;font-weight:900}.download-one{position:absolute;right:7px;top:7px;width:27px;height:27px;padding:0;background:#171a20;color:white;border:1px solid #ffffff22}
+.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:18px 0 0}.page-btn{min-width:38px;padding:9px 12px;background:#171a21;color:#ddd;border:1px solid #ffffff1c}.page-btn.active{background:var(--gold);color:#17130a;border-color:var(--gold)}.page-btn:disabled{opacity:.35}.page-info{font-size:12px;color:var(--muted);margin:0 8px}.note{font-size:12px;color:#747985;text-align:center;margin-top:16px;line-height:1.5}
+@media(max-width:820px){.settings-preview{grid-template-columns:1fr}.previews{grid-template-columns:1fr 1fr}.frame{height:230px}}@media(max-width:520px){main{width:min(100% - 18px,1180px);padding-top:18px}.previews{grid-template-columns:1fr}.frame{height:260px}.settings-preview{gap:10px}}
 </style>
 </head>
 <body>
@@ -89,11 +52,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 <header>
 <h1>Cut It <span>Out!</span> ✂️</h1>
 <p class="subtitle">Remove unwanted borders from any images — fast, free, and right in your browser.</p>
-<div class="badges">
-<div class="badge">🔒 <b>100% Private</b></div>
-<div class="badge">☁️ <b>No Uploads</b></div>
-<div class="badge">💸 <b>100% Free</b></div>
-</div>
+<div class="badges"><div class="badge">🔒 <b>100% Private</b></div><div class="badge">☁️ <b>No Uploads</b></div><div class="badge">💸 <b>100% Free</b></div></div>
 </header>
 
 <section class="card">
@@ -102,33 +61,32 @@ button:disabled{opacity:.4;cursor:not-allowed}
 <div class="drop-title">Tap to select images</div>
 <div class="drop-sub">or drag & drop here</div>
 <div class="count" id="count"><span>○</span><strong>0</strong> images selected</div>
-<input id="files" type="file" accept="image/*" multiple>
 </div>
+<input id="files" type="file" accept="image/*" multiple>
 
 <div class="settings-preview">
 <div class="settings" id="settings">
 <div class="setting">
-<div class="setting-head"><span>Crop Mode <span class="help" title="Choose how much surrounding background should be removed">?</span></span></div>
+<div class="setting-head"><span>Crop Mode <span class="help" title="Choose how strongly the outer background is removed">?</span></span></div>
 <div class="mode-group">
-<button type="button" class="mode-btn active" id="modeNormal">Normal<small>Conservative border detection that protects real artwork.</small></button>
-<button type="button" class="mode-btn" id="modeAggressive">Aggressive<small>Much stronger background removal for tight crops and difficult borders.</small></button>
+<button type="button" class="mode-btn active" id="modeNormal">Normal<small>Carefully removes the outer background while protecting artwork.</small></button>
+<button type="button" class="mode-btn" id="modeAggressive">Aggressive<small>Pushes much harder into large background areas to find the actual content.</small></button>
 </div>
 </div>
 
 <div class="setting">
-<div class="setting-head"><span>Tolerance <span class="help" title="How different a pixel can be from the detected background">?</span></span><span class="value" id="tolVal">18</span></div>
+<div class="setting-head"><span>Tolerance <span class="help" title="How different a pixel can be from the detected background">?</span><span class="value" id="tolVal">18</span></span></div>
 <input id="tol" type="range" min="1" max="100" value="18">
-<div class="desc">Higher removes more background variation. Lower preserves more subtle artwork.</div>
+<div class="desc">Higher detects more pixels as different from the background.</div>
 </div>
 
 <div class="setting">
-<div class="setting-head"><span>Safety Margin (px) <span class="help" title="Adds a small border around detected artwork">?</span></span><span class="value" id="padVal">2</span></div>
+<div class="setting-head"><span>Safety Margin (px) <span class="help" title="Adds a small border around detected content">?</span><span class="value" id="padVal">2</span></span></div>
 <input id="pad" type="range" min="0" max="20" value="2">
-<div class="desc">Keeps a small margin around the detected content.</div>
+<div class="desc">Keeps a small amount of space around the detected content.</div>
 </div>
 
-<div class="learning">🧠 Self-Improve <b id="learningState">ON</b></div>
-<button class="secondary" id="reset" style="width:100%;margin-top:18px">↻ Reset Settings</button>
+<button type="button" class="secondary" id="reset" style="width:100%;margin-top:18px">↻ Reset Settings</button>
 </div>
 
 <div class="previewbox">
@@ -140,10 +98,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 </div>
 </div>
 
-<div class="actions">
-<button class="secondary" id="clean">✣ Clean Images</button>
-<button class="primary" id="downloadAll" disabled>⇩ Download All (.ZIP)</button>
-</div>
+<div class="actions"><button type="button" class="secondary" id="clean">✣ Clean Images</button><button type="button" class="primary" id="downloadAll" disabled>⇩ Download All (.ZIP)</button></div>
+<div class="learn" id="learn">🧠 Self-Improvement: <b>learning your preferred settings</b></div>
 <div class="note">The processing happens on your device. Your images are not sent anywhere.</div>
 </section>
 
@@ -153,60 +109,33 @@ button:disabled{opacity:.4;cursor:not-allowed}
 <div class="status" id="status"></div>
 </section>
 
-<div class="results" id="results"></div>
-<div class="pagination" id="pagination"></div>
+<div class="results" id="results"></div><div class="pagination" id="pagination"></div>
 </main>
 
 <script>
 const $=id=>document.getElementById(id);
-const filesEl=$('files'),drop=$('drop'),count=$('count');
-const tolEl=$('tol'),padEl=$('pad'),tolVal=$('tolVal');
-const padVal=$('padVal'),cleanBtn=$('clean'),downloadAll=$('downloadAll');
-const modeNormal=$('modeNormal'),modeAggressive=$('modeAggressive');
-const resetBtn=$('reset'),settingsBox=$('settings');
-const origPreview=$('origPreview'),cropPreview=$('cropPreview');
-const results=$('results'),pagination=$('pagination');
-const progressCard=$('progressCard'),bar=$('bar'),percent=$('percent');
-const progressText=$('progressText'),status=$('status'),learningState=$('learningState');
+const filesEl=$('files'),drop=$('drop'),count=$('count'),tolEl=$('tol'),padEl=$('pad'),tolVal=$('tolVal'),padVal=$('padVal'),cleanBtn=$('clean'),downloadAll=$('downloadAll'),modeNormal=$('modeNormal'),modeAggressive=$('modeAggressive'),resetBtn=$('reset'),settingsBox=$('settings'),origPreview=$('origPreview'),cropPreview=$('cropPreview'),results=$('results'),pagination=$('pagination'),progressCard=$('progressCard'),bar=$('bar'),percent=$('percent'),progressText=$('progressText'),status=$('status'),learn=$('learn');
 
 let selected=[],outputs=[],previewUrl=null,currentPage=1,cropMode='normal';
 const PAGE_SIZE=20;
-const LEARN_KEY='cutItOutLearning';
-let learning=loadLearning();
 
-function loadLearning(){
-try{return JSON.parse(localStorage.getItem(LEARN_KEY))||{uses:0,tolerance:18,pad:2}}
-catch(e){return{uses:0,tolerance:18,pad:2}}
+try{
+const saved=JSON.parse(localStorage.getItem('cutItOutSettings')||'null');
+if(saved){
+tolEl.value=Math.max(1,Math.min(100,+saved.tol||18));
+padEl.value=Math.max(0,Math.min(20,+saved.pad||2));
+cropMode=saved.mode==='aggressive'?'aggressive':'normal';
 }
-function saveLearning(){
-try{localStorage.setItem(LEARN_KEY,JSON.stringify(learning))}catch(e){}
-}
-function rememberAggressiveSettings(){
-if(cropMode!=='aggressive')return;
-const t=+tolEl.value,p=+padEl.value;
-learning.tolerance=Math.round((learning.tolerance*learning.uses+t)/(learning.uses+1));
-learning.pad=Math.round((learning.pad*learning.uses+p)/(learning.uses+1));
-learning.uses++;
-saveLearning();
-}
-function applyLearnedSettings(){
-if(cropMode!=='aggressive'||!learning.uses)return;
-const t=Math.max(1,Math.min(100,learning.tolerance));
-const p=Math.max(0,Math.min(20,learning.pad));
-tolEl.value=t;
-padEl.value=p;
-tolVal.textContent=t;
-padVal.textContent=p;
-}
+}catch(e){}
+
+tolVal.textContent=tolEl.value;padVal.textContent=padEl.value;
+modeNormal.classList.toggle('active',cropMode==='normal');
+modeAggressive.classList.toggle('active',cropMode==='aggressive');
 
 drop.addEventListener('click',()=>filesEl.click());
 drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag')});
 drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
-drop.addEventListener('drop',e=>{
-e.preventDefault();
-drop.classList.remove('drag');
-setFiles([...e.dataTransfer.files]);
-});
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag');setFiles([...e.dataTransfer.files])});
 filesEl.addEventListener('change',()=>setFiles([...filesEl.files]));
 
 function setFiles(arr){
@@ -217,25 +146,15 @@ if(selected.length)showPreview(selected[0]);
 
 function getImage(file){
 return new Promise((resolve,reject)=>{
-const img=new Image();
-img.onload=()=>resolve(img);
-img.onerror=reject;
-img.src=URL.createObjectURL(file);
+const img=new Image(),url=URL.createObjectURL(file);
+img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};
+img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Image load failed'))};
+img.src=url;
 });
 }
 
-function isWhite(d,i,tol){
-const cutoff=255-tol;
-return d[i]>=cutoff&&d[i+1]>=cutoff&&d[i+2]>=cutoff;
-}
-
-function cropImageNormal(img,tol,pad){
-return cropWithBackgroundModel(img,tol,pad,false);
-}
-
-function cropImageAggressive(img,tol,pad){
-return cropWithBackgroundModel(img,tol,pad,true);
-}
+function cropImageNormal(img,tol,pad){return cropWithBackgroundModel(img,tol,pad,false)}
+function cropImageAggressive(img,tol,pad){return cropWithBackgroundModel(img,tol,pad,true)}
 
 function cropWithBackgroundModel(img,tol,pad,aggressive){
 const w=img.naturalWidth,h=img.naturalHeight;
@@ -243,228 +162,125 @@ const c=document.createElement('canvas');c.width=w;c.height=h;
 const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
 const d=ctx.getImageData(0,0,w,h).data;
 const diag=Math.sqrt(255*255*3);
-const threshold=aggressive?Math.max(5,(0.08+tol/300)*diag):Math.max(4,Math.min(1,0.25+tol/120)*diag);
-const marginX=Math.max(1,Math.floor(w*0.035));
-const marginY=Math.max(1,Math.floor(h*0.035));
+const threshold=aggressive?Math.max(2,diag*(0.16+tol/150)):Math.max(4,diag*(0.25+tol/120));
+const marginX=Math.max(1,Math.floor(w*.035)),marginY=Math.max(1,Math.floor(h*.035));
 
-function pixel(x,y){
-x=Math.max(0,Math.min(w-1,x));y=Math.max(0,Math.min(h-1,y));
-const i=(y*w+x)*4;
-return[d[i],d[i+1],d[i+2]];
-}
-function median(a){
-a.sort((x,y)=>x-y);
-return a[Math.floor(a.length/2)];
-}
+function pixel(x,y){x=Math.max(0,Math.min(w-1,x));y=Math.max(0,Math.min(h-1,y));let i=(y*w+x)*4;return[d[i],d[i+1],d[i+2]]}
+function median(a){a.sort((x,y)=>x-y);return a[Math.floor(a.length/2)]}
 function patchColor(cx,cy){
-const rs=[],gs=[],bs=[];
-const x0=Math.max(0,Math.floor(cx-marginX/2)),x1=Math.min(w-1,Math.floor(cx+marginX/2));
-const y0=Math.max(0,Math.floor(cy-marginY/2)),y1=Math.min(h-1,Math.floor(cy+marginY/2));
-const stepX=Math.max(1,Math.floor((x1-x0+1)/8)),stepY=Math.max(1,Math.floor((y1-y0+1)/8));
-for(let y=y0;y<=y1;y+=stepY)for(let x=x0;x<=x1;x+=stepX){
-const q=pixel(x,y);rs.push(q[0]);gs.push(q[1]);bs.push(q[2]);
+const rs=[],gs=[],bs=[],x0=Math.max(0,Math.floor(cx-marginX/2)),x1=Math.min(w-1,Math.floor(cx+marginX/2)),y0=Math.max(0,Math.floor(cy-marginY/2)),y1=Math.min(h-1,Math.floor(cy+marginY/2)),sx=Math.max(1,Math.floor((x1-x0+1)/8)),sy=Math.max(1,Math.floor((y1-y0+1)/8));
+for(let y=y0;y<=y1;y+=sy)for(let x=x0;x<=x1;x+=sx){let q=pixel(x,y);rs.push(q[0]);gs.push(q[1]);bs.push(q[2])}
+return[median(rs),median(gs),median(bs)]
 }
-return[median(rs),median(gs),median(bs)];
-}
-
 const c00=patchColor(0,0),c10=patchColor(w-1,0),c01=patchColor(0,h-1),c11=patchColor(w-1,h-1);
 
 function expectedColor(x,y){
 const u=w<=1?0:x/(w-1),v=h<=1?0:y/(h-1);
-const top=[c00[0]*(1-u)+c10[0]*u,c00[1]*(1-u)+c10[1]*u,c00[2]*(1-u)+c10[2]*u];
-const bot=[c01[0]*(1-u)+c11[0]*u,c01[1]*(1-u)+c11[1]*u,c01[2]*(1-u)+c11[2]*u];
-return[top[0]*(1-v)+bot[0]*v,top[1]*(1-v)+bot[1]*v,top[2]*(1-v)+bot[2]*v];
+const top=[c00[0]*(1-u)+c10[0]*u,c00[1]*(1-u)+c10[1]*u,c00[2]*(1-u)+c10[2]*u],bot=[c01[0]*(1-u)+c11[0]*u,c01[1]*(1-u)+c11[1]*u,c01[2]*(1-u)+c11[2]*u];
+return[top[0]*(1-v)+bot[0]*v,top[1]*(1-v)+bot[1]*v,top[2]*(1-v)+bot[2]*v]
 }
 function bgDistance(x,y){
-const i=(y*w+x)*4,e=expectedColor(x,y);
-const dr=d[i]-e[0],dg=d[i+1]-e[1],db=d[i+2]-e[2];
-return Math.sqrt(dr*dr+dg*dg+db*db);
+let i=(y*w+x)*4,e=expectedColor(x,y),dr=d[i]-e[0],dg=d[i+1]-e[1],db=d[i+2]-e[2];
+return Math.sqrt(dr*dr+dg*dg+db*db)
 }
 function isArtwork(x,y){return bgDistance(x,y)>threshold}
 
-const maxGrid=220,sx=Math.max(1,Math.ceil(w/maxGrid)),sy=Math.max(1,Math.ceil(h/maxGrid));
-const gw=Math.ceil(w/sx),gh=Math.ceil(h/sy),grid=new Uint8Array(gw*gh);
+const maxGrid=220,sx=Math.max(1,Math.ceil(w/maxGrid)),sy=Math.max(1,Math.ceil(h/maxGrid)),gw=Math.ceil(w/sx),gh=Math.ceil(h/sy),grid=new Uint8Array(gw*gh);
 
 for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){
-const x0=gx*sx,x1=Math.min(w,x0+sx),y0=gy*sy,y1=Math.min(h,y0+sy);
-let hit=0,total=0;
-const stepx=Math.max(1,Math.floor((x1-x0)/5)),stepy=Math.max(1,Math.floor((y1-y0)/5));
-for(let y=y0;y<y1;y+=stepy)for(let x=x0;x<x1;x+=stepx){
-total++;
-if(isArtwork(x,y))hit++;
-}
-grid[gy*gw+gx]=hit/Math.max(1,total)>(aggressive?0.008:0.025)?1:0;
+let x0=gx*sx,x1=Math.min(w,x0+sx),y0=gy*sy,y1=Math.min(h,y0+sy),hit=0,total=0,stepx=Math.max(1,Math.floor((x1-x0)/5)),stepy=Math.max(1,Math.floor((y1-y0)/5));
+for(let y=y0;y<y1;y+=stepy)for(let x=x0;x<x1;x+=stepx){total++;if(isArtwork(x,y))hit++}
+grid[gy*gw+gx]=hit/Math.max(1,total)>(aggressive?.008:.025)?1:0
 }
 
-function densityRows(){
-const a=new Float32Array(gh);
-for(let y=0;y<gh;y++){let n=0;for(let x=0;x<gw;x++)n+=grid[y*gw+x];a[y]=n/gw}
-return a;
-}
-function densityCols(){
-const a=new Float32Array(gw);
-for(let x=0;x<gw;x++){let n=0;for(let y=0;y<gh;y++)n+=grid[y*gw+x];a[x]=n/gh}
-return a;
-}
-function smooth(a,r){
-const out=new Float32Array(a.length);
-for(let i=0;i<a.length;i++){
-let s=0,n=0;
-for(let j=Math.max(0,i-r);j<=Math.min(a.length-1,i+r);j++){s+=a[j];n++}
-out[i]=s/n;
-}
-return out;
-}
+function densityRows(){let a=new Float32Array(gh);for(let y=0;y<gh;y++){let n=0;for(let x=0;x<gw;x++)n+=grid[y*gw+x];a[y]=n/gw}return a}
+function densityCols(){let a=new Float32Array(gw);for(let x=0;x<gw;x++){let n=0;for(let y=0;y<gh;y++)n+=grid[y*gw+x];a[x]=n/gh}return a}
+function smooth(a,r){let out=new Float32Array(a.length);for(let i=0;i<a.length;i++){let s=0,n=0;for(let j=Math.max(0,i-r);j<=Math.min(a.length-1,i+r);j++){s+=a[j];n++}out[i]=s/n}return out}
+
 function runBounds(a,minDensity,minRun){
 let best=null,start=-1,run=0,score=0,bestScore=-1;
 for(let i=0;i<a.length;i++){
 if(a[i]>=minDensity){
-if(start<0){start=i;run=0;score=0}
-run++;score+=a[i];
-if(run>=minRun){
-const value=run*.8+score*.2;
-if(value>bestScore){bestScore=value;best={start,end:i}}
-}
+if(start<0){start=i;run=0;score=0}run++;score+=a[i];
+if(run>=minRun){let value=run*.8+score*.2;if(value>bestScore){bestScore=value;best={start,end:i}}}
 }else if(!aggressive){
-if(start>=0&&run>=minRun){
-const value=run*.8+score*.2;
-if(value>bestScore){bestScore=value;best={start,end:i-1}}
-}
-start=-1;run=0;score=0;
-}
-}
-if(!best)best={start:0,end:a.length-1};
-return best;
+if(start>=0&&run>=minRun){let value=run*.8+score*.2;if(value>bestScore){bestScore=value;best={start,end:i-1}}}
+start=-1;run=0;score=0
+}}
+return best||{start:0,end:a.length-1}
 }
 
-const rs=smooth(densityRows(),Math.max(2,Math.round(gh*.015)));
-const cs=smooth(densityCols(),Math.max(2,Math.round(gw*.015)));
-const minDensity=aggressive?0.006:0.035;
-const minRun=Math.max(2,Math.round(Math.min(gh,gw)*(aggressive?.010:.03)));
+const rs=smooth(densityRows(),Math.max(2,Math.round(gh*.015))),cs=smooth(densityCols(),Math.max(2,Math.round(gw*.015)));
+const minDensity=aggressive?.008:.035,minRun=Math.max(2,Math.round(Math.min(gh,gw)*(aggressive?.008:.03)));
 let yr=runBounds(rs,minDensity,minRun),xr=runBounds(cs,minDensity,minRun);
+let top=yr.start*sy,bottom=Math.min(h-1,(yr.end+1)*sy-1),left=xr.start*sx,right=Math.min(w-1,(xr.end+1)*sx-1);
 
-let top=yr.start*sy,bottom=Math.min(h-1,(yr.end+1)*sy-1);
-let left=xr.start*sx,right=Math.min(w-1,(xr.end+1)*sx-1);
-
-const rowDensity=y=>{
-let hit=0,total=0,step=Math.max(1,Math.floor(w/320));
-for(let x=left;x<=right;x+=step){total++;if(isArtwork(x,y))hit++}
-return hit/Math.max(1,total);
-};
-const colDensity=x=>{
-let hit=0,total=0,step=Math.max(1,Math.floor(h/320));
-for(let y=top;y<=bottom;y+=step){total++;if(isArtwork(x,y))hit++}
-return hit/Math.max(1,total);
-};
-
+const rowDensity=y=>{let hit=0,total=0,step=Math.max(1,Math.floor(w/320));for(let x=left;x<=right;x+=step){total++;if(isArtwork(x,y))hit++}return hit/Math.max(1,total)};
+const colDensity=x=>{let hit=0,total=0,step=Math.max(1,Math.floor(h/320));for(let y=top;y<=bottom;y+=step){total++;if(isArtwork(x,y))hit++}return hit/Math.max(1,total)};
 const realThreshold=aggressive?.004:.022;
+
 let guard=0;
 while(top<bottom&&rowDensity(top)<realThreshold&&guard++<h)top++;
-guard=0;
-while(bottom>top&&rowDensity(bottom)<realThreshold&&guard++<h)bottom--;
-guard=0;
-while(left<right&&colDensity(left)<realThreshold&&guard++<w)left++;
-guard=0;
-while(right>left&&colDensity(right)<realThreshold&&guard++<w)right--;
+guard=0;while(bottom>top&&rowDensity(bottom)<realThreshold&&guard++<h)bottom--;
+guard=0;while(left<right&&colDensity(left)<realThreshold&&guard++<w)left++;
+guard=0;while(right>left&&colDensity(right)<realThreshold&&guard++<w)right--;
 
 const area=(right-left+1)*(bottom-top+1),full=w*h;
-if(area<full*.008){
-left=0;top=0;right=w-1;bottom=h-1;
-}
+if(area<full*(aggressive?.003:.015)){left=0;top=0;right=w-1;bottom=h-1}
 
-left=Math.max(0,left-pad);
-top=Math.max(0,top-pad);
-right=Math.min(w-1,right+pad);
-bottom=Math.min(h-1,bottom+pad);
-
-const out=document.createElement('canvas');
-out.width=Math.max(1,right-left+1);
-out.height=Math.max(1,bottom-top+1);
+left=Math.max(0,left-pad);top=Math.max(0,top-pad);right=Math.min(w-1,right+pad);bottom=Math.min(h-1,bottom+pad);
+const out=document.createElement('canvas');out.width=Math.max(1,right-left+1);out.height=Math.max(1,bottom-top+1);
 out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
-return out;
+return out
 }
 
-function cropImage(img,tol,pad,mode=cropMode){
-return mode==='aggressive'?cropImageAggressive(img,tol,pad):cropImageNormal(img,tol,pad);
-}
+function cropImage(img,tol,pad,mode=cropMode){return mode==='aggressive'?cropImageAggressive(img,tol,pad):cropImageNormal(img,tol,pad)}
 
 async function showPreview(file){
 if(previewUrl)URL.revokeObjectURL(previewUrl);
-previewUrl=URL.createObjectURL(file);
-origPreview.src=previewUrl;
-previewCrop();
+previewUrl=URL.createObjectURL(file);origPreview.src=previewUrl;previewCrop()
 }
 
 async function previewCrop(){
 if(!selected.length)return;
 try{
-const img=await getImage(selected[0]);
-const out=cropImage(img,+tolEl.value,+padEl.value);
-cropPreview.src=out.toDataURL('image/png');
+const img=await getImage(selected[0]),out=cropImage(img,+tolEl.value,+padEl.value);
+cropPreview.src=out.toDataURL('image/png')
 }catch(e){}
 }
 
 function setLocked(locked){
 settingsBox.classList.toggle('locked',locked);
-tolEl.disabled=locked;
-padEl.disabled=locked;
-resetBtn.disabled=locked;
-modeNormal.disabled=locked;
-modeAggressive.disabled=locked;
+tolEl.disabled=locked;padEl.disabled=locked;resetBtn.disabled=locked;modeNormal.disabled=locked;modeAggressive.disabled=locked
+}
+
+function saveSettings(){
+try{localStorage.setItem('cutItOutSettings',JSON.stringify({tol:+tolEl.value,pad:+padEl.value,mode:cropMode}))}catch(e){}
 }
 
 function setMode(mode){
-cropMode=mode;
-modeNormal.classList.toggle('active',mode==='normal');
-modeAggressive.classList.toggle('active',mode==='aggressive');
-if(mode==='aggressive')applyLearnedSettings();
-previewCrop();
+cropMode=mode;modeNormal.classList.toggle('active',mode==='normal');modeAggressive.classList.toggle('active',mode==='aggressive');saveSettings();previewCrop()
 }
+modeNormal.onclick=()=>setMode('normal');
+modeAggressive.onclick=()=>setMode('aggressive');
 
-modeNormal.onclick=()=>{if(!modeNormal.disabled)setMode('normal')};
-modeAggressive.onclick=()=>{if(!modeAggressive.disabled)setMode('aggressive')};
-
-tolEl.oninput=()=>{
-tolVal.textContent=tolEl.value;
-previewCrop();
-};
-padEl.oninput=()=>{
-padVal.textContent=padEl.value;
-previewCrop();
-};
-
+tolEl.oninput=()=>{tolVal.textContent=tolEl.value;saveSettings();previewCrop()};
+padEl.oninput=()=>{padVal.textContent=padEl.value;saveSettings();previewCrop()};
 resetBtn.onclick=()=>{
-tolEl.value=18;
-padEl.value=2;
-tolVal.textContent='18';
-padVal.textContent='2';
-previewCrop();
+tolEl.value=18;padEl.value=2;cropMode='normal';tolVal.textContent='18';padVal.textContent='2';modeNormal.classList.add('active');modeAggressive.classList.remove('active');saveSettings();previewCrop()
 };
 
 function downloadBlob(blob,name){
-const url=URL.createObjectURL(blob);
-const a=document.createElement('a');
-a.href=url;
-a.download=name;
-document.body.appendChild(a);
-a.click();
-a.remove();
-setTimeout(()=>URL.revokeObjectURL(url),5000);
+const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)
 }
 
 function renderPage(){
 results.innerHTML='';
-const totalPages=Math.max(1,Math.ceil(outputs.length/PAGE_SIZE));
-if(currentPage>totalPages)currentPage=totalPages;
-const start=(currentPage-1)*PAGE_SIZE;
-const pageItems=outputs.slice(start,start+PAGE_SIZE);
-
+const totalPages=Math.max(1,Math.ceil(outputs.length/PAGE_SIZE));if(currentPage>totalPages)currentPage=totalPages;
+const pageItems=outputs.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
 for(const item of pageItems){
-const div=document.createElement('div');
-div.className='result';
-const im=document.createElement('img');
-im.src=URL.createObjectURL(item.blob);
-const done=document.createElement('div');
-done.className='done';
-done.textContent='DONE';
-const one=docum
+const div=document.createElement('div');div.className='result';
+const im=document.createElement('img');im.src=URL.createObjectURL(item.blob);
+const done=document.createElement('div');done.className='done';done.textContent='DONE';
+const one=document.createElement('button');one.type='button';one.className='download-one';one.textContent='⇩';one.onclick=()=>downloadBlob(item.blob,item.name);
+const body=document.createElement('div');body.className='result-body';body.innerHTML=`<div class="result-na
