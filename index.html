@@ -31,7 +31,7 @@ input[type=file]{display:none}
 .settings-preview{display:grid;grid-template-columns:390px 1fr;gap:18px;margin-top:18px}
 .settings{background:#12151c;border:1px solid var(--line);border-radius:15px;padding:18px}
 .setting{margin-bottom:23px}.setting:last-child{margin-bottom:0}
-.setting-head{display:flex;justify-content:space-between;align-items:center;font-weight:750;margin-bottom:8px}
+.setting-head{display:flex;justify-between;align-items:center;font-weight:750;margin-bottom:8px}
 .value{border:1px solid #ffffff1c;border-radius:8px;padding:6px 11px;min-width:52px;text-align:center;color:#f3f3f4}
 .help{color:#727784;border:1px solid #ffffff22;border-radius:50%;font-size:11px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
 .desc{color:var(--muted);font-size:13px;line-height:1.4;margin-top:8px}.settings.locked{opacity:.55}.settings.locked input{cursor:not-allowed}
@@ -72,7 +72,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .done{position:absolute;top:7px;left:7px;background:#0b8d43;color:white;border-radius:6px;padding:3px 6px;font-size:9px;font-weight:900}
 .download-one{position:absolute;right:7px;top:7px;width:27px;height:27px;padding:0;background:#171a20;color:white;border:1px solid #ffffff22}
 
-
 .pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:18px 0 0}
 .page-btn{min-width:38px;padding:9px 12px;background:#171a21;color:#ddd;border:1px solid #ffffff1c}
 .page-btn.active{background:var(--gold);color:#17130a;border-color:var(--gold)}
@@ -91,7 +90,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
     <p class="subtitle">Remove unwanted borders from any images — fast, free, and right in your browser.</p>
     <div class="badges">
       <div class="badge">🔒 <b>100% Private</b></div>
-      
       <div class="badge">☁️ <b>No Uploads</b></div>
       <div class="badge">🪙 <b>100% Free</b></div>
     </div>
@@ -179,33 +177,43 @@ const progressText=$('progressText'),status=$('status');
 let selected=[],outputs=[],previewUrl=null,currentPage=1,cropMode='normal';
 const PAGE_SIZE=20;
 
-drop.addEventListener('click',()=>filesEl.click());
+drop.addEventListener('click', e => {
+  if (e.target !== filesEl) filesEl.click();
+});
 drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag')});
 drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
 drop.addEventListener('drop',e=>{
   e.preventDefault();drop.classList.remove('drag');
-  setFiles([...e.dataTransfer.files]);
+  if(e.dataTransfer.files && e.dataTransfer.files.length){
+    setFiles([...e.dataTransfer.files]);
+  }
 });
-filesEl.addEventListener('change',()=>setFiles([...filesEl.files]));
+filesEl.addEventListener('change',()=>{
+  if(filesEl.files && filesEl.files.length){
+    setFiles([...filesEl.files]);
+  }
+});
 
 function setFiles(arr){
   selected=arr.filter(f=>f.type.startsWith('image/'));
   count.innerHTML=`<span style="color:#28d66f">✓</span><strong>${selected.length}</strong> images selected`;
-  if(selected.length)showPreview(selected[0]);
+  if(selected.length) showPreview(selected[0]);
 }
 
 function getImage(file){
   return new Promise((resolve,reject)=>{
     const img=new Image();
-    img.onload=()=>resolve(img);
-    img.onerror=reject;
-    img.src=URL.createObjectURL(file);
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror=(err)=>{
+      URL.revokeObjectURL(url);
+      reject(err);
+    };
+    img.src=url;
   });
-}
-
-function isWhite(d,i,tol){
-  const cutoff=255-tol;
-  return d[i]>=cutoff && d[i+1]>=cutoff && d[i+2]>=cutoff;
 }
 
 function cropImageNormal(img,tol,pad){
@@ -216,26 +224,15 @@ function cropImageAggressive(img,tol,pad){
   return cropWithBackgroundModel(img,tol,pad,true);
 }
 
-/*
- * Background-aware cropper.
- * Instead of assuming "white", it estimates the image's OUTER background
- * from the edge pixels. Four corner regions are used to build a smooth
- * bilinear RGB background model, which works for solid colours as well as
- * many horizontal/vertical/diagonal gradients.
- *
- * Normal: conservative connected-background removal.
- * Aggressive: art-first density crop; sparse text/lines inside a mostly
- * background-coloured area do not keep that area from being removed.
- */
 function cropWithBackgroundModel(img,tol,pad,aggressive){
   const w=img.naturalWidth,h=img.naturalHeight;
+  if (!w || !h) return document.createElement('canvas');
   const c=document.createElement('canvas');c.width=w;c.height=h;
   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
   const d=ctx.getImageData(0,0,w,h).data;
 
   const diag=Math.sqrt(255*255*3);
   const threshold=Math.max(4,Math.min(1,0.25 + tol/120)*diag);
-  const sampleN=Math.max(10,Math.min(36,Math.floor(Math.min(w,h)/40)));
   const marginX=Math.max(1,Math.floor(w*0.035));
   const marginY=Math.max(1,Math.floor(h*0.035));
 
@@ -255,8 +252,6 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
     return [median(rs),median(gs),median(bs)];
   }
 
-  // Use corner patches, not single pixels, so tiny artwork touching a corner
-  // is less likely to poison the estimated background colour.
   const c00=patchColor(0,0),c10=patchColor(w-1,0),c01=patchColor(0,h-1),c11=patchColor(w-1,h-1);
 
   function expectedColor(x,y){
@@ -273,7 +268,6 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   }
   function isArtwork(x,y){return bgDistance(x,y)>threshold;}
 
-  // Work on a small grid for predictable tablet performance.
   const maxGrid=220,sx=Math.max(1,Math.ceil(w/maxGrid)),sy=Math.max(1,Math.ceil(h/maxGrid));
   const gw=Math.ceil(w/sx),gh=Math.ceil(h/sy),grid=new Uint8Array(gw*gh);
   for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){
@@ -290,7 +284,7 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   }
   function densityCols(){
     const a=new Float32Array(gw);
-    for(let x=0;x<gw;x++){let n=0;for(let y=0;y<gh;y++)n+=grid[y*gw+x];a[x]=n/gw;}return a;
+    for(let x=0;x<gw;x++){let n=0;for(let y=0;y<gh;y++)n+=grid[y*gw+x];a[x]=n/gh;}return a;
   }
   function smooth(a,r){
     const out=new Float32Array(a.length);
@@ -316,7 +310,6 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   let top=yr.start*sy,bottom=Math.min(h-1,(yr.end+1)*sy-1);
   let left=xr.start*sx,right=Math.min(w-1,(xr.end+1)*sx-1);
 
-  // Pixel-level tightening against the estimated background.
   const rowDensity=(y)=>{let hit=0,total=0,step=Math.max(1,Math.floor(w/320));for(let x=left;x<=right;x+=step){total++;if(isArtwork(x,y))hit++;}return hit/Math.max(1,total)};
   const colDensity=(x)=>{let hit=0,total=0,step=Math.max(1,Math.floor(h/320));for(let y=top;y<=bottom;y+=step){total++;if(isArtwork(x,y))hit++;}return hit/Math.max(1,total)};
   const realThreshold=aggressive?0.012:0.022;
@@ -326,8 +319,6 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
   guard=0;while(left<right&&colDensity(left)<realThreshold&&guard++<w)left++;
   guard=0;while(right>left&&colDensity(right)<realThreshold&&guard++<w)right--;
 
-  // If the gradient model is poor (for example, a highly textured edge),
-  // avoid returning an absurdly tiny crop. Fall back to a conservative scan.
   const area=(right-left+1)*(bottom-top+1),full=w*h;
   if(area<full*0.015){left=0;top=0;right=w-1;bottom=h-1;}
 
@@ -337,7 +328,6 @@ function cropWithBackgroundModel(img,tol,pad,aggressive){
 }
 
 function cropImage(img,tol,pad,mode=cropMode){
-  // Correct mapping: Normal is conservative; Aggressive is art-first.
   return mode==='aggressive' ? cropImageAggressive(img,tol,pad) : cropImageNormal(img,tol,pad);
 }
 
@@ -345,7 +335,7 @@ async function showPreview(file){
   if(previewUrl)URL.revokeObjectURL(previewUrl);
   previewUrl=URL.createObjectURL(file);
   origPreview.src=previewUrl;
-  previewCrop();
+  await previewCrop();
 }
 
 async function previewCrop(){
@@ -353,9 +343,10 @@ async function previewCrop(){
   try{
     const img=await getImage(selected[0]);
     const out=cropImage(img,+tolEl.value,+padEl.value);
-    const url=out.toDataURL('image/png');
-    cropPreview.src=url;
-  }catch(e){}
+    cropPreview.src=out.toDataURL('image/png');
+  }catch(e){
+    console.error("Preview failed:", e);
+  }
 }
 
 function setLocked(locked){
@@ -406,4 +397,29 @@ function renderPage(){
   if(currentPage>totalPages)currentPage=totalPages;
 
   const start=(currentPage-1)*PAGE_SIZE;
- 
+  const pageItems=outputs.slice(start,start+PAGE_SIZE);
+
+  for(const item of pageItems){
+    const div=document.createElement('div');
+    div.className='result';
+
+    const im=document.createElement('img');
+    im.src=URL.createObjectURL(item.blob);
+
+    const done=document.createElement('div');
+    done.className='done';
+    done.textContent='DONE';
+
+    const one=document.createElement('button');
+    one.className='download-one';
+    one.textContent='⇩';
+    one.onclick=()=>downloadBlob(item.blob,item.name);
+
+    const body=document.createElement('div');
+    body.className='result-body';
+    body.innerHTML=
+      `<div class="result-name" title="${item.name.replace(/"/g,'&quot;')}">${item.name}</div>`+
+      `<div class="result-size">${item.width} × ${item.height}</div>`;
+
+    div.append(im,done,one,body);
+    resul
