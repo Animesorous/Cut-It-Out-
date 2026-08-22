@@ -2,1619 +2,4235 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Free Background Remover Online | Cut It Out!</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>Cut It Out! — AI Background Remover</title>
+
 <style>
 :root{
---bg:#0b0d12;
---panel:#13161d;
---panel2:#171a22;
---line:#ffffff14;
---text:#f5f5f7;
---muted:#9297a3;
---gold:#f1c33b;
---gold2:#dcae27;
---green:#28d66f;
---danger:#ff6464;
+  --bg:#050711;
+  --bg2:#090d1c;
+  --glass:rgba(13,18,38,.62);
+  --glass2:rgba(18,25,52,.72);
+  --line:rgba(150,190,255,.16);
+  --line2:rgba(255,255,255,.10);
+
+  --text:#f4f8ff;
+  --muted:#8d99b5;
+
+  --cyan:#45e7ff;
+  --cyan2:#16bde0;
+  --purple:#9d72ff;
+  --pink:#ef6cff;
+
+  --green:#52f5a0;
+  --red:#ff647c;
+
+  --shadow:0 24px 80px rgba(0,0,0,.45);
 }
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  min-height:100%;
+  background:var(--bg);
+}
+
 body{
-margin:0;
-background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 48%);
-color:var(--text);
-font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  margin:0;
+  min-height:100vh;
+
+  color:var(--text);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  background:
+    radial-gradient(
+      900px 520px at 8% -8%,
+      rgba(69,231,255,.19),
+      transparent 65%
+    ),
+    radial-gradient(
+      760px 560px at 95% 4%,
+      rgba(157,114,255,.22),
+      transparent 64%
+    ),
+    radial-gradient(
+      700px 600px at 50% 100%,
+      rgba(239,108,255,.12),
+      transparent 68%
+    ),
+    linear-gradient(
+      135deg,
+      #050711 0%,
+      #080b18 48%,
+      #050611 100%
+    );
+
+  overflow-x:hidden;
 }
+
+body:before{
+  content:"";
+
+  position:fixed;
+  inset:0;
+
+  pointer-events:none;
+
+  opacity:.24;
+
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.025) 1px,
+      transparent 1px
+    );
+
+  background-size:42px 42px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      black,
+      transparent 85%
+    );
+}
+
+body:after{
+  content:"";
+
+  position:fixed;
+
+  width:420px;
+  height:420px;
+
+  left:-160px;
+  top:42%;
+
+  border-radius:50%;
+
+  background:
+    rgba(69,231,255,.09);
+
+  filter:blur(80px);
+
+  pointer-events:none;
+}
+
 main{
-width:min(1180px,calc(100% - 28px));
-margin:auto;
-padding:28px 0 50px;
+  width:min(
+    1220px,
+    calc(100% - 28px)
+  );
+
+  margin:auto;
+
+  padding:
+    30px
+    0
+    64px;
+
+  position:relative;
+  z-index:1;
 }
+
+.hero{
+  display:flex;
+
+  justify-content:space-between;
+  align-items:flex-end;
+
+  gap:22px;
+
+  margin-bottom:20px;
+}
+
+.eyebrow{
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  padding:
+    7px
+    11px;
+
+  border:
+    1px solid
+    rgba(69,231,255,.20);
+
+  background:
+    rgba(69,231,255,.06);
+
+  border-radius:999px;
+
+  color:#9defff;
+
+  font-size:11px;
+  font-weight:900;
+
+  letter-spacing:1.4px;
+
+  text-transform:uppercase;
+
+  box-shadow:
+    0 0 28px
+    rgba(69,231,255,.06)
+    inset;
+}
+
+.eyebrow i{
+  width:7px;
+  height:7px;
+
+  border-radius:50%;
+
+  background:var(--green);
+
+  box-shadow:
+    0 0 12px
+    var(--green);
+}
+
 h1{
-font-size:clamp(34px,5vw,50px);
-line-height:1;
-margin:0 0 12px;
-font-weight:850;
-letter-spacing:-1.5px;
+  margin:
+    13px
+    0
+    9px;
+
+  font-size:
+    clamp(
+      38px,
+      7vw,
+      68px
+    );
+
+  line-height:.94;
+
+  letter-spacing:-3px;
+
+  font-weight:950;
 }
-h1 span{color:var(--gold)}
+
+h1 .accent{
+  background:
+    linear-gradient(
+      90deg,
+      var(--cyan),
+      #a9f7ff 38%,
+      var(--purple) 80%
+    );
+
+  -webkit-background-clip:text;
+  background-clip:text;
+
+  color:transparent;
+
+  text-shadow:
+    0 0 40px
+    rgba(69,231,255,.12);
+}
+
 .subtitle{
-font-size:16px;
-color:#c5c8d0;
-margin:0 0 14px;
+  margin:0;
+
+  max-width:690px;
+
+  color:#aab5cf;
+
+  line-height:1.55;
+
+  font-size:15px;
 }
-.badges{
-display:flex;
-gap:8px;
-flex-wrap:wrap;
-margin-bottom:18px;
+
+.system-pill{
+  min-width:210px;
+
+  padding:
+    13px
+    15px;
+
+  border:
+    1px solid
+    var(--line);
+
+  background:
+    rgba(12,17,35,.56);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  border-radius:16px;
+
+  box-shadow:var(--shadow);
 }
-.badge{
-background:#191c24;
-border:1px solid var(--line);
-padding:7px 11px;
-border-radius:9px;
-font-size:13px;
-color:#d8dbe2;
+
+.system-pill .top{
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  color:#dbe7ff;
+
+  font-weight:850;
+
+  font-size:12px;
 }
-.badge b{color:var(--gold)}
-.card{
-background:linear-gradient(145deg,#14171e,#11141a);
-border:1px solid var(--line);
-border-radius:18px;
-padding:18px;
-box-shadow:0 12px 40px #0004;
+
+.system-pill .dot{
+  width:8px;
+  height:8px;
+
+  border-radius:50%;
+
+  background:var(--green);
+
+  box-shadow:
+    0 0 14px
+    var(--green);
 }
+
+.system-pill small{
+  display:block;
+
+  color:var(--muted);
+
+  margin-top:5px;
+
+  font-size:11px;
+}
+
+.glass{
+  border:
+    1px solid
+    var(--line);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18,25,52,.72),
+      rgba(7,11,25,.64)
+    );
+
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+
+  box-shadow:
+    var(--shadow),
+    inset 0 1px
+    rgba(255,255,255,.035);
+
+  border-radius:24px;
+}
+
+.import-card{
+  padding:16px;
+}
+
 .drop{
-min-height:220px;
-border:2px dashed #ffffff24;
-border-radius:15px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-cursor:pointer;
-transition:.18s;
-user-select:none;
+  min-height:235px;
+
+  border:
+    1px dashed
+    rgba(111,224,255,.30);
+
+  border-radius:19px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  text-align:center;
+
+  cursor:pointer;
+
+  position:relative;
+
+  overflow:hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(69,231,255,.09),
+      transparent 55%
+    ),
+    rgba(4,8,20,.34);
+
+  transition:.2s ease;
 }
+
+.drop:before,
+.drop:after{
+  content:"";
+
+  position:absolute;
+
+  pointer-events:none;
+
+  border-radius:50%;
+
+  filter:blur(24px);
+}
+
+.drop:before{
+  width:120px;
+  height:120px;
+
+  background:
+    rgba(69,231,255,.08);
+
+  left:15%;
+  bottom:-75px;
+}
+
+.drop:after{
+  width:150px;
+  height:150px;
+
+  background:
+    rgba(157,114,255,.08);
+
+  right:10%;
+  top:-100px;
+}
+
 .drop:hover,
 .drop.drag{
-border-color:var(--gold);
-background:#ffffff04;
-transform:translateY(-1px);
+  border-color:
+    rgba(69,231,255,.85);
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(69,231,255,.15),
+      transparent 60%
+    ),
+    rgba(7,13,29,.55);
+
+  box-shadow:
+    0 0 0 1px
+    rgba(69,231,255,.10),
+
+    0 0 45px
+    rgba(69,231,255,.09)
+    inset;
+
+  transform:
+    translateY(-1px);
 }
+
 .drop-icon{
-font-size:38px;
-margin-bottom:8px;
+  width:64px;
+  height:64px;
+
+  display:grid;
+
+  place-items:center;
+
+  border:
+    1px solid
+    rgba(69,231,255,.28);
+
+  background:
+    rgba(69,231,255,.07);
+
+  color:var(--cyan);
+
+  font-size:30px;
+
+  box-shadow:
+    0 0 30px
+    rgba(69,231,255,.10);
+
+  margin-bottom:13px;
+
+  border-radius:18px;
 }
+
 .drop-title{
-font-size:20px;
-font-weight:800;
+  font-size:19px;
+
+  font-weight:900;
+
+  letter-spacing:-.3px;
 }
+
 .drop-sub{
-font-size:14px;
-color:var(--muted);
-margin-top:5px;
+  font-size:13px;
+
+  color:var(--muted);
+
+  margin-top:6px;
 }
+
 .count{
-display:inline-flex;
-align-items:center;
-gap:7px;
-margin-top:15px;
-padding:8px 13px;
-border:1px solid #ffffff18;
-background:#171a21;
-border-radius:10px;
-color:var(--muted);
+  margin-top:15px;
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  padding:
+    8px
+    12px;
+
+  border:
+    1px solid
+    var(--line);
+
+  background:
+    rgba(255,255,255,.035);
+
+  border-radius:999px;
+
+  color:#aebbd5;
+
+  font-size:12px;
 }
-.count strong{color:var(--green)}
-input[type=file]{display:none}
+
+.count strong{
+  color:var(--green);
+}
+
+input[type=file]{
+  display:none;
+}
 
 .workspace{
-display:grid;
-grid-template-columns:390px 1fr;
-gap:18px;
-margin-top:18px;
+  display:grid;
+
+  grid-template-columns:
+    350px
+    minmax(0,1fr);
+
+  gap:16px;
+
+  margin-top:16px;
 }
-.settings{
-background:#12151c;
-border:1px solid var(--line);
-border-radius:15px;
-padding:18px;
+
+.panel{
+  padding:17px;
+
+  border:
+    1px solid
+    var(--line2);
+
+  background:
+    rgba(5,9,22,.45);
+
+  border-radius:20px;
 }
+
+.panel-title{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-bottom:16px;
+}
+
+.panel-title h2{
+  margin:0;
+
+  font-size:14px;
+
+  letter-spacing:.3px;
+
+  font-weight:900;
+}
+
+.panel-title span{
+  font-size:10px;
+
+  color:#71809d;
+
+  text-transform:uppercase;
+
+  letter-spacing:1.1px;
+}
+
 .setting{
-margin-bottom:23px;
+  margin-bottom:19px;
 }
-.setting:last-child{margin-bottom:0}
+
+.setting:last-child{
+  margin-bottom:0;
+}
+
 .setting-head{
-display:flex;
-justify-content:space-between;
-align-items:center;
-font-weight:750;
-margin-bottom:9px;
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-bottom:9px;
 }
+
+.setting-name{
+  font-size:13px;
+
+  font-weight:800;
+
+  color:#e8efff;
+}
+
 .value{
-border:1px solid #ffffff1c;
-border-radius:8px;
-padding:6px 11px;
-min-width:52px;
-text-align:center;
-color:#f3f3f4;
+  min-width:48px;
+
+  text-align:center;
+
+  padding:
+    5px
+    9px;
+
+  border-radius:8px;
+
+  border:
+    1px solid
+    rgba(69,231,255,.16);
+
+  background:
+    rgba(69,231,255,.05);
+
+  color:#a9f4ff;
+
+  font-weight:900;
+
+  font-size:11px;
 }
+
 .help{
-border:1px solid #ffffff22;
-border-radius:50%;
-font-size:11px;
-width:18px;
-height:18px;
-display:inline-flex;
-align-items:center;
-justify-content:center;
-margin-left:4px;
-color:#aaa;
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  width:16px;
+  height:16px;
+
+  border-radius:50%;
+
+  border:
+    1px solid
+    #ffffff1c;
+
+  color:#71809b;
+
+  font-size:10px;
+
+  margin-left:4px;
+
+  cursor:help;
 }
-.desc{
-color:var(--muted);
-font-size:13px;
-line-height:1.4;
-margin-top:8px;
+
+.mode-grid{
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:8px;
 }
-.mode-group{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:8px;
-}
+
 .mode-btn{
-background:#171a21;
-border:1px solid #ffffff20;
-color:#dfe2e8;
-border-radius:10px;
-padding:11px 10px;
-text-align:left;
-cursor:pointer;
-font-weight:750;
-transition:.15s;
+  border:
+    1px solid
+    var(--line2);
+
+  background:
+    rgba(255,255,255,.035);
+
+  color:#c9d4ea;
+
+  border-radius:13px;
+
+  padding:11px;
+
+  text-align:left;
+
+  cursor:pointer;
+
+  transition:.16s;
 }
+
 .mode-btn:hover{
-border-color:#ffffff40;
-background:#1c2028;
+  border-color:
+    rgba(69,231,255,.35);
+
+  background:
+    rgba(69,231,255,.045);
 }
-.mode-btn small{
-display:block;
-color:var(--muted);
-font-size:11px;
-font-weight:500;
-margin-top:4px;
-line-height:1.35;
-}
+
 .mode-btn.active{
-border-color:var(--gold);
-background:#2a2413;
-box-shadow:0 0 0 1px #f1c33b33 inset;
+  border-color:
+    rgba(69,231,255,.65);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(69,231,255,.12),
+      rgba(157,114,255,.07)
+    );
+
+  box-shadow:
+    0 0 0 1px
+    rgba(69,231,255,.08)
+    inset,
+
+    0 0 24px
+    rgba(69,231,255,.07);
+
+  color:#f1fbff;
 }
-.mode-btn:disabled{
-cursor:not-allowed;
-opacity:.5;
+
+.mode-btn b{
+  display:block;
+
+  font-size:12px;
+}
+
+.mode-btn small{
+  display:block;
+
+  color:#74819a;
+
+  font-size:10px;
+
+  line-height:1.35;
+
+  margin-top:4px;
+}
+
+.mode-btn.active small{
+  color:#93a9c8;
 }
 
 .range-wrap{
-position:relative;
-padding-top:3px;
+  padding:3px 0;
 }
+
 input[type=range]{
-width:100%;
-height:8px;
-margin:0;
-appearance:none;
--webkit-appearance:none;
-background:linear-gradient(to right,var(--gold) 0%,var(--gold) var(--fill,18%),#292d36 var(--fill,18%),#292d36 100%);
-border-radius:99px;
-outline:none;
-cursor:pointer;
+  --fill:0%;
+
+  width:100%;
+
+  height:7px;
+
+  appearance:none;
+  -webkit-appearance:none;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--cyan) 0%,
+      var(--purple) var(--fill),
+      rgba(255,255,255,.09) var(--fill),
+      rgba(255,255,255,.09) 100%
+    );
+
+  border-radius:99px;
+
+  outline:none;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 0 13px
+    rgba(69,231,255,.08);
 }
+
 input[type=range]::-webkit-slider-runnable-track{
-height:8px;
-border-radius:99px;
-background:transparent;
+  height:7px;
+
+  background:transparent;
+
+  border-radius:99px;
 }
+
 input[type=range]::-webkit-slider-thumb{
-appearance:none;
--webkit-appearance:none;
-width:19px;
-height:19px;
-margin-top:-5.5px;
-border-radius:50%;
-background:var(--gold);
-border:3px solid #11141a;
-box-shadow:0 0 0 1px #f1c33b88,0 2px 7px #0008;
-cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+
+  width:19px;
+  height:19px;
+
+  margin-top:-6px;
+
+  border-radius:50%;
+
+  background:#d9fbff;
+
+  border:
+    3px solid
+    #10182d;
+
+  box-shadow:
+    0 0 0 1px
+    var(--cyan),
+
+    0 0 16px
+    rgba(69,231,255,.65);
 }
+
 input[type=range]::-moz-range-track{
-height:8px;
-border-radius:99px;
-background:#292d36;
+  height:7px;
+
+  background:
+    rgba(255,255,255,.09);
+
+  border-radius:99px;
 }
+
 input[type=range]::-moz-range-progress{
-height:8px;
-border-radius:99px;
-background:var(--gold);
+  height:7px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--cyan),
+      var(--purple)
+    );
+
+  border-radius:99px;
 }
+
 input[type=range]::-moz-range-thumb{
-width:19px;
-height:19px;
-border-radius:50%;
-background:var(--gold);
-border:3px solid #11141a;
-box-shadow:0 0 0 1px #f1c33b88;
-cursor:pointer;
+  width:15px;
+  height:15px;
+
+  border-radius:50%;
+
+  background:#d9fbff;
+
+  border:
+    3px solid
+    #10182d;
+
+  box-shadow:
+    0 0 0 1px
+    var(--cyan),
+
+    0 0 16px
+    rgba(69,231,255,.65);
+}
+
+.desc{
+  color:#71809b;
+
+  font-size:11px;
+
+  line-height:1.45;
+
+  margin-top:7px;
 }
 
 .switch-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:12px;
-padding:12px;
-background:#171a21;
-border:1px solid #ffffff18;
-border-radius:11px;
-}
-.switch-text{
-font-size:13px;
-font-weight:700;
-}
-.switch-text small{
-display:block;
-font-size:11px;
-font-weight:500;
-color:var(--muted);
-margin-top:3px;
-}
-.switch{
-position:relative;
-width:46px;
-height:25px;
-flex:0 0 auto;
-}
-.switch input{
-display:none;
-}
-.switch-slider{
-position:absolute;
-inset:0;
-border-radius:99px;
-background:#30343d;
-cursor:pointer;
-transition:.2s;
-}
-.switch-slider:before{
-content:"";
-position:absolute;
-width:19px;
-height:19px;
-left:3px;
-top:3px;
-background:#aaa;
-border-radius:50%;
-transition:.2s;
-}
-.switch input:checked+.switch-slider{
-background:#9c7b17;
-}
-.switch input:checked+.switch-slider:before{
-transform:translateX(21px);
-background:var(--gold);
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:12px;
+
+  padding:12px;
+
+  border:
+    1px solid
+    var(--line2);
+
+  border-radius:13px;
+
+  background:
+    rgba(255,255,255,.025);
 }
 
-.previewbox{
-background:#10131a;
-border:1px solid var(--line);
-border-radius:15px;
-padding:16px;
-min-width:0;
+.switch-text{
+  font-size:12px;
+
+  font-weight:800;
+
+  color:#dce7fb;
 }
-.preview-title{
-text-align:center;
-font-weight:750;
-margin-bottom:12px;
+
+.switch-text small{
+  display:block;
+
+  color:#71809b;
+
+  font-size:10px;
+
+  font-weight:500;
+
+  margin-top:3px;
+
+  line-height:1.35;
 }
+
+.switch{
+  width:46px;
+  height:25px;
+
+  position:relative;
+
+  flex:none;
+}
+
+.switch input{
+  display:none;
+}
+
+.switch-slider{
+  position:absolute;
+
+  inset:0;
+
+  border-radius:99px;
+
+  background:#20283c;
+
+  border:
+    1px solid
+    #ffffff10;
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+.switch-slider:before{
+  content:"";
+
+  position:absolute;
+
+  width:17px;
+  height:17px;
+
+  left:3px;
+  top:3px;
+
+  border-radius:50%;
+
+  background:#68738b;
+
+  transition:.2s;
+}
+
+.switch input:checked+.switch-slider{
+  background:
+    rgba(69,231,255,.14);
+
+  border-color:
+    rgba(69,231,255,.42);
+
+  box-shadow:
+    0 0 18px
+    rgba(69,231,255,.14)
+    inset;
+}
+
+.switch input:checked+.switch-slider:before{
+  transform:
+    translateX(21px);
+
+  background:
+    var(--cyan);
+
+  box-shadow:
+    0 0 13px
+    var(--cyan);
+}
+
+.btn{
+  border:
+    1px solid
+    transparent;
+
+  border-radius:13px;
+
+  min-height:43px;
+
+  padding:
+    11px
+    16px;
+
+  font-size:12px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
+  transition:.16s;
+}
+
+.btn:disabled{
+  opacity:.38;
+
+  cursor:not-allowed;
+
+  transform:none!important;
+}
+
+.btn-secondary{
+  color:#dce7fb;
+
+  background:
+    rgba(255,255,255,.035);
+
+  border-color:
+    var(--line2);
+}
+
+.btn-secondary:hover:not(:disabled){
+  background:
+    rgba(255,255,255,.07);
+
+  border-color:
+    rgba(255,255,255,.18);
+
+  transform:
+    translateY(-1px);
+}
+
+.btn-primary{
+  color:#031016;
+
+  background:
+    linear-gradient(
+      100deg,
+      #55eeff,
+      #a1f7ff
+    );
+
+  box-shadow:
+    0 0 25px
+    rgba(69,231,255,.15);
+}
+
+.btn-primary:hover:not(:disabled){
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 0 32px
+    rgba(69,231,255,.25);
+}
+
+.btn-reset{
+  width:100%;
+
+  margin-top:16px;
+}.previewbox{
+  padding:17px;
+}
+
+.preview-head{
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:13px;
+}
+
+.preview-head h2{
+  margin:0;
+
+  font-size:14px;
+
+  font-weight:900;
+}
+
+.preview-state{
+  color:#71809b;
+
+  font-size:10px;
+
+  text-transform:uppercase;
+
+  letter-spacing:1px;
+}
+
 .previews{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:11px;
 }
-.pane{
-min-width:0;
+
+.pane-label{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  color:#8795af;
+
+  font-size:10px;
+
+  text-transform:uppercase;
+
+  letter-spacing:1px;
+
+  margin:
+    0
+    0
+    7px
+    2px;
 }
-.pane label{
-display:block;
-text-align:center;
-color:#aeb2bc;
-font-size:12px;
-margin-bottom:7px;
-}
+
 .frame{
-height:300px;
-border:1px solid #ffffff15;
-border-radius:10px;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-background:
-linear-gradient(45deg,#1a1d24 25%,transparent 25%) 0 0/18px 18px,
-linear-gradient(-45deg,#1a1d24 25%,transparent 25%) 0 9px/18px 18px,
-linear-gradient(45deg,transparent 75%,#1a1d24 75%) 9px -9px/18px 18px,
-linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,
-#11141a;
+  height:340px;
+
+  border:
+    1px solid
+    var(--line2);
+
+  border-radius:15px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  overflow:hidden;
+
+  position:relative;
+
+  background:
+    linear-gradient(
+      45deg,
+      rgba(255,255,255,.045) 25%,
+      transparent 25%
+    )
+    0 0/22px 22px,
+
+    linear-gradient(
+      -45deg,
+      rgba(255,255,255,.045) 25%,
+      transparent 25%
+    )
+    0 11px/22px 22px,
+
+    linear-gradient(
+      45deg,
+      transparent 75%,
+      rgba(255,255,255,.045) 75%
+    )
+    11px -11px/22px 22px,
+
+    linear-gradient(
+      -45deg,
+      transparent 75%,
+      rgba(255,255,255,.045) 75%
+    )
+    -11px 0/22px 22px,
+
+    #080d1a;
 }
+
+.frame:after{
+  content:"";
+
+  position:absolute;
+
+  inset:0;
+
+  pointer-events:none;
+
+  border:
+    1px solid
+    rgba(69,231,255,.04);
+
+  border-radius:15px;
+}
+
 .frame img{
-max-width:100%;
-max-height:100%;
-object-fit:contain;
-display:block;
+  max-width:100%;
+  max-height:100%;
+
+  object-fit:contain;
+
+  display:block;
+
+  position:relative;
+
+  z-index:1;
 }
+
 .empty-preview{
-color:#686d78;
-font-size:13px;
-text-align:center;
-padding:20px;
+  padding:24px;
+
+  color:#56627a;
+
+  font-size:12px;
+
+  text-align:center;
+
+  line-height:1.5;
 }
+
+.processing-overlay{
+  position:absolute;
+
+  inset:0;
+
+  z-index:3;
+
+  display:none;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:
+    rgba(4,8,20,.62);
+
+  backdrop-filter:blur(5px);
+}
+
+.processing-overlay.show{
+  display:flex;
+}
+
+.spinner{
+  width:34px;
+  height:34px;
+
+  border-radius:50%;
+
+  border:
+    3px solid
+    rgba(255,255,255,.10);
+
+  border-top-color:
+    var(--cyan);
+
+  border-right-color:
+    var(--purple);
+
+  animation:
+    spin .8s linear infinite;
+
+  box-shadow:
+    0 0 25px
+    rgba(69,231,255,.20);
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
 .actions{
-display:flex;
-gap:12px;
-justify-content:center;
-flex-wrap:wrap;
-margin-top:18px;
+  display:flex;
+
+  justify-content:center;
+
+  gap:9px;
+
+  flex-wrap:wrap;
+
+  margin-top:15px;
 }
-button{
-border:1px solid transparent;
-border-radius:10px;
-padding:12px 20px;
-font-weight:800;
-font-size:14px;
-cursor:pointer;
-transition:.15s;
-}
-.primary{
-background:var(--gold);
-color:#16120a;
-}
-.primary:hover{
-background:#ffd14e;
-transform:translateY(-1px);
-}
-.secondary{
-background:#171a21;
-border-color:#ffffff26;
-color:#f4f4f5;
-}
-.secondary:hover{
-background:#1d212a;
-border-color:#ffffff38;
-transform:translateY(-1px);
-}
-button:disabled{
-opacity:.4;
-cursor:not-allowed;
-transform:none!important;
-}
+
 .progress-card{
-margin-top:18px;
-display:none;
+  margin-top:16px;
+
+  padding:16px;
+
+  display:none;
 }
+
 .progress-top{
-display:flex;
-justify-content:space-between;
-gap:12px;
-margin-bottom:8px;
-color:#d9dce2;
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:12px;
+
+  font-size:12px;
+
+  color:#b9c7df;
+
+  margin-bottom:8px;
 }
+
 .percent{
-color:var(--gold);
-font-weight:800;
+  color:#9df4ff;
+
+  font-weight:900;
 }
+
 .track{
-height:9px;
-background:#242832;
-border-radius:99px;
-overflow:hidden;
+  height:9px;
+
+  border-radius:99px;
+
+  overflow:hidden;
+
+  background:
+    rgba(255,255,255,.07);
+
+  border:
+    1px solid
+    rgba(255,255,255,.05);
 }
+
 .bar{
-height:100%;
-width:0;
-background:linear-gradient(90deg,var(--gold2),var(--gold));
-border-radius:99px;
-transition:width .15s;
+  height:100%;
+
+  width:0;
+
+  border-radius:99px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--cyan),
+      var(--purple),
+      var(--pink)
+    );
+
+  box-shadow:
+    0 0 18px
+    rgba(69,231,255,.45);
+
+  transition:
+    width .16s;
 }
+
 .status{
-font-size:13px;
-color:var(--muted);
-margin-top:8px;
+  margin-top:8px;
+
+  color:#71809b;
+
+  font-size:11px;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
 }
 
 .results{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-gap:12px;
-margin-top:18px;
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(190px,1fr)
+    );
+
+  gap:12px;
+
+  margin-top:16px;
 }
+
 .result{
-background:#12151b;
-border:1px solid var(--line);
-border-radius:12px;
-overflow:hidden;
-position:relative;
+  border:
+    1px solid
+    var(--line);
+
+  background:
+    rgba(10,15,31,.68);
+
+  border-radius:17px;
+
+  overflow:hidden;
+
+  position:relative;
+
+  box-shadow:
+    0 15px 40px
+    rgba(0,0,0,.25);
 }
+
 .result img{
-width:100%;
-height:160px;
-object-fit:contain;
-background:#0d1015;
-display:block;
+  width:100%;
+
+  height:165px;
+
+  object-fit:contain;
+
+  display:block;
+
+  background:
+    linear-gradient(
+      45deg,
+      rgba(255,255,255,.04) 25%,
+      transparent 25%
+    )
+    0 0/18px 18px,
+
+    linear-gradient(
+      -45deg,
+      rgba(255,255,255,.04) 25%,
+      transparent 25%
+    )
+    0 9px/18px 18px,
+
+    linear-gradient(
+      45deg,
+      transparent 75%,
+      rgba(255,255,255,.04) 75%
+    )
+    9px -9px/18px 18px,
+
+    linear-gradient(
+      -45deg,
+      transparent 75%,
+      rgba(255,255,255,.04) 75%
+    )
+    -9px 0/18px 18px,
+
+    #080d18;
 }
+
 .result-body{
-padding:9px;
+  padding:10px;
 }
+
 .result-name{
-font-size:11px;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-color:#c8cbd2;
+  font-size:11px;
+
+  color:#c6d1e6;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
 }
+
 .result-size{
-font-size:11px;
-color:#707580;
-margin-top:3px;
+  font-size:10px;
+
+  color:#65728a;
+
+  margin-top:4px;
 }
+
 .done{
-position:absolute;
-top:7px;
-left:7px;
-background:#0b8d43;
-color:white;
-border-radius:6px;
-padding:3px 6px;
-font-size:9px;
-font-weight:900;
+  position:absolute;
+
+  top:8px;
+  left:8px;
+
+  padding:
+    4px
+    7px;
+
+  border-radius:999px;
+
+  background:
+    rgba(24,168,102,.86);
+
+  color:#eafff5;
+
+  font-size:8px;
+
+  font-weight:950;
+
+  letter-spacing:.7px;
+
+  border:
+    1px solid
+    rgba(82,245,160,.3);
 }
+
 .download-one{
-position:absolute;
-right:7px;
-top:7px;
-width:29px;
-height:29px;
-padding:0;
-background:#171a20;
-color:white;
-border:1px solid #ffffff22;
+  position:absolute;
+
+  right:8px;
+  top:8px;
+
+  width:30px;
+  height:30px;
+
+  padding:0;
+
+  border-radius:9px;
+
+  color:#dffaff;
+
+  background:
+    rgba(5,10,22,.78);
+
+  border:
+    1px solid
+    rgba(69,231,255,.18);
+
+  cursor:pointer;
 }
+
 .download-one:hover{
-background:#242933;
+  background:
+    rgba(69,231,255,.12);
+
+  border-color:
+    rgba(69,231,255,.5);
 }
+
 .pagination{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:7px;
-flex-wrap:wrap;
-margin:18px 0 0;
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+
+  margin-top:16px;
 }
+
 .page-btn{
-min-width:38px;
-padding:9px 12px;
-background:#171a21;
-color:#ddd;
-border:1px solid #ffffff1c;
+  min-width:37px;
+
+  padding:
+    9px
+    11px;
+
+  border-radius:10px;
+
+  color:#bfcce3;
+
+  background:
+    rgba(255,255,255,.035);
+
+  border:
+    1px solid
+    var(--line2);
+
+  cursor:pointer;
+
+  font-weight:800;
+
+  font-size:11px;
 }
+
+.page-btn:hover:not(:disabled){
+  border-color:
+    rgba(69,231,255,.3);
+}
+
 .page-btn.active{
-background:var(--gold);
-color:#17130a;
-border-color:var(--gold);
+  color:#041117;
+
+  background:
+    var(--cyan);
+
+  border-color:
+    var(--cyan);
+
+  box-shadow:
+    0 0 17px
+    rgba(69,231,255,.2);
 }
+
+.page-btn:disabled{
+  opacity:.35;
+
+  cursor:not-allowed;
+}
+
 .page-info{
-font-size:12px;
-color:var(--muted);
-margin:0 8px;
+  font-size:10px;
+
+  color:#68758d;
+
+  margin:
+    0
+    6px;
 }
+
 .note{
-font-size:12px;
-color:#747985;
-text-align:center;
-margin-top:16px;
-line-height:1.5;
+  margin-top:14px;
+
+  text-align:center;
+
+  color:#56627a;
+
+  font-size:10px;
+
+  line-height:1.5;
 }
+
+.toast{
+  position:fixed;
+
+  left:50%;
+  bottom:22px;
+
+  z-index:20;
+
+  transform:
+    translate(
+      -50%,
+      20px
+    );
+
+  opacity:0;
+
+  pointer-events:none;
+
+  padding:
+    11px
+    15px;
+
+  border-radius:12px;
+
+  border:
+    1px solid
+    rgba(69,231,255,.24);
+
+  background:
+    rgba(7,12,27,.90);
+
+  backdrop-filter:blur(18px);
+
+  color:#dceeff;
+
+  font-size:12px;
+
+  font-weight:800;
+
+  box-shadow:
+    0 18px 50px
+    rgba(0,0,0,.4),
+
+    0 0 28px
+    rgba(69,231,255,.08);
+
+  transition:.22s;
+}
+
+.toast.show{
+  opacity:1;
+
+  transform:
+    translate(
+      -50%,
+      0
+    );
+}
+
+.toast.error{
+  border-color:
+    rgba(255,100,124,.4);
+
+  color:#ffd8df;
+}
+
 .locked{
-opacity:.6;
+  opacity:.58;
+
+  pointer-events:none;
 }
-@media(max-width:820px){
-.workspace{
-grid-template-columns:1fr;
+
+@media(max-width:850px){
+
+  .hero{
+    align-items:flex-start;
+
+    flex-direction:column;
+  }
+
+  .system-pill{
+    width:100%;
+  }
+
+  .workspace{
+    grid-template-columns:1fr;
+  }
+
 }
-.frame{
-height:270px;
+
+@media(max-width:620px){
+
+  main{
+    width:
+      min(
+        100% - 16px,
+        1220px
+      );
+
+    padding-top:18px;
+  }
+
+  h1{
+    letter-spacing:-2px;
+  }
+
+  .import-card{
+    padding:10px;
+  }
+
+  .drop{
+    min-height:210px;
+  }
+
+  .mode-grid{
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .previews{
+    grid-template-columns:1fr;
+  }
+
+  .frame{
+    height:270px;
+  }
+
+  .actions .btn{
+    width:100%;
+  }
+
 }
-}
-@media(max-width:520px){
-main{
-width:min(100% - 18px,1180px);
-padding-top:18px;
-}
-.mode-group{
-grid-template-columns:1fr;
-}
-.previews{
-grid-template-columns:1fr;
-}
-.frame{
-height:250px;
-}
+
+@media(max-width:430px){
+
+  .mode-grid{
+    grid-template-columns:1fr;
+  }
+
 }
 </style>
 </head>
+
 <body>
+
 <main>
-<header>
-<h1>Cut It <span>Out!</span> ✂️</h1>
-<p class="subtitle">Remove backgrounds from images with AI — fast, private, and right in your browser.</p>
-<div class="badges">
-<div class="badge">🔒 <b>100% Private</b></div>
-<div class="badge">☁️ <b>No Uploads</b></div>
-<div class="badge">💰 <b>100% Free</b></div>
-</div>
+
+<header class="hero">
+
+  <div>
+
+    <div class="eyebrow">
+      <i></i>
+      Local AI processing
+    </div>
+
+    <h1>
+      Cut It
+      <span class="accent">Out!</span>
+    </h1>
+
+    <p class="subtitle">
+      A futuristic, browser-based background remover.
+      Your images stay on your device while the AI isolates
+      the subject.
+    </p>
+
+  </div>
+
+  <div class="system-pill">
+
+    <div class="top">
+      <span class="dot"></span>
+
+      <span id="systemState">
+        SYSTEM READY
+      </span>
+    </div>
+
+    <small id="systemDetail">
+      Waiting for an image
+    </small>
+
+  </div>
+
 </header>
 
-<section class="card">
-<div class="drop" id="drop">
-<div class="drop-icon">▧</div>
-<div class="drop-title">Tap to select images</div>
-<div class="drop-sub">or drag & drop images here</div>
-<div class="count" id="count"><span>○</span><strong>0</strong> images selected</div>
-<input id="files" type="file" accept="image/*" multiple>
-</div>
 
-<div class="workspace">
-<div class="settings" id="settings">
+<section class="glass import-card">
 
-<div class="setting">
-<div class="setting-head">
-<span>Removal Mode <span class="help" title="Choose how strongly the background is removed">?</span></span>
-</div>
-<div class="mode-group">
-<button type="button" class="mode-btn active" id="modeNormal">
-Normal
-<small>Balanced removal while preserving fine subject details.</small>
-</button>
-<button type="button" class="mode-btn" id="modeAggressive">
-Aggressive
-<small>Stronger separation for difficult backgrounds.</small>
-</button>
-</div>
-</div>
+  <div class="drop" id="drop">
 
-<div class="setting">
-<div class="setting-head">
-<span>Tolerance <span class="help" title="Controls the strength of the mask cleanup">?</span></span>
-<span class="value" id="tolVal">18</span>
-</div>
-<input id="tol" type="range" min="1" max="100" value="18">
-<div class="desc">Higher values make the removal stronger. Lower values preserve more subtle edges.</div>
-</div>
+    <div class="drop-icon">
+      ⌁
+    </div>
 
-<div class="setting">
-<div class="setting-head">
-<span>Safety Margin (px) <span class="help" title="Protects a small amount around subject edges">?</span></span>
-<span class="value" id="padVal">2</span>
-</div>
-<input id="pad" type="range" min="0" max="20" value="2">
-<div class="desc">Adds a small protective margin around detected subject edges.</div>
-</div>
+    <div class="drop-title">
+      Import your image matrix
+    </div>
 
-<div class="setting">
-<div class="setting-head">
-<span>Self Improvement</span>
-</div>
-<div class="switch-row">
-<div class="switch-text">
-Edge Refinement
-<small>Automatically smooths and improves uncertain subject edges.</small>
-</div>
-<label class="switch">
-<input type="checkbox" id="selfImprove" checked>
-<span class="switch-slider"></span>
-</label>
-</div>
-</div>
+    <div class="drop-sub">
+      Click here or drag & drop PNG, JPG, WEBP and other image files
+    </div>
 
-<button type="button" class="secondary" id="reset" style="width:100%;margin-top:18px">↻ Reset Settings</button>
+    <div class="count" id="count">
+      ◉
+      <strong>0</strong>
+      images loaded
+    </div>
 
-</div>
+    <input
+      id="files"
+      type="file"
+      accept="image/*"
+      multiple
+    >
 
-<div class="previewbox">
-<div class="preview-title">Live Preview</div>
-<div class="previews">
-<div class="pane">
-<label>Original</label>
-<div class="frame" id="originalFrame">
-<div class="empty-preview">Choose an image to preview it here.</div>
-<img id="origPreview" style="display:none">
-</div>
-</div>
-<div class="pane">
-<label>Background Removed</label>
-<div class="frame" id="resultFrame">
-<div class="empty-preview">Your transparent result will appear here.</div>
-<img id="cropPreview" style="display:none">
-</div>
-</div>
-</div>
-</div>
-</div>
+  </div>
 
-<div class="actions">
-<button type="button" class="secondary" id="clean">✣ Remove Background</button>
-<button type="button" class="primary" id="downloadAll" disabled>⇩ Download All (.ZIP)</button>
-</div>
 
-<div class="note">Processing happens on your device. Your images are not uploaded to a server.</div>
+  <div class="workspace">
+
+
+    <section class="panel" id="settings">
+
+      <div class="panel-title">
+
+        <h2>
+          CONTROL CORE
+        </h2>
+
+        <span>
+          v2.0
+        </span>
+
+      </div>
+
+
+      <div class="setting">
+
+        <div class="setting-head">
+
+          <span class="setting-name">
+
+            Removal Mode
+
+            <span
+              class="help"
+              title="Normal preserves more uncertain edge pixels. Aggressive pushes the segmentation harder."
+            >
+              ?
+            </span>
+
+          </span>
+
+        </div>
+
+
+        <div class="mode-grid">
+
+          <button
+            type="button"
+            class="mode-btn active"
+            id="modeNormal"
+          >
+
+            <b>
+              STANDARD
+            </b>
+
+            <small>
+              Balanced subject isolation.
+            </small>
+
+          </button>
+
+
+          <button
+            type="button"
+            class="mode-btn"
+            id="modeAggressive"
+          >
+
+            <b>
+              AGGRESSIVE
+            </b>
+
+            <small>
+              Stronger difficult-background cleanup.
+            </small>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="setting">
+
+        <div class="setting-head">
+
+          <span class="setting-name">
+
+            Tolerance
+
+            <span
+              class="help"
+              title="Controls how much low-confidence mask information is discarded."
+            >
+              ?
+            </span>
+
+          </span>
+
+          <span
+            class="value"
+            id="tolVal"
+          >
+            18
+          </span>
+
+        </div>
+
+
+        <div class="range-wrap">
+
+          <input
+            id="tol"
+            type="range"
+            min="1"
+            max="100"
+            value="18"
+          >
+
+        </div>
+
+
+        <div class="desc">
+          Higher values remove more uncertain pixels.
+        </div>
+
+      </div>
+
+
+      <div class="setting">
+
+        <div class="setting-head">
+
+          <span class="setting-name">
+
+            Safety Margin
+
+            <span
+              class="help"
+              title="Keeps a tiny amount of uncertain edge information instead of making a hard cut."
+            >
+              ?
+            </span>
+
+          </span>
+
+          <span
+            class="value"
+            id="padVal"
+          >
+            2 px
+          </span>
+
+        </div>
+
+
+        <div class="range-wrap">
+
+          <input
+            id="pad"
+            type="range"
+            min="0"
+            max="20"
+            value="2"
+          >
+
+        </div>
+
+
+        <div class="desc">
+          Protects uncertain pixels around subject boundaries.
+        </div>
+
+      </div>
+
+
+      <div class="setting">
+
+        <div class="setting-head">
+
+          <span class="setting-name">
+            Self Improvement
+          </span>
+
+        </div>
+
+
+        <div class="switch-row">
+
+          <div class="switch-text">
+
+            Edge Refinement
+
+            <small>
+              Runs a lightweight local cleanup pass after AI segmentation.
+            </small>
+
+          </div>
+
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              id="selfImprove"
+              checked
+            >
+
+            <span class="switch-slider"></span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="btn btn-secondary btn-reset"
+        id="reset"
+      >
+        ↻ Reset controls
+      </button>
+
+    </section>
+
+
+    <section class="panel previewbox">
+
+      <div class="preview-head">
+
+        <h2>
+          VISUAL FEED
+        </h2>
+
+        <span
+          class="preview-state"
+          id="previewState"
+        >
+          NO SIGNAL
+        </span>
+
+      </div>
+
+
+      <div class="previews">
+
+
+        <div class="pane">
+
+          <div class="pane-label">
+
+            <span>
+              Input
+            </span>
+
+            <span>
+              ORIGINAL
+            </span>
+
+          </div>
+
+
+          <div
+            class="frame"
+            id="originalFrame"
+          >
+
+            <div class="empty-preview">
+              Load an image to establish the visual feed.
+            </div>
+
+            <img
+              id="origPreview"
+              style="display:none"
+              alt="Original preview"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="pane">
+
+          <div class="pane-label">
+
+            <span>
+              Output
+            </span>
+
+            <span>
+              TRANSPARENT
+            </span>
+
+          </div>
+
+
+          <div
+            class="frame"
+            id="resultFrame"
+          >
+
+            <div class="empty-preview">
+              The transparent result will appear here.
+            </div>
+
+            <img
+              id="resultPreview"
+              style="display:none"
+              alt="Background removed preview"
+            >
+
+            <div
+              class="processing-overlay"
+              id="previewOverlay"
+            >
+
+              <div class="spinner"></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <div class="actions">
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="clean"
+    >
+      ✦ Remove Background
+    </button>
+
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      id="downloadAll"
+      disabled
+    >
+      ⇩ Download All (.ZIP)
+    </button>
+
+  </div>
+
+
+  <div class="note">
+
+    Local processing • Original dimensions preserved •
+    AI model is downloaded once and then cached by your browser.
+
+  </div>
+
 </section>
 
-<section class="card progress-card" id="progressCard">
-<div class="progress-top">
-<span id="progressText">Preparing…</span>
-<span class="percent" id="percent">0%</span>
-</div>
-<div class="track"><div class="bar" id="bar"></div></div>
-<div class="status" id="status"></div>
+
+<section
+  class="glass progress-card"
+  id="progressCard"
+>
+
+  <div class="progress-top">
+
+    <span id="progressText">
+      Preparing AI engine…
+    </span>
+
+    <span
+      class="percent"
+      id="percent"
+    >
+      0%
+    </span>
+
+  </div>
+
+
+  <div class="track">
+
+    <div
+      class="bar"
+      id="bar"
+    ></div>
+
+  </div>
+
+
+  <div
+    class="status"
+    id="status"
+  >
+    Stand by.
+  </div>
+
 </section>
 
-<div class="results" id="results"></div>
-<div class="pagination" id="pagination"></div>
-  </main>
-  <script>
-const $=id=>document.getElementById(id);
 
-const filesEl=$("files");
-const drop=$("drop");
-const count=$("count");
+<div
+  class="results"
+  id="results"
+></div>
 
-const modeNormal=$("modeNormal");
-const modeAggressive=$("modeAggressive");
-const tolEl=$("tol");
-const padEl=$("pad");
-const tolVal=$("tolVal");
-const padVal=$("padVal");
-const selfImprove=$("selfImprove");
-const resetBtn=$("reset");
 
-const origPreview=$("origPreview");
-const cropPreview=$("cropPreview");
-const originalFrame=$("originalFrame");
-const resultFrame=$("resultFrame");
+<div
+  class="pagination"
+  id="pagination"
+></div>
 
-const cleanBtn=$("clean");
-const downloadAll=$("downloadAll");
+</main>
 
-const progressCard=$("progressCard");
-const progressText=$("progressText");
-const percent=$("percent");
-const bar=$("bar");
-const status=$("status");
 
-const results=$("results");
-const pagination=$("pagination");
+<div
+  class="toast"
+  id="toast"
+></div><script type="module">
 
-let selected=[];
-let outputs=[];
-let currentPage=1;
-let cropMode="normal";
-let previewURL=null;
-let previewToken=0;
+const $ = id =>
+  document.getElementById(id);
 
-const PAGE_SIZE=20;
+
+/* =========================
+   DOM REFERENCES
+========================= */
+
+const filesEl = $("files");
+const drop = $("drop");
+const count = $("count");
+
+const settings = $("settings");
+
+const modeNormal =
+  $("modeNormal");
+
+const modeAggressive =
+  $("modeAggressive");
+
+const tolEl =
+  $("tol");
+
+const padEl =
+  $("pad");
+
+const tolVal =
+  $("tolVal");
+
+const padVal =
+  $("padVal");
+
+const selfImprove =
+  $("selfImprove");
+
+const resetBtn =
+  $("reset");
+
+const origPreview =
+  $("origPreview");
+
+const resultPreview =
+  $("resultPreview");
+
+const originalFrame =
+  $("originalFrame");
+
+const resultFrame =
+  $("resultFrame");
+
+const previewOverlay =
+  $("previewOverlay");
+
+const previewState =
+  $("previewState");
+
+const cleanBtn =
+  $("clean");
+
+const downloadAll =
+  $("downloadAll");
+
+const progressCard =
+  $("progressCard");
+
+const progressText =
+  $("progressText");
+
+const percent =
+  $("percent");
+
+const bar =
+  $("bar");
+
+const status =
+  $("status");
+
+const results =
+  $("results");
+
+const pagination =
+  $("pagination");
+
+const toast =
+  $("toast");
+
+const systemState =
+  $("systemState");
+
+const systemDetail =
+  $("systemDetail");
+
+
+/* =========================
+   STATE
+========================= */
+
+let selected = [];
+
+let outputs = [];
+
+let currentPage = 1;
+
+let cropMode = "normal";
+
+let previewURL = null;
+
+let previewToken = 0;
+
+let remover = null;
+
+let modelLoading = null;
+
+let toastTimer = null;
+
+const PAGE_SIZE = 20;
+
+
+/* =========================
+   TOAST
+========================= */
+
+function showToast(
+  message,
+  error = false
+){
+
+  clearTimeout(toastTimer);
+
+  toast.textContent =
+    message;
+
+  toast.classList.toggle(
+    "error",
+    error
+  );
+
+  toast.classList.add(
+    "show"
+  );
+
+  toastTimer =
+    setTimeout(
+      () =>
+        toast.classList.remove(
+          "show"
+        ),
+      3200
+    );
+}
+
+
+/* =========================
+   SLIDER
+========================= */
 
 function updateSlider(el){
-const min=Number(el.min);
-const max=Number(el.max);
-const value=Number(el.value);
-const pct=((value-min)/(max-min))*100;
-el.style.setProperty("--fill",pct+"%");
+
+  const min =
+    Number(el.min);
+
+  const max =
+    Number(el.max);
+
+  const value =
+    Number(el.value);
+
+  const pct =
+    ((value - min) /
+      (max - min)) *
+    100;
+
+  el.style.setProperty(
+    "--fill",
+    pct + "%"
+  );
 }
 
-updateSlider(tolEl);
-updateSlider(padEl);
+
+/* =========================
+   COUNT
+========================= */
 
 function updateCount(){
-count.innerHTML=`<span style="color:#28d66f">✓</span><strong>${selected.length}</strong> images selected`;
+
+  count.innerHTML =
+    `
+      ◉
+      <strong>
+        ${selected.length}
+      </strong>
+
+      ${
+        selected.length === 1
+          ? "image"
+          : "images"
+      }
+
+      loaded
+    `;
+
+  systemDetail.textContent =
+    selected.length
+      ? `${selected.length} visual${
+          selected.length === 1
+            ? ""
+            : "s"
+        } ready`
+      : "Waiting for an image";
 }
 
-function setFiles(files){
-const valid=files.filter(f=>f&&f.type&&f.type.startsWith("image/"));
 
-selected=valid;
+/* =========================
+   CLEAR RESULT PREVIEW
+========================= */
 
-updateCount();
+function clearResultPreview(){
 
-if(!selected.length){
-origPreview.style.display="none";
-cropPreview.style.display="none";
-return;
+  resultPreview.style.display =
+    "none";
+
+  resultPreview.removeAttribute(
+    "src"
+  );
+
+  const empty =
+    resultFrame.querySelector(
+      ".empty-preview"
+    );
+
+  if(empty){
+    empty.style.display =
+      "block";
+  }
 }
 
-showPreview(selected[0]);
+
+/* =========================
+   FILE IMPORT
+========================= */
+
+function setFiles(fileList){
+
+  const valid =
+    Array.from(
+      fileList || []
+    ).filter(
+      file =>
+        file &&
+        file.type &&
+        file.type.startsWith(
+          "image/"
+        )
+    );
+
+  if(!valid.length){
+
+    showToast(
+      "No supported image files were detected.",
+      true
+    );
+
+    return;
+  }
+
+  selected = valid;
+
+  updateCount();
+
+  clearResultPreview();
+
+  showPreview(
+    selected[0]
+  );
+
+  showToast(
+    `${selected.length} image${
+      selected.length === 1
+        ? ""
+        : "s"
+    } imported.`
+  );
 }
 
-drop.addEventListener("click",event=>{
-if(event.target===filesEl)return;
-filesEl.click();
+
+/* =========================
+   IMPORT BUTTON
+========================= */
+
+drop.addEventListener(
+  "click",
+  () =>
+    filesEl.click()
+);
+
+
+/* =========================
+   FILE INPUT
+========================= */
+
+filesEl.addEventListener(
+  "change",
+  () => {
+
+    setFiles(
+      filesEl.files
+    );
+
+    /*
+      Reset the input so selecting
+      the exact same image again
+      still triggers change.
+    */
+
+    filesEl.value = "";
+
+  }
+);
+
+
+/* =========================
+   DRAG ENTER
+========================= */
+
+[
+  "dragenter",
+  "dragover"
+].forEach(type => {
+
+  drop.addEventListener(
+    type,
+    event => {
+
+      event.preventDefault();
+
+      event.stopPropagation();
+
+      drop.classList.add(
+        "drag"
+      );
+
+    }
+  );
+
 });
 
-filesEl.addEventListener("change",()=>{
-setFiles(Array.from(filesEl.files||[]));
+
+/* =========================
+   DRAG LEAVE
+========================= */
+
+[
+  "dragleave",
+  "drop"
+].forEach(type => {
+
+  drop.addEventListener(
+    type,
+    event => {
+
+      event.preventDefault();
+
+      event.stopPropagation();
+
+      drop.classList.remove(
+        "drag"
+      );
+
+    }
+  );
+
 });
 
-drop.addEventListener("dragover",event=>{
-event.preventDefault();
-drop.classList.add("drag");
-});
 
-drop.addEventListener("dragleave",event=>{
-if(!drop.contains(event.relatedTarget)){
-drop.classList.remove("drag");
-}
-});
+/* =========================
+   DROP
+========================= */
 
-drop.addEventListener("drop",event=>{
-event.preventDefault();
-drop.classList.remove("drag");
-setFiles(Array.from(event.dataTransfer.files||[]));
-});
+drop.addEventListener(
+  "drop",
+  event => {
+
+    setFiles(
+      event.dataTransfer.files
+    );
+
+  }
+);
+
+
+/* =========================
+   IMAGE PREVIEW
+========================= */
 
 async function showPreview(file){
-if(previewURL){
-URL.revokeObjectURL(previewURL);
-previewURL=null;
+
+  if(previewURL){
+
+    URL.revokeObjectURL(
+      previewURL
+    );
+
+  }
+
+  previewURL =
+    URL.createObjectURL(
+      file
+    );
+
+  origPreview.src =
+    previewURL;
+
+  origPreview.style.display =
+    "block";
+
+  const empty =
+    originalFrame.querySelector(
+      ".empty-preview"
+    );
+
+  if(empty){
+    empty.style.display =
+      "none";
+  }
+
+  previewState.textContent =
+    "READY";
+
+  systemState.textContent =
+    "IMAGE LINKED";
+
+  await updatePreview();
+
 }
 
-previewURL=URL.createObjectURL(file);
 
-origPreview.src=previewURL;
-origPreview.style.display="block";
-
-const empty=originalFrame.querySelector(".empty-preview");
-if(empty)empty.style.display="none";
-
-updatePreview();
-}
+/* =========================
+   LOAD IMAGE
+========================= */
 
 function loadImage(file){
-return new Promise((resolve,reject)=>{
-const url=URL.createObjectURL(file);
-const img=new Image();
 
-img.onload=()=>{
-URL.revokeObjectURL(url);
-resolve(img);
-};
+  return new Promise(
+    (resolve,reject) => {
 
-img.onerror=()=>{
-URL.revokeObjectURL(url);
-reject(new Error("Could not load image."));
-};
+      const url =
+        URL.createObjectURL(
+          file
+        );
 
-img.src=url;
-});
+      const img =
+        new Image();
+
+      img.onload = () => {
+
+        URL.revokeObjectURL(
+          url
+        );
+
+        resolve(img);
+
+      };
+
+      img.onerror = () => {
+
+        URL.revokeObjectURL(
+          url
+        );
+
+        reject(
+          new Error(
+            "Could not load this image."
+          )
+        );
+
+      };
+
+      img.src =
+        url;
+
+    }
+  );
+
 }
+
+
+/* =========================
+   MODE
+========================= */
 
 function setMode(mode){
-cropMode=mode;
 
-modeNormal.classList.toggle("active",mode==="normal");
-modeAggressive.classList.toggle("active",mode==="aggressive");
+  cropMode =
+    mode;
 
-updatePreview();
+  modeNormal.classList.toggle(
+    "active",
+    mode === "normal"
+  );
+
+  modeAggressive.classList.toggle(
+    "active",
+    mode === "aggressive"
+  );
+
+  if(selected.length){
+
+    updatePreview();
+
+  }
+
 }
 
-modeNormal.addEventListener("click",()=>{
-if(!modeNormal.disabled)setMode("normal");
-});
 
-modeAggressive.addEventListener("click",()=>{
-if(!modeAggressive.disabled)setMode("aggressive");
-});
+modeNormal.addEventListener(
+  "click",
+  () =>
+    setMode(
+      "normal"
+    )
+);
 
-tolEl.addEventListener("input",()=>{
-tolVal.textContent=tolEl.value;
-updateSlider(tolEl);
-updatePreview();
-});
 
-padEl.addEventListener("input",()=>{
-padVal.textContent=padEl.value;
-updateSlider(padEl);
-updatePreview();
-});
+modeAggressive.addEventListener(
+  "click",
+  () =>
+    setMode(
+      "aggressive"
+    )
+);
 
-resetBtn.addEventListener("click",()=>{
-tolEl.value="18";
-padEl.value="2";
-selfImprove.checked=true;
 
-tolVal.textContent="18";
-padVal.textContent="2";
+/* =========================
+   TOLERANCE
+========================= */
 
-updateSlider(tolEl);
-updateSlider(padEl);
+tolEl.addEventListener(
+  "input",
+  () => {
 
-setMode("normal");
-});
+    tolVal.textContent =
+      tolEl.value;
+
+    updateSlider(
+      tolEl
+    );
+
+    if(selected.length){
+
+      updatePreview();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   SAFETY MARGIN
+========================= */
+
+padEl.addEventListener(
+  "input",
+  () => {
+
+    padVal.textContent =
+      padEl.value +
+      " px";
+
+    updateSlider(
+      padEl
+    );
+
+    if(selected.length){
+
+      updatePreview();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   SELF IMPROVEMENT
+========================= */
+
+selfImprove.addEventListener(
+  "change",
+  () => {
+
+    if(selected.length){
+
+      updatePreview();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   RESET
+========================= */
+
+resetBtn.addEventListener(
+  "click",
+  () => {
+
+    tolEl.value =
+      "18";
+
+    padEl.value =
+      "2";
+
+    selfImprove.checked =
+      true;
+
+    tolVal.textContent =
+      "18";
+
+    padVal.textContent =
+      "2 px";
+
+    updateSlider(
+      tolEl
+    );
+
+    updateSlider(
+      padEl
+    );
+
+    setMode(
+      "normal"
+    );
+
+    showToast(
+      "Controls reset."
+    );
+
+  }
+);
+
+
+/* =========================
+   LOCK SETTINGS
+========================= */
 
 function setLocked(value){
-settings.classList.toggle("locked",value);
 
-tolEl.disabled=value;
-padEl.disabled=value;
-resetBtn.disabled=value;
-modeNormal.disabled=value;
-modeAggressive.disabled=value;
-selfImprove.disabled=value;
+  settings.classList.toggle(
+    "locked",
+    value
+  );
+
+  resetBtn.disabled =
+    value;
+
 }
 
-function setProgress(value,text){
-const v=Math.max(0,Math.min(100,value));
 
-bar.style.width=v+"%";
-percent.textContent=Math.round(v)+"%";
+/* =========================
+   PROGRESS
+========================= */
 
-if(text)progressText.textContent=text;
-}
-    <script>
-let remover=null;
-let modelLoading=null;
-
-async function getRemover(){
-if(remover)return remover;
-
-if(modelLoading)return modelLoading;
-
-modelLoading=(async()=>{
-status.textContent="Loading AI background remover…";
-
-try{
-const mod=await import(
-"https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1"
-);
-
-const pipeline=mod.pipeline;
-
-remover=await pipeline(
-"background-removal",
-"briaai/RMBG-1.4"
-);
-
-return remover;
-}catch(error){
-console.error(error);
-throw new Error(
-"AI model could not load. Open this page through GitHub Pages or localhost and try again."
-);
-}finally{
-modelLoading=null;
-}
-})();
-
-return modelLoading;
-}
-
-async function removeBackground(file){
-const pipe=await getRemover();
-
-const url=URL.createObjectURL(file);
-
-try{
-const output=await pipe(url);
-
-if(!output||!output.length){
-throw new Error("The AI model returned no result.");
-}
-
-const first=output[0];
-
-if(first&&typeof first.toCanvas==="function"){
-return first.toCanvas();
-}
-
-if(first&&typeof first.toBlob==="function"){
-const blob=await first.toBlob();
-const bitmap=await createImageBitmap(blob);
-
-const canvas=document.createElement("canvas");
-canvas.width=bitmap.width;
-canvas.height=bitmap.height;
-
-canvas.getContext("2d").drawImage(bitmap,0,0);
-
-if(bitmap.close)bitmap.close();
-
-return canvas;
-}
-
-throw new Error("Unsupported AI output.");
-}finally{
-URL.revokeObjectURL(url);
-}
-}
-
-function resizeMask(mask,width,height){
-const canvas=document.createElement("canvas");
-
-canvas.width=width;
-canvas.height=height;
-
-const ctx=canvas.getContext("2d",{
-willReadFrequently:true
-});
-
-ctx.imageSmoothingEnabled=true;
-ctx.imageSmoothingQuality="high";
-
-ctx.drawImage(
-mask,
-0,
-0,
-width,
-height
-);
-
-return canvas;
-}
-
-function refineAlpha(alpha,width,height,aggressive){
-const result=new Uint8ClampedArray(alpha);
-
-const threshold=aggressive?20:10;
-
-for(let y=1;y<height-1;y++){
-for(let x=1;x<width-1;x++){
-
-const i=y*width+x;
-
-if(alpha[i]===0)continue;
-
-let neighbors=0;
-
-if(alpha[i-1]>100)neighbors++;
-if(alpha[i+1]>100)neighbors++;
-if(alpha[i-width]>100)neighbors++;
-if(alpha[i+width]>100)neighbors++;
-
-if(neighbors===0&&alpha[i]<150){
-result[i]=0;
-}else if(
-neighbors>=3&&
-alpha[i]>40&&
-alpha[i]<220
+function setProgress(
+  value,
+  text
 ){
-result[i]=Math.min(
-255,
-alpha[i]+threshold
-);
-}
-}
-}
 
-return result;
-}
+  const v =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        value
+      )
+    );
 
-function applySafety(alpha,width,height,pad){
-if(pad<=0)return alpha;
+  bar.style.width =
+    v + "%";
 
-const result=new Uint8ClampedArray(alpha);
+  percent.textContent =
+    Math.round(v) +
+    "%";
 
-for(let y=0;y<height;y++){
-for(let x=0;x<width;x++){
+  if(text){
 
-const i=y*width+x;
+    progressText.textContent =
+      text;
 
-if(alpha[i]>0)continue;
+  }
 
-let nearby=false;
-
-for(
-let yy=Math.max(0,y-pad);
-yy<=Math.min(height-1,y+pad)&&!nearby;
-yy++
-){
-for(
-let xx=Math.max(0,x-pad);
-xx<=Math.min(width-1,x+pad);
-xx++
-){
-if(alpha[yy*width+xx]>180){
-nearby=true;
-break;
-}
-}
 }
 
-if(nearby)result[i]=12;
-}
-}
 
-return result;
-}
+/* =========================
+   INITIALIZE UI
+========================= */
 
-async function createTransparentPNG(file){
-const img=await loadImage(file);
-
-const width=img.naturalWidth;
-const height=img.naturalHeight;
-
-const mask=await removeBackground(file);
-const fitted=resizeMask(mask,width,height);
-
-const maskCtx=fitted.getContext("2d",{
-willReadFrequently:true
-});
-
-const maskData=maskCtx.getImageData(
-0,
-0,
-width,
-height
+updateSlider(
+  tolEl
 );
 
-const alpha=new Uint8ClampedArray(width*height);
-
-for(let i=0,p=0;i<maskData.data.length;i+=4,p++){
-const r=maskData.data[i];
-const g=maskData.data[i+1];
-const b=maskData.data[i+2];
-const a=maskData.data[i+3];
-
-alpha[p]=Math.round(
-((r+g+b)/3)*(a/255)
+updateSlider(
+  padEl
 );
-}
-
-const aggressive=cropMode==="aggressive";
-
-let finalAlpha=alpha;
-
-const tolerance=Number(tolEl.value);
-const cutoff=aggressive
-?Math.max(0,30-tolerance/3)
-:Math.max(0,18-tolerance/5);
-
-for(let i=0;i<finalAlpha.length;i++){
-let a=finalAlpha[i];
-
-if(a<=cutoff){
-a=0;
-}
-
-finalAlpha[i]=a;
-}
-
-if(selfImprove.checked){
-finalAlpha=refineAlpha(
-finalAlpha,
-width,
-height,
-aggressive
-);
-}
-
-finalAlpha=applySafety(
-finalAlpha,
-width,
-height,
-Number(padEl.value)
-);
-
-const canvas=document.createElement("canvas");
-
-canvas.width=width;
-canvas.height=height;
-
-const ctx=canvas.getContext("2d",{
-willReadFrequently:true
-});
-
-ctx.clearRect(0,0,width,height);
-
-ctx.drawImage(
-img,
-0,
-0,
-width,
-height
-);
-
-const imageData=ctx.getImageData(
-0,
-0,
-width,
-height
-);
-
-for(let i=0,p=0;i<imageData.data.length;i+=4,p++){
-imageData.data[i+3]=finalAlpha[p];
-}
-
-ctx.putImageData(imageData,0,0);
-
-const blob=await new Promise((resolve,reject)=>{
-canvas.toBlob(blob=>{
-if(blob)resolve(blob);
-else reject(new Error("Could not create PNG."));
-},"image/png");
-});
-
-return{
-blob,
-width,
-height
-};
-}
-
-async function updatePreview(){
-if(!selected.length)return;
-
-const token=++previewToken;
-
-cropPreview.style.display="none";
-
-try{
-const result=await createTransparentPNG(
-selected[0]
-);
-
-if(token!==previewToken)return;
-
-const url=URL.createObjectURL(result.blob);
-
-cropPreview.onload=()=>{
-URL.revokeObjectURL(url);
-};
-
-cropPreview.src=url;
-cropPreview.style.display="block";
-
-const empty=resultFrame.querySelector(".empty-preview");
-if(empty)empty.style.display="none";
-
-}catch(error){
-console.error(error);
-
-if(token===previewToken){
-cropPreview.style.display="none";
-}
-}
-    }
-    <script>
-function downloadBlob(blob,name){
-const url=URL.createObjectURL(blob);
-const a=document.createElement("a");
-
-a.href=url;
-a.download=name;
-
-document.body.appendChild(a);
-a.click();
-a.remove();
-
-setTimeout(()=>{
-URL.revokeObjectURL(url);
-},4000);
-}
-
-function outputName(name){
-const dot=name.lastIndexOf(".");
-const base=dot>0?name.slice(0,dot):name;
-return base+".png";
-}
-
-function renderResults(){
-results.innerHTML="";
-
-const totalPages=Math.max(
-1,
-Math.ceil(outputs.length/PAGE_SIZE)
-);
-
-if(currentPage>totalPages){
-currentPage=totalPages;
-}
-
-const start=(currentPage-1)*PAGE_SIZE;
-
-outputs
-.slice(start,start+PAGE_SIZE)
-.forEach(item=>{
-const card=document.createElement("div");
-card.className="result";
-
-const img=document.createElement("img");
-img.src=URL.createObjectURL(item.blob);
-img.alt=item.name;
-
-const done=document.createElement("div");
-done.className="done";
-done.textContent="DONE";
-
-const button=document.createElement("button");
-button.type="button";
-button.className="download-one";
-button.textContent="⇩";
-
-button.addEventListener("click",()=>{
-downloadBlob(item.blob,item.name);
-});
-
-const body=document.createElement("div");
-body.className="result-body";
-
-const name=document.createElement("div");
-name.className="result-name";
-name.textContent=item.name;
-name.title=item.name;
-
-const size=document.createElement("div");
-size.className="result-size";
-size.textContent=
-`${item.width} × ${item.height}`;
-
-body.append(name,size);
-
-card.append(
-img,
-done,
-button,
-body
-);
-
-results.appendChild(card);
-});
-
-renderPagination();
-}
-
-function renderPagination(){
-pagination.innerHTML="";
-
-const totalPages=Math.max(
-1,
-Math.ceil(outputs.length/PAGE_SIZE)
-);
-
-if(totalPages<=1)return;
-
-const prev=document.createElement("button");
-
-prev.type="button";
-prev.className="page-btn";
-prev.textContent="‹";
-prev.disabled=currentPage===1;
-
-prev.addEventListener("click",()=>{
-if(currentPage>1){
-currentPage--;
-renderResults();
-}
-});
-
-pagination.appendChild(prev);
-
-const first=Math.max(
-1,
-Math.min(
-currentPage-3,
-totalPages-6
-)
-);
-
-const last=Math.min(
-totalPages,
-first+6
-);
-
-for(let p=first;p<=last;p++){
-const button=document.createElement("button");
-
-button.type="button";
-button.className=
-"page-btn"+
-(p===currentPage?" active":"");
-
-button.textContent=p;
-
-button.addEventListener("click",()=>{
-currentPage=p;
-renderResults();
-});
-
-pagination.appendChild(button);
-}
-
-const next=document.createElement("button");
-
-next.type="button";
-next.className="page-btn";
-next.textContent="›";
-next.disabled=currentPage===totalPages;
-
-next.addEventListener("click",()=>{
-if(currentPage<totalPages){
-currentPage++;
-renderResults();
-}
-});
-
-pagination.appendChild(next);
-
-const info=document.createElement("span");
-
-info.className="page-info";
-info.textContent=
-`Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
-
-pagination.appendChild(info);
-}
-
-cleanBtn.addEventListener("click",async()=>{
-if(!selected.length){
-alert("Select some images first.");
-return;
-}
-
-outputs=[];
-currentPage=1;
-
-results.innerHTML="";
-pagination.innerHTML="";
-
-downloadAll.disabled=true;
-cleanBtn.disabled=true;
-
-setLocked(true);
-
-progressCard.style.display="block";
-
-try{
-for(let i=0;i<selected.length;i++){
-
-const file=selected[i];
-
-setProgress(
-(i/selected.length)*100,
-`Processing ${i+1} of ${selected.length}…`
-);
-
-status.textContent=file.name;
-
-const result=await createTransparentPNG(file);
-
-outputs.push({
-blob:result.blob,
-name:outputName(file.name),
-width:result.width,
-height:result.height
-});
-
-setProgress(
-((i+1)/selected.length)*100,
-`Processing ${i+1} of ${selected.length}…`
-);
-
-await new Promise(r=>setTimeout(r,0));
-}
-
-setProgress(
-100,
-`Finished ${selected.length} image${selected.length===1?"":"s"}`
-);
-
-status.textContent=
-"Transparent PNGs are ready.";
-
-renderResults();
-
-downloadAll.disabled=false;
-
-}catch(error){
-
-console.error(error);
-
-status.textContent=
-error.message||
-"Something went wrong.";
-
-alert(
-"Background removal failed. If you opened the HTML directly from your device, run it through GitHub Pages or a local web server."
-);
-
-}finally{
-
-cleanBtn.disabled=false;
-setLocked(false);
-
-}
-});
-
-downloadAll.addEventListener("click",async()=>{
-if(!outputs.length)return;
-
-downloadAll.disabled=true;
-downloadAll.textContent="Creating ZIP…";
-
-try{
-const zip=await makeZip(outputs);
-
-downloadBlob(
-zip,
-"cut-it-out-background-removed.zip"
-);
-
-}catch(error){
-console.error(error);
-alert("Could not create the ZIP.");
-}finally{
-downloadAll.disabled=false;
-downloadAll.textContent=
-"⇩ Download All (.ZIP)";
-}
-});
-
-function crc32(data){
-let table=crc32.table;
-
-if(!table){
-table=new Uint32Array(256);
-
-for(let n=0;n<256;n++){
-let c=n;
-
-for(let k=0;k<8;k++){
-c=(c&1)
-?0xedb88320^(c>>>1)
-:c>>>1;
-}
-
-table[n]=c>>>0;
-}
-
-crc32.table=table;
-}
-
-let c=0xffffffff;
-
-for(let i=0;i<data.length;i++){
-c=
-table[(c^data[i])&255]^
-(c>>>8);
-}
-
-return(c^0xffffffff)>>>0;
-}
-
-function u16(a,n){
-a.push(n&255,(n>>>8)&255);
-}
-
-function u32(a,n){
-a.push(
-n&255,
-(n>>>8)&255,
-(n>>>16)&255,
-(n>>>24)&255
-);
-}
-
-function bytes(text){
-return new TextEncoder().encode(text);
-}
-
-async function makeZip(items){
-const chunks=[];
-const central=[];
-let offset=0;
-
-for(const item of items){
-
-const data=new Uint8Array(
-await item.blob.arrayBuffer()
-);
-
-const name=bytes(item.name);
-const crc=crc32(data);
-
-const local=[];
-
-u32(local,0x04034b50);
-u16(local,20);
-u16(local,0);
-u16(local,0);
-u16(local,0);
-u16(local,0);
-u32(local,crc);
-u32(local,data.length);
-u32(local,data.length);
-u16(local,name.length);
-u16(local,0);
-
-chunks.push(
-new Uint8Array(local),
-name,
-data
-);
-
-const cen=[];
-
-u32(cen,0x02014b50);
-u16(cen,20);
-u16(cen,20);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u32(cen,crc);
-u32(cen,data.length);
-u32(cen,data.length);
-u16(cen,name.length);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u32(cen,0);
-u32(cen,offset);
-
-central.push(
-new Uint8Array(cen),
-name
-);
-
-offset+=
-local.length+
-name.length+
-data.length;
-}
-
-const centralOffset=offset;
-let centralSize=0;
-
-for(const item of central){
-chunks.push(item);
-centralSize+=item.length;
-}
-
-const end=[];
-
-u32(end,0x06054b50);
-u16(end,0);
-u16(end,0);
-u16(end,items.length);
-u16(end,items.length);
-u32(end,centralSize);
-u32(end,centralOffset);
-u16(end,0);
-
-chunks.push(new Uint8Array(end));
-
-return new Blob(
-chunks,
-{type:"application/zip"}
-);
-}
 
 updateCount();
-setMode("normal");
+
+setMode(
+  "normal"
+);
+
+</script><script type="module">
+
+/* =========================
+   OUTPUT NAME
+========================= */
+
+function outputName(name){
+
+  const dot =
+    name.lastIndexOf(
+      "."
+    );
+
+
+  const base =
+    dot > 0
+      ? name.slice(
+          0,
+          dot
+        )
+      : name;
+
+
+  return (
+    base +
+    ".png"
+  );
+
+}
+
+
+/* =========================
+   DOWNLOAD BLOB
+========================= */
+
+function downloadBlob(
+  blob,
+  name
+){
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const a =
+    document.createElement(
+      "a"
+    );
+
+
+  a.href =
+    url;
+
+  a.download =
+    name;
+
+
+  document.body.appendChild(
+    a
+  );
+
+
+  a.click();
+
+
+  a.remove();
+
+
+  setTimeout(
+    () =>
+      URL.revokeObjectURL(
+        url
+      ),
+    4000
+  );
+
+}
+
+
+/* =========================
+   RENDER RESULTS
+========================= */
+
+function renderResults(){
+
+  results.innerHTML =
+    "";
+
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        outputs.length /
+        PAGE_SIZE
+      )
+    );
+
+
+  if(
+    currentPage >
+    totalPages
+  ){
+
+    currentPage =
+      totalPages;
+
+  }
+
+
+  const start =
+    (currentPage - 1) *
+    PAGE_SIZE;
+
+
+  outputs
+    .slice(
+      start,
+      start + PAGE_SIZE
+    )
+    .forEach(
+      item => {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+        card.className =
+          "result";
+
+
+        const img =
+          document.createElement(
+            "img"
+          );
+
+        img.src =
+          URL.createObjectURL(
+            item.blob
+          );
+
+        img.alt =
+          item.name;
+
+
+        img.onload =
+          () => {
+
+            URL.revokeObjectURL(
+              img.src
+            );
+
+          };
+
+
+        const done =
+          document.createElement(
+            "div"
+          );
+
+        done.className =
+          "done";
+
+        done.textContent =
+          "DONE";
+
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+        button.type =
+          "button";
+
+        button.className =
+          "download-one";
+
+        button.textContent =
+          "⇩";
+
+        button.title =
+          "Download PNG";
+
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            downloadBlob(
+              item.blob,
+              item.name
+            );
+
+          }
+        );
+
+
+        const body =
+          document.createElement(
+            "div"
+          );
+
+        body.className =
+          "result-body";
+
+
+        const name =
+          document.createElement(
+            "div"
+          );
+
+        name.className =
+          "result-name";
+
+        name.textContent =
+          item.name;
+
+        name.title =
+          item.name;
+
+
+        const size =
+          document.createElement(
+            "div"
+          );
+
+        size.className =
+          "result-size";
+
+        size.textContent =
+          `${item.width} × ${item.height}`;
+
+
+        body.append(
+          name,
+          size
+        );
+
+
+        card.append(
+          img,
+          done,
+          button,
+          body
+        );
+
+
+        results.appendChild(
+          card
+        );
+
+      }
+    );
+
+
+  renderPagination();
+
+}
+
+
+/* =========================
+   PAGINATION
+========================= */
+
+function renderPagination(){
+
+  pagination.innerHTML =
+    "";
+
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        outputs.length /
+        PAGE_SIZE
+      )
+    );
+
+
+  if(
+    totalPages <= 1
+  ){
+
+    return;
+
+  }
+
+
+  const prev =
+    document.createElement(
+      "button"
+    );
+
+
+  prev.type =
+    "button";
+
+  prev.className =
+    "page-btn";
+
+  prev.textContent =
+    "‹";
+
+  prev.disabled =
+    currentPage === 1;
+
+
+  prev.addEventListener(
+    "click",
+    () => {
+
+      if(
+        currentPage > 1
+      ){
+
+        currentPage--;
+
+        renderResults();
+
+      }
+
+    }
+  );
+
+
+  pagination.appendChild(
+    prev
+  );
+
+
+  const first =
+    Math.max(
+      1,
+      Math.min(
+        currentPage - 3,
+        totalPages - 6
+      )
+    );
+
+
+  const last =
+    Math.min(
+      totalPages,
+      first + 6
+    );
+
+
+  for(
+    let p=first;
+    p<=last;
+    p++
+  ){
+
+    const button =
+      document.createElement(
+        "button"
+      );
+
+
+    button.type =
+      "button";
+
+    button.className =
+      "page-btn" +
+      (
+        p === currentPage
+          ? " active"
+          : ""
+      );
+
+
+    button.textContent =
+      p;
+
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        currentPage =
+          p;
+
+        renderResults();
+
+      }
+    );
+
+
+    pagination.appendChild(
+      button
+    );
+
+  }
+
+
+  const next =
+    document.createElement(
+      "button"
+    );
+
+
+  next.type =
+    "button";
+
+  next.className =
+    "page-btn";
+
+  next.textContent =
+    "›";
+
+  next.disabled =
+    currentPage ===
+    totalPages;
+
+
+  next.addEventListener(
+    "click",
+    () => {
+
+      if(
+        currentPage <
+        totalPages
+      ){
+
+        currentPage++;
+
+        renderResults();
+
+      }
+
+    }
+  );
+
+
+  pagination.appendChild(
+    next
+  );
+
+
+  const info =
+    document.createElement(
+      "span"
+    );
+
+
+  info.className =
+    "page-info";
+
+
+  info.textContent =
+    `Page ${currentPage} / ${totalPages} • ${outputs.length} images`;
+
+
+  pagination.appendChild(
+    info
+  );
+
+}
+
+
+/* =========================
+   MAIN PROCESS BUTTON
+========================= */
+
+cleanBtn.addEventListener(
+  "click",
+  async () => {
+
+    if(
+      !selected.length
+    ){
+
+      showToast(
+        "Import at least one image first.",
+        true
+      );
+
+      return;
+
+    }
+
+
+    outputs = [];
+
+    currentPage = 1;
+
+
+    results.innerHTML =
+      "";
+
+    pagination.innerHTML =
+      "";
+
+
+    downloadAll.disabled =
+      true;
+
+
+    cleanBtn.disabled =
+      true;
+
+
+    setLocked(
+      true
+    );
+
+
+    progressCard.style.display =
+      "block";
+
+
+    setProgress(
+      0,
+      "Starting AI processor…"
+    );
+
+
+    try{
+
+      /*
+        Force AI initialization
+        before processing the files.
+      */
+
+      await getRemover();
+
+
+      for(
+        let i=0;
+        i<selected.length;
+        i++
+      ){
+
+        const file =
+          selected[i];
+
+
+        setProgress(
+          (
+            i /
+            selected.length
+          ) * 100,
+
+          `Processing ${
+            i + 1
+          } of ${
+            selected.length
+          }…`
+        );
+
+
+        status.textContent =
+          file.name;
+
+
+        systemState.textContent =
+          "PROCESSING";
+
+
+        systemDetail.textContent =
+          `${
+            i + 1
+          } / ${
+            selected.length
+          }`;
+
+
+        const result =
+          await createTransparentPNG(
+            file
+          );
+
+
+        outputs.push({
+
+          blob:
+            result.blob,
+
+          name:
+            outputName(
+              file.name
+            ),
+
+          width:
+            result.width,
+
+          height:
+            result.height
+
+        });
+
+
+        setProgress(
+          (
+            (i + 1) /
+            selected.length
+          ) * 100,
+
+          `Processing ${
+            i + 1
+          } of ${
+            selected.length
+          }…`
+        );
+
+
+        renderResults();
+
+
+        /*
+          Give the browser a chance
+          to update the interface.
+        */
+
+        await new Promise(
+          resolve =>
+            setTimeout(
+              resolve,
+              0
+            )
+        );
+
+      }
+
+
+      setProgress(
+        100,
+
+        `Finished ${
+          selected.length
+        } image${
+          selected.length === 1
+            ? ""
+            : "s"
+        }`
+      );
+
+
+      status.textContent =
+        "Transparent PNGs are ready.";
+
+
+      systemState.textContent =
+        "PROCESS COMPLETE";
+
+
+      systemDetail.textContent =
+        `${
+          outputs.length
+        } PNG${
+          outputs.length === 1
+            ? ""
+            : "s"
+        } generated`;
+
+
+      downloadAll.disabled =
+        false;
+
+
+      showToast(
+        "Background removal complete."
+      );
+
+
+    }catch(error){
+
+      console.error(
+        error
+      );
+
+
+      status.textContent =
+        error.message ||
+        "Something went wrong.";
+
+
+      systemState.textContent =
+        "PROCESS ERROR";
+
+
+      systemDetail.textContent =
+        "Check the browser console.";
+
+
+      showToast(
+        error.message ||
+        "Background removal failed.",
+        true
+      );
+
+
+    }finally{
+
+      cleanBtn.disabled =
+        false;
+
+
+      setLocked(
+        false
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   DOWNLOAD ALL
+========================= */
+
+downloadAll.addEventListener(
+  "click",
+  async () => {
+
+    if(
+      !outputs.length
+    ){
+
+      return;
+
+    }
+
+
+    downloadAll.disabled =
+      true;
+
+
+    downloadAll.textContent =
+      "Creating ZIP…";
+
+
+    try{
+
+      const zip =
+        await makeZip(
+          outputs
+        );
+
+
+      downloadBlob(
+        zip,
+        "cut-it-out-background-removed.zip"
+      );
+
+
+      showToast(
+        "ZIP download started."
+      );
+
+
+    }catch(error){
+
+      console.error(
+        error
+      );
+
+
+      showToast(
+        "Could not create the ZIP.",
+        true
+      );
+
+
+    }finally{
+
+      downloadAll.disabled =
+        false;
+
+
+      downloadAll.textContent =
+        "⇩ Download All (.ZIP)";
+
+    }
+
+  }
+);
+
+
+/* =========================
+   CRC32
+========================= */
+
+function crc32(data){
+
+  let table =
+    crc32.table;
+
+
+  if(!table){
+
+    table =
+      new Uint32Array(
+        256
+      );
+
+
+    for(
+      let n=0;
+      n<256;
+      n++
+    ){
+
+      let c =
+        n;
+
+
+      for(
+        let k=0;
+        k<8;
+        k++
+      ){
+
+        c =
+          (
+            c & 1
+          )
+
+          ?
+
+          (
+            0xedb88320 ^
+            (c >>> 1)
+          )
+
+          :
+
+          (
+            c >>> 1
+          );
+
+      }
+
+
+      table[n] =
+        c >>> 0;
+
+    }
+
+
+    crc32.table =
+      table;
+
+  }
+
+
+  let c =
+    0xffffffff;
+
+
+  for(
+    let i=0;
+    i<data.length;
+    i++
+  ){
+
+    c =
+      table[
+        (c ^ data[i]) &
+        255
+      ] ^
+      (c >>> 8);
+
+  }
+
+
+  return (
+    c ^
+    0xffffffff
+  ) >>> 0;
+
+}
+
+
+/* =========================
+   ZIP HELPERS
+========================= */
+
+function u16(
+  a,
+  n
+){
+
+  a.push(
+    n & 255,
+    (n >>> 8) & 255
+  );
+
+}
+
+
+function u32(
+  a,
+  n
+){
+
+  a.push(
+    n & 255,
+    (n >>> 8) & 255,
+    (n >>> 16) & 255,
+    (n >>> 24) & 255
+  );
+
+}
+
+
+function bytes(text){
+
+  return new TextEncoder()
+    .encode(
+      text
+    );
+
+}
+
+
+/* =========================
+   CREATE ZIP
+========================= */
+
+async function makeZip(
+  items
+){
+
+  const chunks =
+    [];
+
+  const central =
+    [];
+
+  let offset =
+    0;
+
+
+  for(
+    const item of items
+  ){
+
+    const data =
+      new Uint8Array(
+        await item.blob.arrayBuffer()
+      );
+
+
+    const name =
+      bytes(
+        item.name
+      );
+
+
+    const crc =
+      crc32(
+        data
+      );
+
+
+    /*
+      Local file header.
+    */
+
+    const local =
+      [];
+
+
+    u32(
+      local,
+      0x04034b50
+    );
+
+
+    u16(
+      local,
+      20
+    );
+
+
+    u16(
+      local,
+      0
+    );
+
+
+    u16(
+      local,
+      0
+    );
+
+
+    u16(
+      local,
+      0
+    );
+
+
+    u16(
+      local,
+      0
+    );
+
+
+    u32(
+      local,
+      crc
+    );
+
+
+    u32(
+      local,
+      data.length
+    );
+
+
+    u32(
+      local,
+      data.length
+    );
+
+
+    u16(
+      local,
+      name.length
+    );
+
+
+    u16(
+      local,
+      0
+    );
+
+
+    chunks.push(
+      new Uint8Array(
+        local
+      ),
+      name,
+      data
+    );
+
+
+    /*
+      Central directory entry.
+    */
+
+    const cen =
+      [];
+
+
+    u32(
+      cen,
+      0x02014b50
+    );
+
+
+    u16(
+      cen,
+      20
+    );
+
+
+    u16(
+      cen,
+      20
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u32(
+      cen,
+      crc
+    );
+
+
+    u32(
+      cen,
+      data.length
+    );
+
+
+    u32(
+      cen,
+      data.length
+    );
+
+
+    u16(
+      cen,
+      name.length
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u16(
+      cen,
+      0
+    );
+
+
+    u32(
+      cen,
+      0
+    );
+
+
+    u32(
+      cen,
+      offset
+    );
+
+
+    central.push(
+      new Uint8Array(
+        cen
+      ),
+      name
+    );
+
+
+    offset +=
+      local.length +
+      name.length +
+      data.length;
+
+  }
+
+
+  const centralOffset =
+    offset;
+
+
+  let centralSize =
+    0;
+
+
+  for(
+    const part of central
+  ){
+
+    chunks.push(
+      part
+    );
+
+
+    centralSize +=
+      part.length;
+
+  }
+
+
+  /*
+    End of central directory.
+  */
+
+  const end =
+    [];
+
+
+  u32(
+    end,
+    0x06054b50
+  );
+
+
+  u16(
+    end,
+    0
+  );
+
+
+  u16(
+    end,
+    0
+  );
+
+
+  u16(
+    end,
+    items.length
+  );
+
+
+  u16(
+    end,
+    items.length
+  );
+
+
+  u32(
+    end,
+    centralSize
+  );
+
+
+  u32(
+    end,
+    centralOffset
+  );
+
+
+  u16(
+    end,
+    0
+  );
+
+
+  chunks.push(
+    new Uint8Array(
+      end
+    )
+  );
+
+
+  return new Blob(
+    chunks,
+    {
+      type:
+        "application/zip"
+    }
+  );
+
+}
+
 
 console.log(
-"Cut It Out! Background Remover loaded successfully."
+  "Cut It Out! futuristic background remover loaded."
 );
+
 </script>
+
 </body>
 </html>
