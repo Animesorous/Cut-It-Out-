@@ -1,393 +1,259 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Auto Image Cropper</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ArtExtract — Panel & Gradient Isolator</title>
 <style>
-  :root {
-    --bg-color: #0f172a;
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --border-color: rgba(255, 255, 255, 0.1);
-    --primary-color: #38bdf8;
-    --primary-hover: #0284c7;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-  }
-
-  body {
-    margin: 0;
-    padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    box-sizing: border-box;
-  }
-
-  .container {
-    width: 100%;
-    max-width: 900px;
-    background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-  }
-
-  h1 {
-    margin-top: 0;
-    font-size: 1.8rem;
-    font-weight: 700;
-    text-align: center;
-    background: linear-gradient(to right, #38bdf8, #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  p.description {
-    text-align: center;
-    color: var(--text-muted);
-    margin-bottom: 25px;
-    font-size: 0.95rem;
-  }
-
-  .drop-zone {
-    border: 2px dashed rgba(56, 189, 248, 0.4);
-    border-radius: 12px;
-    padding: 40px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: rgba(15, 23, 42, 0.4);
-  }
-
-  .drop-zone:hover {
-    border-color: var(--primary-color);
-    background: rgba(56, 189, 248, 0.05);
-  }
-
-  .drop-zone p {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
-
-  .drop-zone span {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    display: block;
-    margin-top: 6px;
-  }
-
-  input[type="file"] {
-    display: none;
-  }
-
-  .controls {
-    margin-top: 25px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
-  .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .control-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    display: flex;
-    justify-content: space-between;
-  }
-
-  input[type="range"] {
-    width: 100%;
-    accent-color: var(--primary-color);
-  }
-
-  .btn-group {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 12px;
-    margin-top: 25px;
-  }
-
-  button {
-    background-color: var(--primary-color);
-    color: #0f172a;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-
-  button:hover:not(:disabled) {
-    background-color: var(--primary-hover);
-    color: #ffffff;
-  }
-
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .btn-secondary {
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-  }
-
-  .btn-secondary:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-main);
-  }
-
-  .results-grid {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 5px;
-  }
-
-  .result-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .result-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: contain;
-    background: #020617;
-  }
-
-  .result-card-body {
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
-
-  .download-btn {
-    padding: 4px 8px;
-    font-size: 0.75rem;
-  }
+:root{
+  --bg:#070a14;
+  --panel:#0d1322;
+  --line:rgba(120,220,255,.18);
+  --text:#edf8ff;
+  --muted:#8290a8;
+  --cyan:#4de8ff;
+  --blue:#5d7cff;
+  --shadow:0 25px 80px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);padding:30px 15px;
+}
+main{max-width:1100px;margin:auto}
+h1{margin:0 0 8px;font-size:32px;letter-spacing:-1px}
+h1 span{color:var(--cyan)}
+p.sub{margin:0 0 24px;color:var(--muted);font-size:14px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:18px;padding:20px;box-shadow:var(--shadow);
+}
+.drop-zone{
+  border:2px dashed var(--line);border-radius:14px;padding:40px 20px;
+  text-align:center;cursor:pointer;transition:.2s;background:rgba(255,255,255,.015);
+}
+.drop-zone:hover{border-color:var(--cyan);background:rgba(77,232,255,.03)}
+input[type=file]{display:none}
+.controls{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-top:20px;
+}
+.control-group{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase}
+input[type=range]{width:100%}
+.btn-group{
+  display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:20px;
+}
+.btn{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));border:none;
+  color:#04101a;font-weight:800;padding:12px 20px;border-radius:10px;
+  cursor:pointer;transition:.2s;width:100%;font-size:15px;
+}
+.btn:hover:not(:disabled){opacity:.9;transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-secondary{
+  background:transparent;border:1px solid var(--line);color:var(--text);
+}
+.btn-secondary:hover:not(:disabled){background:rgba(255,255,255,.05)}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;margin-top:25px}
+.result-item{
+  background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;display:flex;flex-direction:column;
+}
+.result-item img{width:100%;height:200px;object-fit:contain;background:#03050a}
+.result-info{padding:10px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.dl-btn{
+  background:rgba(77,232,255,.15);border:1px solid var(--cyan);color:var(--cyan);
+  padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;
+}
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Bulk Screenshot Auto-Cropper</h1>
-  <p class="description">Trims white, black, and gradient background margins from full screenshots automatically.</p>
+<main>
+  <h1>ArtExtract <span>// Manga Panel Crop</span></h1>
+  <p class="sub">Trims white, black, and gradient background margins from full screenshots automatically.</p>
 
-  <div class="drop-zone" id="dropZone">
-    <p>Drop your screenshots here or click to browse</p>
-    <span>Supports PNG, JPG, WEBP (Bulk processing supported)</span>
-    <input type="file" id="fileInput" accept="image/*" multiple>
-  </div>
+  <div class="card">
+    <div class="drop-zone" id="dropZone">
+      <div style="font-size:24px;margin-bottom:8px">✂️</div>
+      <strong>Drop manhwa or manga screenshots here</strong>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Bulk processing enabled — select multiple screenshots</div>
+      <input type="file" id="fileInput" accept="image/*" multiple>
+    </div>
 
-  <div class="controls">
-    <div class="control-group">
-      <label>Crop Sensitivity (Threshold) <span id="thresholdVal">30</span></label>
-      <input type="range" id="threshold" min="5" max="100" value="30">
+    <div class="controls">
+      <div class="control-group">
+        <label>Crop Sensitivity: <span id="tolVal">28</span></label>
+        <input type="range" id="tolerance" min="5" max="80" value="28">
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" id="processBtn">Extract Panel Artwork</button>
+      <button class="btn btn-secondary" id="downloadAllBtn" disabled>Save All</button>
     </div>
   </div>
 
-  <div class="btn-group">
-    <button id="processBtn">Process All Screenshots</button>
-    <button id="downloadAllBtn" class="btn-secondary" disabled>Download All</button>
-  </div>
-
-  <div class="results-grid" id="resultsGrid"></div>
-</div>
+  <div class="results" id="resultsGrid"></div>
+</main>
 
 <script>
-  const dropZone = document.getElementById('dropZone');
-  const fileInput = document.getElementById('fileInput');
-  const processBtn = document.getElementById('processBtn');
-  const downloadAllBtn = document.getElementById('downloadAllBtn');
-  const resultsGrid = document.getElementById('resultsGrid');
-  const thresholdInput = document.getElementById('threshold');
-  const thresholdVal = document.getElementById('thresholdVal');
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const processBtn = document.getElementById('processBtn');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+const resultsGrid = document.getElementById('resultsGrid');
+const toleranceInput = document.getElementById('tolerance');
+const tolVal = document.getElementById('tolVal');
 
-  let loadedFiles = [];
-  let processedImages = [];
+let loadedFiles = [];
+let processedOutputs = [];
 
-  thresholdInput.addEventListener('input', (e) => {
-    thresholdVal.textContent = e.target.value;
-  });
+toleranceInput.addEventListener('input', e => tolVal.textContent = e.target.value);
 
-  dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--cyan)'; });
+dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = 'var(--line)');
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.style.borderColor = 'var(--line)';
+  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e => { if (e.target.files.length) handleFiles(e.target.files); });
 
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.style.borderColor = 'var(--primary-color)';
-  });
+function handleFiles(files) {
+  loadedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  dropZone.querySelector('strong').textContent = `${loadedFiles.length} file(s) ready to trim`;
+}
 
-  dropZone.addEventListener('dragleave', () => {
-    dropZone.style.borderColor = 'rgba(56, 189, 248, 0.4)';
-  });
+function colorDiff(r1, g1, b1, r2, g2, b2) {
+  return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
+}
 
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.style.borderColor = 'rgba(56, 189, 248, 0.4)';
-    if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
-  });
+// Improved global margin cropping algorithm (keeps entire screenshot as 1 clean image)
+function processImage(img, tol) {
+  const canvas = document.createElement('canvas');
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
+  canvas.width = w;
+  canvas.height = h;
 
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length) handleFiles(e.target.files);
-  });
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
 
-  function handleFiles(files) {
-    loadedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-    dropZone.querySelector('p').textContent = `${loadedFiles.length} file(s) selected`;
-  }
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
 
-  function colorDiff(r1, g1, b1, r2, g2, b2) {
-    return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
-  }
+  // Sample corner pixels to detect outer border color (handles white, black, or custom gradients)
+  const bgR = data[0];
+  const bgG = data[1];
+  const bgB = data[2];
 
-  function autoCropImage(img, threshold) {
-    const canvas = document.createElement('canvas');
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-    canvas.width = w;
-    canvas.height = h;
+  let minX = w, minY = h, maxX = 0, maxY = 0;
 
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
+  // Scan four corners inwards to isolate true content boundaries
+  for (let y = 0; y < h; y += 2) {
+    for (let x = 0; x < w; x += 2) {
+      const idx = (y * w + x) * 4;
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
 
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const data = imgData.data;
-
-    // Use top-left corner pixel as background reference color
-    const bgR = data[0];
-    const bgG = data[1];
-    const bgB = data[2];
-
-    let minX = w, minY = h, maxX = 0, maxY = 0;
-
-    // Scan every 2nd pixel for speed
-    for (let y = 0; y < h; y += 2) {
-      for (let x = 0; x < w; x += 2) {
-        const idx = (y * w + x) * 4;
-        const r = data[idx];
-        const g = data[idx + 1];
-        const b = data[idx + 2];
-
-        if (colorDiff(bgR, bgG, bgB, r, g, b) > threshold) {
-          if (x < minX) minX = x;
-          if (x > maxX) maxX = x;
-          if (y < minY) minY = y;
-          if (y > maxY) maxY = y;
-        }
+      if (colorDiff(bgR, bgG, bgB, r, g, b) > tol) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
       }
     }
-
-    // Fallback if image is solid
-    if (maxX <= minX || maxY <= minY) {
-      minX = 0; minY = 0; maxX = w - 1; maxY = h - 1;
-    }
-
-    const cropW = maxX - minX + 1;
-    const cropH = maxY - minY + 1;
-
-    const croppedCanvas = document.createElement('canvas');
-    croppedCanvas.width = cropW;
-    croppedCanvas.height = cropH;
-    const croppedCtx = croppedCanvas.getContext('2d');
-
-    croppedCtx.drawImage(img, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
-
-    return croppedCanvas.toDataURL('image/png');
   }
 
-  processBtn.addEventListener('click', async () => {
-    if (!loadedFiles.length) return alert('Please select images first.');
+  // Fallback protection if no background margins exist
+  if (maxX <= minX || maxY <= minY) {
+    minX = 0; minY = 0; maxX = w - 1; maxY = h - 1;
+  }
 
-    processBtn.disabled = true;
-    processBtn.textContent = 'Processing...';
-    resultsGrid.innerHTML = '';
-    processedImages = [];
+  const cropW = maxX - minX + 1;
+  const cropH = maxY - minY + 1;
 
-    const threshold = Number(thresholdInput.value);
+  const croppedCanvas = document.createElement('canvas');
+  croppedCanvas.width = cropW;
+  croppedCanvas.height = cropH;
+  const croppedCtx = croppedCanvas.getContext('2d');
 
-    for (let i = 0; i < loadedFiles.length; i++) {
-      const file = loadedFiles[i];
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      await img.decode();
+  croppedCtx.drawImage(img, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
 
-      const croppedDataUrl = autoCropImage(img, threshold);
-      const outputName = `clean_${file.name.replace(/\.[^/.]+$/, "")}.png`;
+  return croppedCanvas;
+}
 
-      processedImages.push({ url: croppedDataUrl, name: outputName });
+processBtn.addEventListener('click', async () => {
+  if (!loadedFiles.length) return alert('Please add images first.');
 
-      const card = document.createElement('div');
-      card.className = 'result-card';
+  processBtn.disabled = true;
+  downloadAllBtn.disabled = true;
+  processBtn.textContent = 'Trimming Margins…';
+  resultsGrid.innerHTML = '';
+  processedOutputs = [];
 
-      const preview = document.createElement('img');
-      preview.src = croppedDataUrl;
+  const tol = Number(toleranceInput.value);
 
-      const body = document.createElement('div');
-      body.className = 'result-card-body';
-      body.innerHTML = `<span>Cleaned ${i + 1}</span>`;
+  for (let fIdx = 0; fIdx < loadedFiles.length; fIdx++) {
+    const file = loadedFiles[fIdx];
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    await img.decode();
 
-      const dlBtn = document.createElement('button');
-      dlBtn.className = 'download-btn';
-      dlBtn.textContent = 'Save';
-      dlBtn.onclick = () => {
-        const a = document.createElement('a');
-        a.href = croppedDataUrl;
-        a.download = outputName;
-        a.click();
-      };
+    const pCanvas = processImage(img, tol);
+    const dataUrl = pCanvas.toDataURL('image/png');
+    const fileName = `clean_${file.name.replace(/\.[^/.]+$/, "")}.png`;
 
-      body.appendChild(dlBtn);
-      card.appendChild(preview);
-      card.appendChild(body);
-      resultsGrid.appendChild(card);
+    processedOutputs.push({ url: dataUrl, name: fileName });
 
-      URL.revokeObjectURL(img.src);
-    }
+    const container = document.createElement('div');
+    container.className = 'result-item';
 
-    processBtn.disabled = false;
-    processBtn.textContent = 'Process All Screenshots';
-    downloadAllBtn.disabled = false;
+    const previewImg = document.createElement('img');
+    previewImg.src = dataUrl;
+
+    const info = document.createElement('div');
+    info.className = 'result-info';
+    info.innerHTML = `<span>${pCanvas.width}x${pCanvas.height}px</span>`;
+
+    const dl = document.createElement('button');
+    dl.className = 'dl-btn';
+    dl.textContent = 'Save PNG';
+    dl.onclick = () => {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = fileName;
+      a.click();
+    };
+
+    info.appendChild(dl);
+    container.appendChild(previewImg);
+    container.appendChild(info);
+    resultsGrid.appendChild(container);
+
+    URL.revokeObjectURL(img.src);
+  }
+
+  processBtn.disabled = false;
+  processBtn.textContent = 'Extract Panel Artwork';
+  downloadAllBtn.disabled = false;
+});
+
+// Bulk download trigger
+downloadAllBtn.addEventListener('click', () => {
+  processedOutputs.forEach((item, index) => {
+    setTimeout(() => {
+      const a = document.createElement('a');
+      a.href = item.url;
+      a.download = item.name;
+      a.click();
+    }, index * 200);
   });
-
-  downloadAllBtn.addEventListener('click', () => {
-    processedImages.forEach((item, index) => {
-      setTimeout(() => {
-        const a = document.createElement('a');
-        a.href = item.url;
-        a.download = item.name;
-        a.click();
-      }, index * 200);
-    });
-  });
+});
 </script>
 </body>
 </html>
