@@ -179,7 +179,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .toggle-track:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:#6f8198;transition:.2s}
 .toggle input:checked+.toggle-track{background:rgba(77,232,255,.18);border-color:var(--cyan);box-shadow:0 0 18px rgba(77,232,255,.12)}
 .toggle input:checked+.toggle-track:before{transform:translateX(21px);background:#dffbff;box-shadow:0 0 12px var(--cyan)}
-.previewbox{min-width:0;contain:layout paint}.ai-status{font-size:10px;letter-spacing:.12em;color:var(--cyan);padding:5px 8px;border:1px solid rgba(67,232,255,.18);border-radius:999px;background:rgba(67,232,255,.06);white-space:nowrap}.ai-setting .switch-row{min-height:58px}.ai-setting .switch-copy b{display:block;font-size:13px}.ai-setting .switch-copy small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.previewbox{min-width:0;contain:layout paint}.ai-status{font-size:10px;letter-spacing:.12em;color:var(--cyan);padding:5px 8px;border:1px solid rgba(67,232,255,.18);border-radius:999px;background:rgba(67,232,255,.06);white-space:nowrap}
+.ai-setting .switch-copy b{display:block;font-size:13px}.ai-setting .switch-copy small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
 .preview-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .preview-title strong{font-size:13px;letter-spacing:.12em;text-transform:uppercase}
 .preview-meta{font-size:10px;color:#65758f}
@@ -225,9 +226,9 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .result img{width:100%;height:155px;object-fit:contain;background:#050b15;display:block}
 .result-body{padding:10px}.result-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#cbd7e8}.result-size{font-size:10px;color:#62738d;margin-top:3px}
 .done{position:absolute;top:8px;left:8px;background:rgba(72,240,164,.16);border:1px solid rgba(72,240,164,.28);color:var(--green);border-radius:999px;padding:4px 7px;font-size:9px;font-weight:950}
-.download-one{position:absolute;right:8px;top:8px;width:29px;height:29px;padding:0;border-radius:9px!important;background:rgba(5,12,24,.82);color:#dffbff;border:1px solid #ffffff14!important}
+.download-one{position:absolute;right:8px;top:8px;width:29px;height:29px;padding:0;border-radius:9px!important;background:rgba(5,12,24,.82);color:#dffbff;border:1px solid #ffffff14!important;cursor:pointer;}
 .pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:16px 0 0}
-.page-btn{min-width:38px;padding:9px 12px;background:rgba(255,255,255,.035);color:#cbd8e9;border:1px solid #ffffff10;border-radius:10px}
+.page-btn{min-width:38px;padding:9px 12px;background:rgba(255,255,255,.035);color:#cbd8e9;border:1px solid #ffffff10;border-radius:10px;cursor:pointer;}
 .page-btn.active{background:rgba(77,232,255,.14);color:#dffbff;border-color:rgba(77,232,255,.55)}
 .page-info{font-size:10px;color:#60718a;margin:0 8px}
 .locked{opacity:.55}
@@ -321,11 +322,24 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
       </div>
 
       <div class="setting ai-setting">
-<div class="setting-head"><span>AI Boundary Guard <span class="help" title="On-device AI gives the crop detector a second opinion and protects artwork edges.">?</span></span><span class="ai-status" id="aiStatus">STANDBY</span></div>
-<div class="switch-row"><div class="switch-copy"><b>AI Assist</b><small>Runs only in Aggressive mode and caches the result.</small></div><label class="switch"><input id="aiAssist" type="checkbox" checked><span class="toggle-track"></span></label></div>
-<div class="desc">AI analyzes a small copy for speed. The final crop always uses the original pixels.</div>
-</div>
-<button type="button" class="action secondary" id="reset" style="width:100%;margin-top:18px">↻ RESET CORE</button>
+        <div class="setting-head">
+          <span>AI Boundary Guard <span class="help" title="On-device AI gives the crop detector a second opinion and protects artwork edges.">?</span></span>
+          <span class="ai-status" id="aiStatus">STANDBY</span>
+        </div>
+        <div class="toggle-row">
+          <div class="switch-copy">
+            <b>AI Assist</b>
+            <small>Runs only in Aggressive mode and caches the result.</small>
+          </div>
+          <label class="toggle">
+            <input id="aiAssist" type="checkbox" checked>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="desc">AI analyzes a small copy for speed. The final crop always uses the original pixels.</div>
+      </div>
+
+      <button type="button" class="action secondary" id="reset" style="width:100%;margin-top:18px">↻ RESET CORE</button>
     </div>
 
     <div class="previewbox">
@@ -414,6 +428,17 @@ let aiCache=null;
 
 const PAGE_SIZE=20;
 
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function updateSlider(el){
   const min=Number(el.min)||0;
   const max=Number(el.max)||100;
@@ -487,7 +512,6 @@ function percentile(a,p){
   const b=Array.from(a).sort((x,y)=>x-y);
   return b[Math.min(b.length-1,Math.max(0,Math.floor((b.length-1)*p)))];
 }
-function idx(x,y,w){return y*w+x}
 
 function buildAnalysis(img,maxSide=900){
   const ow=img.naturalWidth||img.width,oh=img.naturalHeight||img.height;
@@ -501,30 +525,9 @@ function buildAnalysis(img,maxSide=900){
   return {w,h,d,ow,oh,sx:ow/w,sy:oh/h};
 }
 
-/*
-  ------------------------------------------------------------------
-  ADAPTIVE BORDER ENGINE
-  ------------------------------------------------------------------
-  This is deliberately not a "compare everything to white" cropper.
-
-  The engine:
-  1. Samples the four outer zones.
-  2. Measures local colour changes, luma changes and texture.
-  3. Builds an edge barrier map.
-  4. Grows a background region FROM THE OUTSIDE.
-  5. Allows slow colour drift, so gradients remain connected.
-  6. Uses multiple side profiles to locate the persistent boundary.
-  7. Applies the result to the ORIGINAL image dimensions.
-
-  This matters because a manga panel can have white, grey, coloured,
-  noisy, compressed, or gradient margins.
-  ------------------------------------------------------------------
-*/
-
 function outerProfile(d,w,h){
   const band=Math.max(3,Math.floor(Math.min(w,h)*.055));
   const samples=[];
-  const local=[];
   const sideMeans={top:[],right:[],bottom:[],left:[]};
 
   function pix(x,y){
@@ -613,10 +616,6 @@ function growOuterBackground(info,features,tol,mode,learning){
   );
   const edgeBase=Math.max(7,percentile(Array.from(edge),.78));
 
-  /*
-    Tolerance is deliberately mapped to a usable range instead of
-    becoming a raw RGB distance. This keeps the slider predictable.
-  */
   const colorLimit=(aggressive?18:12)+tol*.72+(profile.lumaSpread*.025);
   const edgeLimit=(aggressive?42:30)+tol*.48+edgeBase*.35;
   const noisyLimit=borderNoise*.95+tol*.55;
@@ -631,11 +630,6 @@ function growOuterBackground(info,features,tol,mode,learning){
     state[i]=2;q[tail]=i;seedCost[i]=cost;tail++;
   }
 
-  /*
-    Seed EVERY outer pixel. The previous failed version rejected many
-    outer pixels before the flood even began. Textured/coloured borders
-    need to be seeded too; the edge barrier is applied during growth.
-  */
   for(let x=0;x<w;x++){push(x,0);if(h>1)push((h-1)*w+x,0)}
   for(let y=1;y<h-1;y++){push(y*w,0);if(w>1)push(y*w+w-1,0)}
 
@@ -649,17 +643,7 @@ function growOuterBackground(info,features,tol,mode,learning){
     const e=Math.max(edge[cur],edge[next]);
     const t=Math.max(texture[cur],texture[next]);
 
-    /*
-      Local continuity handles gradients: the detector compares a new
-      pixel with the connected pixel, not against one global colour.
-    */
     if(cd>colorLimit*1.75 && t>noisyLimit)return false;
-
-    /*
-      A very strong edge is likely the artwork boundary. Aggressive
-      mode may cross medium edges when the colour transition itself is
-      smooth, but not a major discontinuity.
-    */
     if(e>edgeLimit && cd>colorLimit*.72)return false;
 
     if(learning&&learnedN>24){
@@ -692,10 +676,6 @@ function growOuterBackground(info,features,tol,mode,learning){
     }
   }
 
-  /*
-    Convert "queued" to background only if it was actually reached.
-    State 1 is the connected outside region.
-  */
   return {
     mask:state,
     colorLimit,
@@ -720,11 +700,6 @@ function sideScore(mask,w,h,side,offset){
 }
 
 function sideEdgeProfile(d,w,h,side,depth){
-  /*
-    Measures how strongly the image changes across a complete candidate
-    boundary. This is deliberately a secondary signal: it can never
-    override the connected-background detector by itself.
-  */
   let sum=0, strong=0, total=0;
   const span=side==='top'||side==='bottom'?w:h;
   const stride=Math.max(1,Math.floor(span/420));
@@ -764,18 +739,6 @@ function sideEdgeProfile(d,w,h,side,depth){
 }
 
 function aggressiveBoundary(mask,info,side,tol){
-  /*
-    Aggressive mode is NOT "delete more pixels blindly".
-
-    It combines:
-      1. connected outside-background coverage,
-      2. the strongest persistent edge,
-      3. a requirement that the region OUTSIDE the edge is still mostly
-         connected background.
-
-    This makes Aggressive visibly stronger on clean margins while reducing
-    the chance of eating manga artwork, speech bubbles, hair, or borders.
-  */
   const {w,h,d}=info;
   const span=side==='top'||side==='bottom'?h:w;
   const maxDepth=Math.floor(span*.44);
@@ -790,15 +753,7 @@ function aggressiveBoundary(mask,info,side,tol){
     const bg1=sideScore(mask,w,h,side,depth);
     const bg2=sideScore(mask,w,h,side,Math.min(maxDepth,depth+2));
 
-    /*
-      We want a clear transition: background before the boundary, then a
-      sustained reduction after it.
-    */
-    const transition=Math.max(
-      0,
-      bg0-Math.min(bg1,bg2)
-    );
-
+    const transition=Math.max(0,bg0-Math.min(bg1,bg2));
     const edge=sideEdgeProfile(d,w,h,side,depth);
     const persistence=Math.max(0,bg0-bg2);
 
@@ -808,10 +763,6 @@ function aggressiveBoundary(mask,info,side,tol){
       Math.min(1,edge.strong*2.4)*0.85+
       Math.min(1,edge.mean/80)*0.45;
 
-    /*
-      Reject weak edges and anything where the supposed outer region is
-      already too uncertain. This is the important safety mechanism.
-    */
     if(bg0>=baseNeed &&
        transition>=.11 &&
        (edge.strong>=.12 || edge.mean>=30) &&
@@ -824,11 +775,6 @@ function aggressiveBoundary(mask,info,side,tol){
 
   if(best<0)return 0;
 
-  /*
-    Verify that the candidate persists for a few neighbouring samples.
-    This prevents a single letter, manga speed-line, or compression edge
-    from becoming the crop boundary.
-  */
   let confirmations=0;
   for(let d=Math.max(2,best-3);d<=Math.min(maxDepth,best+3);d++){
     const s=sideScore(mask,w,h,side,d);
@@ -845,10 +791,6 @@ function persistentBoundary(mask,w,h,side,mode,info,tol){
   const span=side==='top'||side==='bottom'?h:w;
   const maxDepth=Math.floor(span*.48);
 
-  /*
-    Normal mode stays conservative and uses the connected-background
-    boundary only. Aggressive gets an additional edge-aware pass.
-  */
   let previous=sideScore(mask,w,h,side,0);
   let bestDepth=0;
   let bestDrop=0;
@@ -866,10 +808,6 @@ function persistentBoundary(mask,w,h,side,mode,info,tol){
   if(aggressive && info){
     const strong=aggressiveBoundary(mask,info,side,tol);
     if(strong>0){
-      /*
-        Never let Aggressive jump farther than the strongest connected
-        background drop by a huge amount. This keeps it useful for videos.
-      */
       const cap=Math.min(
         Math.floor(span*.44),
         Math.max(strong,Math.floor(bestDepth*1.55)+3)
@@ -896,7 +834,6 @@ function persistentBoundary(mask,w,h,side,mode,info,tol){
   if(bestDrop>0.18)return bestDepth;
   return 0;
 }
-
 
 function setAIStatus(text,good=false){
   if(!aiStatus)return;
@@ -935,18 +872,28 @@ async function getAIBoundaryInfo(img){
   const input=document.createElement('canvas');input.width=w;input.height=h;
   const ictx=input.getContext('2d',{willReadFrequently:true});ictx.drawImage(img,0,0,w,h);
   setAIStatus('AI SCANNING');
+  
   const out=await pipe(input);
   if(!out||!out.length)throw new Error('AI returned no mask.');
-  const first=out[0];let mask=null;
-  if(first&&typeof first.toCanvas==='function')mask=first.toCanvas();
-  else if(first&&typeof first.toBlob==='function'){
-    const blob=await first.toBlob(),bmp=await createImageBitmap(blob);
-    mask=document.createElement('canvas');mask.width=bmp.width;mask.height=bmp.height;
-    mask.getContext('2d').drawImage(bmp,0,0);if(bmp.close)bmp.close();
+  const first=out[0];
+  
+  const maskCanvas=document.createElement('canvas');
+  maskCanvas.width=first.width||w;
+  maskCanvas.height=first.height||h;
+  const mctx=maskCanvas.getContext('2d');
+  
+  if(first.toCanvas){
+    const c=await first.toCanvas();
+    mctx.drawImage(c,0,0);
+  } else if (first.data) {
+    const imgData = new ImageData(new Uint8ClampedArray(first.data), first.width, first.height);
+    mctx.putImageData(imgData, 0, 0);
+  } else {
+    throw new Error('Unsupported AI output format.');
   }
-  if(!mask)throw new Error('Unsupported AI output.');
-  const mw=mask.width,mh=mask.height;
-  const md=mask.getContext('2d',{willReadFrequently:true}).getImageData(0,0,mw,mh).data;
+
+  const mw=maskCanvas.width,mh=maskCanvas.height;
+  const md=mctx.getImageData(0,0,mw,mh).data;
   const threshold=34;
   let minX=mw,maxX=-1,minY=mh,maxY=-1;
   for(let y=0;y<mh;y++)for(let x=0;x<mw;x++){
@@ -969,6 +916,7 @@ async function getAIBoundaryInfo(img){
   aiCache={minX,maxX,minY,maxY,w:mw,h:mh,occupancy:{left:occ('left'),right:occ('right'),top:occ('top'),bottom:occ('bottom')}};
   aiCacheKey=key;setAIStatus('AI CACHED',true);return aiCache;
 }
+
 function applyAIGuard(bounds,ai,ow,oh,mode,pad){
   if(!ai||mode!=='aggressive')return bounds;
   const sx=ow/ai.w,sy=oh/ai.h;
@@ -996,11 +944,6 @@ async function refineBounds(info,grown,pad,mode,aiInfo=null){
   const topA=persistentBoundary(mask,w,h,'top',mode,info,info._tol);
   const bottomA=persistentBoundary(mask,w,h,'bottom',mode,info,info._tol);
 
-  /*
-    Convert analysis coordinates to original coordinates conservatively.
-    We intentionally expand by one analysis pixel before applying the
-    user safety margin, preventing accidental loss of high-res details.
-  */
   let left=Math.floor(Math.max(0,leftA-1)*ow/w);
   let right=Math.ceil(Math.min(w-1,w-1-rightA+1)*ow/w)-1;
   let top=Math.floor(Math.max(0,topA-1)*oh/h);
@@ -1015,10 +958,6 @@ async function refineBounds(info,grown,pad,mode,aiInfo=null){
   const cw=right-left+1,ch=bottom-top+1;
   const area=cw*ch/(ow*oh);
 
-  /*
-    Never return a ridiculous crop. A 1-2% sliver is almost certainly a
-    segmentation failure. This is the final crash/safety guard.
-  */
   if(cw<Math.max(8,ow*.035)||ch<Math.max(8,oh*.035)||area<.035){
     return {left:0,top:0,right:ow-1,bottom:oh-1,confidence:'low',removed:0};
   }
@@ -1081,6 +1020,7 @@ function schedulePreview(delay=160){
   if(previewTimer)clearTimeout(previewTimer);
   previewTimer=setTimeout(()=>refreshPreview(),delay);
 }
+
 async function showPreview(file){
   if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
   previewUrl=URL.createObjectURL(file);
@@ -1089,6 +1029,7 @@ async function showPreview(file){
   originalMeta.textContent=(img.naturalWidth||img.width)+' × '+(img.naturalHeight||img.height);
   setPreviewMeta('READY');schedulePreview(20);
 }
+
 async function refreshPreview(){
   if(!selected.length||busy)return;
   const token=++previewToken;
@@ -1122,7 +1063,6 @@ async function refreshPreview(){
     if(token===previewToken){setPreviewMeta('SCAN ERROR');cropMeta.textContent='—'}
   }finally{previewRunning=false}
 }
-
 
 function setLocked(locked){
   settingsBox.classList.toggle('locked',locked);
@@ -1161,7 +1101,7 @@ padEl.addEventListener('input',()=>{
 });
 selfImprove.addEventListener('change',()=>{
   selfState.textContent=selfImprove.checked?'ON':'OFF';
-setAIStatus('STANDBY',true);
+  setAIStatus('STANDBY',true);
   schedulePreview(140);
 });
 aiAssist.addEventListener('change',()=>{
@@ -1181,351 +1121,352 @@ resetBtn.addEventListener('click',()=>{
 setCount();
 
 function renderPage(){
-results.innerHTML='';
+  results.innerHTML='';
 
-const totalPages=Math.max(1,Math.ceil(outputs.length/PAGE_SIZE));
+  const totalPages=Math.max(1,Math.ceil(outputs.length/PAGE_SIZE));
 
-if(currentPage>totalPages){
-currentPage=totalPages;
+  if(currentPage>totalPages){
+    currentPage=totalPages;
+  }
+
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageItems=outputs.slice(start,start+PAGE_SIZE);
+
+  for(const item of pageItems){
+    const div=document.createElement('div');
+    div.className='result';
+
+    const im=document.createElement('img');
+    im.src=URL.createObjectURL(item.blob);
+    im.alt=item.name;
+
+    const done=document.createElement('div');
+    done.className='done';
+    done.textContent='DONE';
+
+    const one=document.createElement('button');
+    one.type='button';
+    one.className='download-one';
+    one.textContent='⇩';
+
+    one.addEventListener('click',function(e){
+      e.stopPropagation();
+      downloadBlob(item.blob,item.name);
+    });
+
+    const body=document.createElement('div');
+    body.className='result-body';
+
+    const nameDiv=document.createElement('div');
+    nameDiv.className='result-name';
+    nameDiv.title=item.name;
+    nameDiv.textContent=item.name;
+
+    const sizeDiv=document.createElement('div');
+    sizeDiv.className='result-size';
+    sizeDiv.textContent=item.width+' × '+item.height;
+
+    body.append(nameDiv,sizeDiv);
+    div.append(im,done,one,body);
+    results.append(div);
+  }
+
+  pagination.innerHTML='';
+
+  if(totalPages<=1)return;
+
+  const prev=document.createElement('button');
+  prev.type='button';
+  prev.className='page-btn';
+  prev.textContent='‹';
+  prev.disabled=currentPage===1;
+
+  prev.addEventListener('click',function(){
+    if(currentPage>1){
+      currentPage--;
+      renderPage();
+      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+    }
+  });
+
+  pagination.append(prev);
+
+  const maxButtons=7;
+  let first=1;
+  let last=totalPages;
+
+  if(totalPages>maxButtons){
+    first=Math.max(1,currentPage-3);
+    last=Math.min(totalPages,first+6);
+
+    if(last-first<6){
+      first=Math.max(1,last-6);
+    }
+  }
+
+  for(let p=first;p<=last;p++){
+    const btn=document.createElement('button');
+
+    btn.type='button';
+    btn.className='page-btn'+(p===currentPage?' active':'');
+    btn.textContent=p;
+
+    btn.addEventListener('click',function(){
+      currentPage=p;
+      renderPage();
+      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+    });
+
+    pagination.append(btn);
+  }
+
+  const next=document.createElement('button');
+  next.type='button';
+  next.className='page-btn';
+  next.textContent='›';
+  next.disabled=currentPage===totalPages;
+
+  next.addEventListener('click',function(){
+    if(currentPage<totalPages){
+      currentPage++;
+      renderPage();
+      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+    }
+  });
+
+  pagination.append(next);
+
+  const info=document.createElement('span');
+  info.className='page-info';
+  info.textContent='Page '+currentPage+' of '+totalPages+' • '+outputs.length+' images';
+
+  pagination.append(info);
 }
 
-const start=(currentPage-1)*PAGE_SIZE;
-const pageItems=outputs.slice(start,start+PAGE_SIZE);
+function crc32(buf){
+  let table=crc32.table;
 
-for(const item of pageItems){
-const div=document.createElement('div');
-div.className='result';
+  if(!table){
+    table=crc32.table=new Uint32Array(256);
 
-const im=document.createElement('img');
-im.src=URL.createObjectURL(item.blob);
-im.alt=item.name;
+    for(let n=0;n<256;n++){
+      let c=n;
 
-const done=document.createElement('div');
-done.className='done';
-done.textContent='DONE';
+      for(let k=0;k<8;k++){
+        c=(c&1)?0xedb88320^(c>>>1):c>>>1;
+      }
 
-const one=document.createElement('button');
-one.type='button';
-one.className='download-one';
-one.textContent='⇩';
+      table[n]=c>>>0;
+    }
+  }
 
-one.addEventListener('click',function(e){
-e.stopPropagation();
-downloadBlob(item.blob,item.name);
-});
+  let c=0xffffffff;
 
-const body=document.createElement('div');
-body.className='result-body';
+  for(let i=0;i<buf.length;i++){
+    c=table[(c^buf[i])&255]^(c>>>8);
+  }
 
-const nameDiv=document.createElement('div');
-nameDiv.className='result-name';
-nameDiv.title=item.name;
-nameDiv.textContent=item.name;
-
-const sizeDiv=document.createElement('div');
-sizeDiv.className='result-size';
-sizeDiv.textContent=item.width+' × '+item.height;
-
-body.append(nameDiv,sizeDiv);
-div.append(im,done,one,body);
-results.append(div);
-}
-
-pagination.innerHTML='';
-
-if(totalPages<=1)return;
-
-const prev=document.createElement('button');
-prev.type='button';
-prev.className='page-btn';
-prev.textContent='‹';
-prev.disabled=currentPage===1;
-
-prev.addEventListener('click',function(){
-if(currentPage>1){
-currentPage--;
-renderPage();
-window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-}
-});
-
-pagination.append(prev);
-
-const maxButtons=7;
-let first=1;
-let last=totalPages;
-
-if(totalPages>maxButtons){
-first=Math.max(1,currentPage-3);
-last=Math.min(totalPages,first+6);
-
-if(last-first<6){
-first=Math.max(1,last-6);
-}
-}
-
-for(let p=first;p<=last;p++){
-const btn=document.createElement('button');
-
-btn.type='button';
-btn.className='page-btn'+(p===currentPage?' active':'');
-btn.textContent=p;
-
-btn.addEventListener('click',function(){
-currentPage=p;
-renderPage();
-window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-});
-
-pagination.append(btn);
-}
-
-const next=document.createElement('button');
-next.type='button';
-next.className='page-btn';
-next.textContent='›';
-next.disabled=currentPage===totalPages;
-
-next.addEventListener('click',function(){
-if(currentPage<totalPages){
-currentPage++;
-renderPage();
-window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-}
-});
-
-pagination.append(next);
-
-const info=document.createElement('span');
-info.className='page-info';
-info.textContent='Page '+currentPage+' of '+totalPages+' • '+outputs.length+' images';
-
-pagination.append(info);
-}function crc32(buf){
-let table=crc32.table;
-
-if(!table){
-table=crc32.table=new Uint32Array(256);
-
-for(let n=0;n<256;n++){
-let c=n;
-
-for(let k=0;k<8;k++){
-c=(c&1)?0xedb88320^(c>>>1):c>>>1;
-}
-
-table[n]=c>>>0;
-}
-}
-
-let c=0xffffffff;
-
-for(let i=0;i<buf.length;i++){
-c=table[(c^buf[i])&255]^(c>>>8);
-}
-
-return(c^0xffffffff)>>>0;
+  return(c^0xffffffff)>>>0;
 }
 
 function u16(a,n){
-a.push(n&255,(n>>>8)&255);
+  a.push(n&255,(n>>>8)&255);
 }
 
 function u32(a,n){
-a.push(
-n&255,
-(n>>>8)&255,
-(n>>>16)&255,
-(n>>>24)&255
-);
+  a.push(
+    n&255,
+    (n>>>8)&255,
+    (n>>>16)&255,
+    (n>>>24)&255
+  );
 }
 
 function strBytes(s){
-return new TextEncoder().encode(s);
+  return new TextEncoder().encode(s);
 }
 
 async function makeZip(items){
-const chunks=[];
-const central=[];
-let offset=0;
+  const chunks=[];
+  const central=[];
+  let offset=0;
 
-for(const item of items){
-const data=new Uint8Array(await item.blob.arrayBuffer());
-const name=strBytes(item.name);
-const crc=crc32(data);
-const local=[];
+  for(const item of items){
+    const data=new Uint8Array(await item.blob.arrayBuffer());
+    const name=strBytes(item.name);
+    const crc=crc32(data);
+    const local=[];
 
-u32(local,0x04034b50);
-u16(local,20);
-u16(local,0);
-u16(local,0);
-u16(local,0);
-u16(local,0);
-u32(local,crc);
-u32(local,data.length);
-u32(local,data.length);
-u16(local,name.length);
-u16(local,0);
+    u32(local,0x04034b50);
+    u16(local,20);
+    u16(local,0);
+    u16(local,0);
+    u16(local,0);
+    u16(local,0);
+    u32(local,crc);
+    u32(local,data.length);
+    u32(local,data.length);
+    u16(local,name.length);
+    u16(local,0);
 
-const localBytes=new Uint8Array(local);
+    const localBytes=new Uint8Array(local);
 
-chunks.push(localBytes);
-chunks.push(name);
-chunks.push(data);
+    chunks.push(localBytes);
+    chunks.push(name);
+    chunks.push(data);
 
-const cen=[];
+    const cen=[];
 
-u32(cen,0x02014b50);
-u16(cen,20);
-u16(cen,20);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u32(cen,crc);
-u32(cen,data.length);
-u32(cen,data.length);
-u16(cen,name.length);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u16(cen,0);
-u32(cen,0);
-u32(cen,offset);
+    u32(cen,0x02014b50);
+    u16(cen,20);
+    u16(cen,20);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u32(cen,crc);
+    u32(cen,data.length);
+    u32(cen,data.length);
+    u16(cen,name.length);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u32(cen,0);
+    u32(cen,offset);
 
-central.push(new Uint8Array(cen));
-central.push(name);
+    central.push(new Uint8Array(cen));
+    central.push(name);
 
-offset+=localBytes.length+name.length+data.length;
-}
+    offset+=localBytes.length+name.length+data.length;
+  }
 
-const centralOffset=offset;
-let centralSize=0;
+  const centralOffset=offset;
+  let centralSize=0;
 
-for(const c of central){
-chunks.push(c);
-centralSize+=c.length;
-}
+  for(const c of central){
+    chunks.push(c);
+    centralSize+=c.length;
+  }
 
-const end=[];
+  const end=[];
 
-u32(end,0x06054b50);
-u16(end,0);
-u16(end,0);
-u16(end,items.length);
-u16(end,items.length);
-u32(end,centralSize);
-u32(end,centralOffset);
-u16(end,0);
+  u32(end,0x06054b50);
+  u16(end,0);
+  u16(end,0);
+  u16(end,items.length);
+  u16(end,items.length);
+  u32(end,centralSize);
+  u32(end,centralOffset);
+  u16(end,0);
 
-chunks.push(new Uint8Array(end));
+  chunks.push(new Uint8Array(end));
 
-return new Blob(chunks,{type:'application/zip'});
+  return new Blob(chunks,{type:'application/zip'});
 }
 
 cleanBtn.addEventListener('click',async function(){
-if(!selected.length){
-alert('Select some images first.');
-return;
-}
+  if(!selected.length){
+    alert('Select some images first.');
+    return;
+  }
 
-outputs=[];
-currentPage=1;
+  outputs=[];
+  currentPage=1;
 
-results.innerHTML='';
-pagination.innerHTML='';
+  results.innerHTML='';
+  pagination.innerHTML='';
 
-downloadAll.disabled=true;
-cleanBtn.disabled=true;
+  downloadAll.disabled=true;
+  cleanBtn.disabled=true;
 
-setLocked(true);
+  setLocked(true);
 
-progressCard.style.display='block';
-bar.style.width='0%';
-percent.textContent='0%';
+  progressCard.style.display='block';
+  bar.style.width='0%';
+  percent.textContent='0%';
 
-const tol=Number(tolEl.value);
-const pad=Number(padEl.value);
-const mode=cropMode;
+  const tol=Number(tolEl.value);
+  const pad=Number(padEl.value);
+  const mode=cropMode;
 
-try{
-for(let i=0;i<selected.length;i++){
-progressText.textContent='Processing '+(i+1)+' of '+selected.length+' images…';
-status.textContent=selected[i].name;
+  try{
+    for(let i=0;i<selected.length;i++){
+      progressText.textContent='Processing '+(i+1)+' of '+selected.length+' images…';
+      status.textContent=selected[i].name;
 
-const img=await getImage(selected[i]);
-let aiInfo=null;
-if(mode==='aggressive'&&aiAssist.checked){
-  try{status.textContent=selected[i].name+' • AI guard…';aiInfo=await getAIBoundaryInfo(img)}catch(e){console.warn(e);aiInfo=null}
-}
-const out=await cropImage(img,tol,pad,mode,900,aiInfo);
+      const img=await getImage(selected[i]);
+      let aiInfo=null;
+      if(mode==='aggressive'&&aiAssist.checked){
+        try{status.textContent=selected[i].name+' • AI guard…';aiInfo=await getAIBoundaryInfo(img)}catch(e){console.warn(e);aiInfo=null}
+      }
+      const out=await cropImage(img,tol,pad,mode,900,aiInfo);
 
-const blob=await new Promise(function(resolve,reject){
-out.toBlob(function(result){
-if(result)resolve(result);
-else reject(new Error('Could not create PNG'));
-},'image/png');
-});
+      const blob=await new Promise(function(resolve,reject){
+        out.toBlob(function(result){
+          if(result)resolve(result);
+          else reject(new Error('Could not create PNG'));
+        },'image/png');
+      });
 
-const name=selected[i].name.replace(/\.[^.]+$/,'')+'_clean.png';
+      const name=selected[i].name.replace(/\.[^.]+$/,'')+'_clean.png';
 
-outputs.push({
-blob:blob,
-name:name,
-width:out.width,
-height:out.height
-});
+      outputs.push({
+        blob:blob,
+        name:name,
+        width:out.width,
+        height:out.height
+      });
 
-const p=((i+1)/selected.length)*100;
+      const p=((i+1)/selected.length)*100;
 
-bar.style.width=p+'%';
-percent.textContent=Math.round(p)+'%';
+      bar.style.width=p+'%';
+      percent.textContent=Math.round(p)+'%';
 
-await new Promise(function(resolve){
-setTimeout(resolve,0);
-});
-}
+      await new Promise(function(resolve){
+        setTimeout(resolve,0);
+      });
+    }
 
-progressText.textContent='Finished '+selected.length+' images';
-status.textContent='All processed images are ready.';
+    progressText.textContent='Finished '+selected.length+' images';
+    status.textContent='All processed images are ready.';
 
-renderPage();
+    renderPage();
 
-downloadAll.disabled=false;
+    downloadAll.disabled=false;
 
-}catch(err){
-console.error(err);
-status.textContent='Something went wrong while processing an image.';
-alert('Something went wrong while processing an image. Check the browser console for details.');
-}finally{
-cleanBtn.disabled=false;
-setLocked(false);
-}
+  }catch(err){
+    console.error(err);
+    status.textContent='Something went wrong while processing an image.';
+    alert('Something went wrong while processing an image. Check the browser console for details.');
+  }finally{
+    cleanBtn.disabled=false;
+    setLocked(false);
+  }
 });
 
 downloadAll.addEventListener('click',async function(){
-if(!outputs.length)return;
+  if(!outputs.length)return;
 
-downloadAll.disabled=true;
-downloadAll.textContent='Creating ZIP…';
+  downloadAll.disabled=true;
+  downloadAll.textContent='Creating ZIP…';
 
-try{
-const zip=await makeZip(outputs);
-downloadBlob(zip,'cut-it-out-cleaned-images.zip');
-}catch(err){
-console.error(err);
-alert('Could not create the ZIP file.');
-}finally{
-downloadAll.disabled=false;
-downloadAll.textContent='⇩ Download All (.ZIP)';
-}
+  try{
+    const zip=await makeZip(outputs);
+    downloadBlob(zip,'cut-it-out-cleaned-images.zip');
+  }catch(err){
+    console.error(err);
+    alert('Could not create the ZIP file.');
+  }finally{
+    downloadAll.disabled=false;
+    downloadAll.textContent='⇩ Download All (.ZIP)';
+  }
 });
 
 setLocked(false);
 updateSlider(tolEl);
 updateSlider(padEl);
 selfState.textContent=selfImprove.checked?'ON':'OFF';
-
 
 </script>
 </body>
