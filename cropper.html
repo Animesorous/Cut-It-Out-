@@ -1,560 +1,393 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ArtExtract // Sci-Fi Panel Isolator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Image Cropper</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+  :root {
+    --bg-color: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --primary-color: #38bdf8;
+    --primary-hover: #0284c7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+  }
 
-:root {
-  --bg: #030712;
-  --panel: rgba(13, 22, 41, 0.75);
-  --panel-border: rgba(0, 243, 255, 0.25);
-  --cyan: #00f3ff;
-  --cyan-glow: rgba(0, 243, 255, 0.4);
-  --magenta: #ff0055;
-  --magenta-glow: rgba(ff, 0, 85, 0.4);
-  --text: #e0f7fc;
-  --muted: #52728c;
-  --grid-line: rgba(0, 243, 255, 0.05);
-}
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
 
-* { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
+  .container {
+    width: 100%;
+    max-width: 900px;
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  color: var(--text);
-  background: var(--bg);
-  background-image: 
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 30px 30px;
-  padding: 30px 15px;
-  overflow-x: hidden;
-}
+  h1 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(to right, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-main { max-width: 1250px; margin: auto; }
+  p.description {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+  }
 
-/* Sci-Fi HUD Header */
-header {
-  position: relative;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--panel-border);
-}
+  .drop-zone {
+    border: 2px dashed rgba(56, 189, 248, 0.4);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(15, 23, 42, 0.4);
+  }
 
-header::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 120px;
-  height: 2px;
-  background: var(--cyan);
-  box-shadow: 0 0 10px var(--cyan);
-}
+  .drop-zone:hover {
+    border-color: var(--primary-color);
+    background: rgba(56, 189, 248, 0.05);
+  }
 
-h1 {
-  font-family: 'Orbitron', sans-serif;
-  margin: 0 0 5px;
-  font-size: 32px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow: 0 0 12px var(--cyan-glow);
-}
+  .drop-zone p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
 
-h1 span { color: var(--cyan); }
+  .drop-zone span {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 6px;
+  }
 
-p.sub {
-  margin: 0;
-  color: var(--muted);
-  font-size: 15px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-weight: 600;
-}
+  input[type="file"] {
+    display: none;
+  }
 
-/* Cyber Terminal Container */
-.card {
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 6px;
-  padding: 25px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 0 35px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 243, 255, 0.05);
-  position: relative;
-  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
-}
+  .controls {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
 
-/* Upload Area */
-.drop-zone {
-  border: 2px dashed var(--panel-border);
-  border-radius: 4px;
-  padding: 45px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  background: rgba(0, 243, 255, 0.015);
-  position: relative;
-}
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-.drop-zone:hover {
-  border-color: var(--cyan);
-  background: rgba(0, 243, 255, 0.05);
-  box-shadow: 0 0 20px var(--cyan-glow);
-}
+  .control-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
 
-.drop-icon {
-  font-size: 32px;
-  color: var(--cyan);
-  margin-bottom: 8px;
-  text-shadow: 0 0 10px var(--cyan-glow);
-}
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--primary-color);
+  }
 
-.drop-zone strong {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 18px;
-  letter-spacing: 1px;
-  color: #fff;
-}
+  .btn-group {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin-top: 25px;
+  }
 
-input[type=file] { display: none; }
+  button {
+    background-color: var(--primary-color);
+    color: #0f172a;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
 
-/* Control Sliders */
-.controls {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 25px;
-}
+  button:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    color: #ffffff;
+  }
 
-.control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: rgba(0,0,0,0.3);
-  padding: 12px 16px;
-  border-left: 3px solid var(--cyan);
-}
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-label {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  color: var(--cyan);
-  text-transform: uppercase;
-}
+  .btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+  }
 
-.val-display {
-  float: right;
-  color: var(--text);
-  font-family: 'Rajdhani', sans-serif;
-}
+  .btn-secondary:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+  }
 
-input[type=range] {
-  -webkit-appearance: none;
-  width: 100%;
-  background: rgba(255,255,255,0.1);
-  height: 4px;
-  outline: none;
-}
+  .results-grid {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
 
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  background: var(--cyan);
-  cursor: pointer;
-  box-shadow: 0 0 8px var(--cyan);
-}
+  .result-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* Sci-Fi Action Buttons */
-.btn-group {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 15px;
-  margin-top: 25px;
-}
+  .result-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background: #020617;
+  }
 
-.btn {
-  font-family: 'Orbitron', sans-serif;
-  background: linear-gradient(135deg, rgba(0,243,255,0.2), rgba(0,100,255,0.4));
-  border: 1px solid var(--cyan);
-  color: #fff;
-  font-weight: 700;
-  padding: 14px 20px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
-  box-shadow: 0 0 15px var(--cyan-glow);
-}
+  .result-card-body {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
 
-.btn:hover:not(:disabled) {
-  background: var(--cyan);
-  color: #000;
-  box-shadow: 0 0 25px var(--cyan);
-}
-
-.btn-secondary {
-  background: linear-gradient(135deg, rgba(255,0,85,0.2), rgba(150,0,50,0.4));
-  border-color: var(--magenta);
-  box-shadow: 0 0 15px var(--magenta-glow);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: var(--magenta);
-  color: #fff;
-  box-shadow: 0 0 25px var(--magenta);
-}
-
-.btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
-
-/* Status & Progress Bar */
-.status-bar {
-  margin-top: 15px;
-  display: none;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.progress-track {
-  width: 100%;
-  height: 6px;
-  background: rgba(0,0,0,0.5);
-  border: 1px solid var(--panel-border);
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--cyan);
-  box-shadow: 0 0 10px var(--cyan);
-  transition: width 0.1s linear;
-}
-
-.status-text {
-  font-size: 13px;
-  color: var(--cyan);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-/* Results Section */
-.results {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 18px;
-  margin-top: 30px;
-}
-
-.result-item {
-  background: rgba(4, 9, 20, 0.85);
-  border: 1px solid var(--panel-border);
-  border-radius: 4px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: transform 0.2s;
-}
-
-.result-item:hover {
-  transform: translateY(-3px);
-  border-color: var(--cyan);
-}
-
-.result-item img {
-  width: 100%;
-  height: 220px;
-  object-fit: contain;
-  background: #020408;
-  padding: 8px;
-}
-
-.result-info {
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(0,0,0,0.5);
-  border-top: 1px solid rgba(0, 243, 255, 0.1);
-  font-size: 13px;
-  letter-spacing: 1px;
-}
-
-.dl-btn {
-  background: rgba(0, 243, 255, 0.1);
-  border: 1px solid var(--cyan);
-  color: var(--cyan);
-  padding: 4px 10px;
-  cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 10px;
-  letter-spacing: 1px;
-  transition: all 0.2s;
-}
-
-.dl-btn:hover {
-  background: var(--cyan);
-  color: #000;
-}
+  .download-btn {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
 </style>
 </head>
 <body>
 
-<main>
-  <header>
-    <h1>ArtExtract <span>// HUD v2.5</span></h1>
-    <p class="sub">Automated Panel Cutter &amp; Gradient Margin Isolator</p>
-  </header>
+<div class="container">
+  <h1>Bulk Screenshot Auto-Cropper</h1>
+  <p class="description">Trims white, black, and gradient background margins from full screenshots automatically.</p>
 
-  <div class="card">
-    <div class="drop-zone" id="dropZone">
-      <div class="drop-icon">⏏</div>
-      <strong>DROP BULK IMAGES OR CLICK TO SELECT</strong>
-      <div style="font-size:13px; color:var(--muted); margin-top:6px; letter-spacing:1px;">
-        BATCH PROCESSING ACTIVE &bull; SELECT MULTIPLE MANHWA / MANGA STRIPS
-      </div>
-      <input type="file" id="fileInput" accept="image/*" multiple>
-    </div>
+  <div class="drop-zone" id="dropZone">
+    <p>Drop your screenshots here or click to browse</p>
+    <span>Supports PNG, JPG, WEBP (Bulk processing supported)</span>
+    <input type="file" id="fileInput" accept="image/*" multiple>
+  </div>
 
-    <div class="controls">
-      <div class="control-group">
-        <label>Margin / Gradient Sensitivity <span class="val-display" id="tolVal">28</span></label>
-        <input type="range" id="tolerance" min="5" max="80" value="28">
-      </div>
-      <div class="control-group">
-        <label>Min Panel Height (PX) <span class="val-display" id="minHVal">100px</span></label>
-        <input type="range" id="minHeight" min="40" max="400" value="100">
-      </div>
-    </div>
-
-    <div class="status-bar" id="statusBar">
-      <div class="status-text" id="statusText">INITIALIZING SYSTEM...</div>
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn" id="processBtn">EXECUTE BATCH EXTRACTION</button>
-      <button class="btn btn-secondary" id="downloadAllBtn" disabled>SAVE ALL (.PNG)</button>
+  <div class="controls">
+    <div class="control-group">
+      <label>Crop Sensitivity (Threshold) <span id="thresholdVal">30</span></label>
+      <input type="range" id="threshold" min="5" max="100" value="30">
     </div>
   </div>
 
-  <div class="results" id="resultsGrid"></div>
-</main>
+  <div class="btn-group">
+    <button id="processBtn">Process All Screenshots</button>
+    <button id="downloadAllBtn" class="btn-secondary" disabled>Download All</button>
+  </div>
+
+  <div class="results-grid" id="resultsGrid"></div>
+</div>
 
 <script>
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const processBtn = document.getElementById('processBtn');
-const downloadAllBtn = document.getElementById('downloadAllBtn');
-const resultsGrid = document.getElementById('resultsGrid');
-const toleranceInput = document.getElementById('tolerance');
-const minHeightInput = document.getElementById('minHeight');
-const tolVal = document.getElementById('tolVal');
-const minHVal = document.getElementById('minHVal');
-const statusBar = document.getElementById('statusBar');
-const statusText = document.getElementById('statusText');
-const progressFill = document.getElementById('progressFill');
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const processBtn = document.getElementById('processBtn');
+  const downloadAllBtn = document.getElementById('downloadAllBtn');
+  const resultsGrid = document.getElementById('resultsGrid');
+  const thresholdInput = document.getElementById('threshold');
+  const thresholdVal = document.getElementById('thresholdVal');
 
-let loadedFiles = [];
-let extractedPanels = [];
+  let loadedFiles = [];
+  let processedImages = [];
 
-// UI Slider Listeners
-toleranceInput.addEventListener('input', e => tolVal.textContent = e.target.value);
-minHeightInput.addEventListener('input', e => minHVal.textContent = `${e.target.value}px`);
+  thresholdInput.addEventListener('input', (e) => {
+    thresholdVal.textContent = e.target.value;
+  });
 
-// Drag and Drop
-dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--cyan)'; });
-dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = 'var(--panel-border)');
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.style.borderColor = 'var(--panel-border)';
-  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
-});
-fileInput.addEventListener('change', e => { if (e.target.files.length) handleFiles(e.target.files); });
+  dropZone.addEventListener('click', () => fileInput.click());
 
-function handleFiles(files) {
-  loadedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-  dropZone.querySelector('strong').textContent = `${loadedFiles.length} FILES LOADED IN QUEUE`;
-}
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = 'var(--primary-color)';
+  });
 
-function colorDiff(r1, g1, b1, r2, g2, b2) {
-  return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
-}
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+  });
 
-// Slice panels from full webtoon vertical image strips
-function processImage(img, tol, minPanelH) {
-  const canvas = document.createElement('canvas');
-  const w = img.naturalWidth;
-  const h = img.naturalHeight;
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0);
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+    if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+  });
 
-  const imgData = ctx.getImageData(0, 0, w, h);
-  const data = imgData.data;
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length) handleFiles(e.target.files);
+  });
 
-  // 1. Scan horizontal lines for color variance (detect gutters/backgrounds)
-  const rowVariance = new Float32Array(h);
-  for (let y = 0; y < h; y++) {
-    let diffSum = 0;
-    const firstIdx = y * w * 4;
-    const r0 = data[firstIdx], g0 = data[firstIdx + 1], b0 = data[firstIdx + 2];
-
-    for (let x = 1; x < w; x += 4) {
-      const idx = (y * w + x) * 4;
-      diffSum += colorDiff(r0, g0, b0, data[idx], data[idx + 1], data[idx + 2]);
-    }
-    rowVariance[y] = diffSum / (w / 4);
+  function handleFiles(files) {
+    loadedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    dropZone.querySelector('p').textContent = `${loadedFiles.length} file(s) selected`;
   }
 
-  // 2. Classify rows
-  const isContentRow = new Uint8Array(h);
-  for (let y = 0; y < h; y++) {
-    isContentRow[y] = rowVariance[y] > tol ? 1 : 0;
+  function colorDiff(r1, g1, b1, r2, g2, b2) {
+    return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
   }
 
-  // 3. Find vertical panel blocks
-  const panels = [];
-  let inPanel = false;
-  let startY = 0;
+  function autoCropImage(img, threshold) {
+    const canvas = document.createElement('canvas');
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    canvas.width = w;
+    canvas.height = h;
 
-  for (let y = 0; y < h; y++) {
-    if (isContentRow[y] && !inPanel) {
-      inPanel = true;
-      startY = y;
-    } else if (!isContentRow[y] && inPanel) {
-      inPanel = false;
-      if ((y - startY) >= minPanelH) {
-        panels.push({ top: startY, bottom: y - 1 });
-      }
-    }
-  }
-  if (inPanel && (h - startY) >= minPanelH) {
-    panels.push({ top: startY, bottom: h - 1 });
-  }
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
 
-  // 4. Crop horizontal margins (left and right) per panel
-  const croppedCanvases = [];
-  for (const panel of panels) {
-    const ph = panel.bottom - panel.top + 1;
-    let minX = w, maxX = 0;
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
 
-    for (let y = panel.top; y <= panel.bottom; y += 2) {
-      const rowIdx = y * w * 4;
-      const bgR = data[rowIdx], bgG = data[rowIdx + 1], bgB = data[rowIdx + 2];
+    // Use top-left corner pixel as background reference color
+    const bgR = data[0];
+    const bgG = data[1];
+    const bgB = data[2];
 
-      for (let x = 0; x < w; x++) {
+    let minX = w, minY = h, maxX = 0, maxY = 0;
+
+    // Scan every 2nd pixel for speed
+    for (let y = 0; y < h; y += 2) {
+      for (let x = 0; x < w; x += 2) {
         const idx = (y * w + x) * 4;
-        if (colorDiff(bgR, bgG, bgB, data[idx], data[idx + 1], data[idx + 2]) > tol) {
+        const r = data[idx];
+        const g = data[idx + 1];
+        const b = data[idx + 2];
+
+        if (colorDiff(bgR, bgG, bgB, r, g, b) > threshold) {
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
         }
       }
     }
 
-    if (maxX <= minX) { minX = 0; maxX = w - 1; }
+    // Fallback if image is solid
+    if (maxX <= minX || maxY <= minY) {
+      minX = 0; minY = 0; maxX = w - 1; maxY = h - 1;
+    }
 
-    const pw = maxX - minX + 1;
-    const pCanvas = document.createElement('canvas');
-    pCanvas.width = pw;
-    pCanvas.height = ph;
-    const pCtx = pCanvas.getContext('2d');
-    pCtx.drawImage(img, minX, panel.top, pw, ph, 0, 0, pw, ph);
+    const cropW = maxX - minX + 1;
+    const cropH = maxY - minY + 1;
 
-    croppedCanvases.push(pCanvas);
+    const croppedCanvas = document.createElement('canvas');
+    croppedCanvas.width = cropW;
+    croppedCanvas.height = cropH;
+    const croppedCtx = croppedCanvas.getContext('2d');
+
+    croppedCtx.drawImage(img, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+
+    return croppedCanvas.toDataURL('image/png');
   }
 
-  return croppedCanvases;
-}
+  processBtn.addEventListener('click', async () => {
+    if (!loadedFiles.length) return alert('Please select images first.');
 
-// Execute Bulk Processing
-processBtn.addEventListener('click', async () => {
-  if (!loadedFiles.length) return alert('SELECT OR DROP IMAGES FIRST');
+    processBtn.disabled = true;
+    processBtn.textContent = 'Processing...';
+    resultsGrid.innerHTML = '';
+    processedImages = [];
 
-  processBtn.disabled = true;
-  downloadAllBtn.disabled = true;
-  statusBar.style.display = 'flex';
-  resultsGrid.innerHTML = '';
-  extractedPanels = [];
+    const threshold = Number(thresholdInput.value);
 
-  const tol = Number(toleranceInput.value);
-  const minH = Number(minHeightInput.value);
-  const total = loadedFiles.length;
+    for (let i = 0; i < loadedFiles.length; i++) {
+      const file = loadedFiles[i];
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await img.decode();
 
-  for (let i = 0; i < total; i++) {
-    const file = loadedFiles[i];
-    statusText.textContent = `PROCESSING IMAGE [${i + 1}/${total}]: ${file.name.substring(0, 25)}...`;
-    progressFill.style.width = `${((i + 1) / total) * 100}%`;
+      const croppedDataUrl = autoCropImage(img, threshold);
+      const outputName = `clean_${file.name.replace(/\.[^/.]+$/, "")}.png`;
 
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    await img.decode();
+      processedImages.push({ url: croppedDataUrl, name: outputName });
 
-    const panels = processImage(img, tol, minH);
+      const card = document.createElement('div');
+      card.className = 'result-card';
 
-    panels.forEach((pCanvas, pIdx) => {
-      const dataUrl = pCanvas.toDataURL('image/png');
-      const fileName = `art_panel_img${i + 1}_crop${pIdx + 1}.png`;
+      const preview = document.createElement('img');
+      preview.src = croppedDataUrl;
 
-      extractedPanels.push({ dataUrl, fileName });
+      const body = document.createElement('div');
+      body.className = 'result-card-body';
+      body.innerHTML = `<span>Cleaned ${i + 1}</span>`;
 
-      const container = document.createElement('div');
-      container.className = 'result-item';
-
-      const previewImg = document.createElement('img');
-      previewImg.src = dataUrl;
-
-      const info = document.createElement('div');
-      info.className = 'result-info';
-      info.innerHTML = `<span>${pCanvas.width}x${pCanvas.height}PX</span>`;
-
-      const dl = document.createElement('button');
-      dl.className = 'dl-btn';
-      dl.textContent = 'EXPORT';
-      dl.onclick = () => {
+      const dlBtn = document.createElement('button');
+      dlBtn.className = 'download-btn';
+      dlBtn.textContent = 'Save';
+      dlBtn.onclick = () => {
         const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = fileName;
+        a.href = croppedDataUrl;
+        a.download = outputName;
         a.click();
       };
 
-      info.appendChild(dl);
-      container.appendChild(previewImg);
-      container.appendChild(info);
-      resultsGrid.appendChild(container);
-    });
+      body.appendChild(dlBtn);
+      card.appendChild(preview);
+      card.appendChild(body);
+      resultsGrid.appendChild(card);
 
-    URL.revokeObjectURL(img.src);
-    // Yield execution frame to keep browser UI smooth during heavy batch loads
-    await new Promise(r => setTimeout(r, 10));
-  }
+      URL.revokeObjectURL(img.src);
+    }
 
-  statusText.textContent = `EXTRACTION COMPLETE: ${extractedPanels.length} PANELS ISOLATED`;
-  processBtn.disabled = false;
-  if (extractedPanels.length > 0) downloadAllBtn.disabled = false;
-});
-
-// Bulk Batch Download Trigger
-downloadAllBtn.addEventListener('click', () => {
-  extractedPanels.forEach((item, index) => {
-    setTimeout(() => {
-      const a = document.createElement('a');
-      a.href = item.dataUrl;
-      a.download = item.fileName;
-      a.click();
-    }, index * 150); // Stagger downloads to prevent browser blocking
+    processBtn.disabled = false;
+    processBtn.textContent = 'Process All Screenshots';
+    downloadAllBtn.disabled = false;
   });
-});
+
+  downloadAllBtn.addEventListener('click', () => {
+    processedImages.forEach((item, index) => {
+      setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = item.url;
+        a.download = item.name;
+        a.click();
+      }, index * 200);
+    });
+  });
 </script>
 </body>
 </html>
