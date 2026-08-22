@@ -3,1471 +3,558 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cut It Out! — Adaptive Border Cropper</title>
+<title>ArtExtract // Sci-Fi Panel Isolator</title>
 <style>
-:root{
-  --bg:#050814;
-  --bg2:#090e1d;
-  --glass:rgba(13,20,38,.68);
-  --glass2:rgba(18,28,52,.58);
-  --line:rgba(120,220,255,.15);
-  --line2:rgba(255,255,255,.09);
-  --text:#edf8ff;
-  --muted:#8290a8;
-  --cyan:#4de8ff;
-  --blue:#5d7cff;
-  --violet:#a46bff;
-  --green:#48f0a4;
-  --danger:#ff5e7a;
-  --shadow:0 25px 80px rgba(0,0,0,.42);
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+
+:root {
+  --bg: #030712;
+  --panel: rgba(13, 22, 41, 0.75);
+  --panel-border: rgba(0, 243, 255, 0.25);
+  --cyan: #00f3ff;
+  --cyan-glow: rgba(0, 243, 255, 0.4);
+  --magenta: #ff0055;
+  --magenta-glow: rgba(ff, 0, 85, 0.4);
+  --text: #e0f7fc;
+  --muted: #52728c;
+  --grid-line: rgba(0, 243, 255, 0.05);
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg)}
-body{
-  margin:0;min-height:100vh;color:var(--text);
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:
-    radial-gradient(900px 500px at 8% -8%,rgba(77,232,255,.16),transparent 65%),
-    radial-gradient(850px 600px at 92% 4%,rgba(164,107,255,.15),transparent 64%),
-    radial-gradient(700px 500px at 50% 100%,rgba(93,124,255,.10),transparent 70%),
-    linear-gradient(145deg,#050814,#080d1a 48%,#060914);
-  overflow-x:hidden;
+
+* { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background: var(--bg);
+  background-image: 
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 30px 30px;
+  padding: 30px 15px;
+  overflow-x: hidden;
 }
-body:before{
-  content:"";position:fixed;inset:0;pointer-events:none;opacity:.32;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:42px 42px;
-  mask-image:linear-gradient(to bottom,#000,transparent 82%);
+
+main { max-width: 1250px; margin: auto; }
+
+/* Sci-Fi HUD Header */
+header {
+  position: relative;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--panel-border);
 }
-body:after{
-  content:"";position:fixed;width:420px;height:420px;right:-180px;top:25%;
-  border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,rgba(77,232,255,.08),transparent 68%);
-  filter:blur(8px);
+
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 120px;
+  height: 2px;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
 }
-main{width:min(1220px,calc(100% - 28px));margin:auto;padding:30px 0 55px;position:relative;z-index:1}
-.hero{
-  padding:22px 0 24px;text-align:center;animation:boot .65s ease both;
+
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  margin: 0 0 5px;
+  font-size: 32px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 12px var(--cyan-glow);
 }
-@keyframes boot{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:none}}
-.kicker{
-  display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;
-  border:1px solid var(--line);background:rgba(10,20,38,.55);backdrop-filter:blur(16px);
-  color:#a9b8d0;font-size:11px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;
-  box-shadow:0 0 30px rgba(77,232,255,.06);
+
+h1 span { color: var(--cyan); }
+
+p.sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
 }
-.kicker i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
-h1{
-  margin:15px 0 10px;font-size:clamp(42px,7vw,72px);line-height:.92;
-  letter-spacing:-3px;font-weight:950;
-  text-shadow:0 0 35px rgba(77,232,255,.12);
+
+/* Cyber Terminal Container */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 25px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 35px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 243, 255, 0.05);
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
 }
-h1 span{
-  background:linear-gradient(100deg,var(--cyan),#8aa9ff 45%,var(--violet));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
+
+/* Upload Area */
+.drop-zone {
+  border: 2px dashed var(--panel-border);
+  border-radius: 4px;
+  padding: 45px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: rgba(0, 243, 255, 0.015);
+  position: relative;
 }
-.subtitle{margin:0 auto;color:#9eacc4;max-width:720px;font-size:15px;line-height:1.6}
-.badges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}
-.badge{
-  padding:7px 10px;border:1px solid var(--line2);border-radius:999px;
-  background:rgba(255,255,255,.035);backdrop-filter:blur(12px);
-  color:#aebbd0;font-size:11px;font-weight:750;
+
+.drop-zone:hover {
+  border-color: var(--cyan);
+  background: rgba(0, 243, 255, 0.05);
+  box-shadow: 0 0 20px var(--cyan-glow);
 }
-.badge b{color:#d9f8ff}
-.card,.panel{
-  position:relative;background:linear-gradient(145deg,rgba(18,29,52,.74),rgba(7,13,27,.72));
-  border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  overflow:hidden;
+
+.drop-icon {
+  font-size: 32px;
+  color: var(--cyan);
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px var(--cyan-glow);
 }
-.card:before,.panel:before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(120deg,rgba(77,232,255,.045),transparent 28%,transparent 70%,rgba(164,107,255,.045));
+
+.drop-zone strong {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #fff;
 }
-.workspace{padding:14px;animation:pop .7s .08s cubic-bezier(.2,.8,.2,1) both}
-@keyframes pop{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:none}}
-.drop{
-  min-height:190px;border:1px dashed rgba(77,232,255,.30);border-radius:18px;
-  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
-  cursor:pointer;transition:.2s;background:rgba(7,18,34,.48);position:relative;overflow:hidden;
+
+input[type=file] { display: none; }
+
+/* Control Sliders */
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
 }
-.drop:before{
-  content:"";position:absolute;inset:-60%;
-  background:conic-gradient(from 180deg,transparent,rgba(77,232,255,.08),transparent,rgba(164,107,255,.07),transparent);
-  animation:spin 9s linear infinite;pointer-events:none;
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0,0,0,0.3);
+  padding: 12px 16px;
+  border-left: 3px solid var(--cyan);
 }
-@keyframes spin{to{transform:rotate(360deg)}}
-.drop>*{position:relative;z-index:1}
-.drop:hover,.drop.drag{
-  border-color:rgba(77,232,255,.8);transform:translateY(-2px);
-  box-shadow:0 0 45px rgba(77,232,255,.08) inset,0 12px 45px rgba(0,0,0,.25);
+
+label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  text-transform: uppercase;
 }
-.drop-icon{
-  width:58px;height:58px;border-radius:17px;display:grid;place-items:center;margin-bottom:11px;
-  border:1px solid rgba(77,232,255,.25);background:rgba(77,232,255,.07);
-  color:var(--cyan);font-size:27px;box-shadow:0 0 30px rgba(77,232,255,.08);
+
+.val-display {
+  float: right;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
 }
-.drop-title{font-size:19px;font-weight:900}
-.drop-sub{font-size:13px;color:var(--muted);margin-top:4px}
-.count{
-  display:inline-flex;align-items:center;gap:7px;margin-top:13px;padding:7px 11px;
-  border:1px solid var(--line2);background:rgba(255,255,255,.04);border-radius:999px;
-  color:#91a0b7;font-size:11px;
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: rgba(255,255,255,0.1);
+  height: 4px;
+  outline: none;
 }
-.count strong{color:var(--green)}
-input[type=file]{display:none}
-.settings-preview{display:grid;grid-template-columns:365px 1fr;gap:14px;margin-top:14px}
-.settings,.previewbox{
-  position:relative;background:rgba(5,12,27,.48);border:1px solid var(--line2);
-  border-radius:20px;padding:18px;backdrop-filter:blur(18px);
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--cyan);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--cyan);
 }
-.settings:after,.previewbox:after{
-  content:"";position:absolute;top:0;left:20px;right:20px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.55;
+
+/* Sci-Fi Action Buttons */
+.btn-group {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+  margin-top: 25px;
 }
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
-.section-title{
-  font-size:13px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;color:#dce9fa;
+
+.btn {
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg, rgba(0,243,255,0.2), rgba(0,100,255,0.4));
+  border: 1px solid var(--cyan);
+  color: #fff;
+  font-weight: 700;
+  padding: 14px 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  box-shadow: 0 0 15px var(--cyan-glow);
 }
-.section-title:before{content:"";display:inline-block;width:3px;height:14px;border-radius:4px;background:var(--cyan);margin-right:8px;vertical-align:-2px;box-shadow:0 0 12px var(--cyan)}
-.signal{font-size:10px;color:#6f819d;display:flex;gap:6px;align-items:center}
-.signal i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
-.setting{margin-bottom:21px}.setting:last-child{margin-bottom:0}
-.setting-head{display:flex;justify-content:space-between;align-items:center;font-weight:850;margin-bottom:9px}
-.help{color:#6f8099;border:1px solid #ffffff16;border-radius:50%;font-size:10px;width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
-.value{
-  min-width:50px;text-align:center;padding:6px 9px;border-radius:9px;
-  border:1px solid rgba(77,232,255,.16);background:rgba(77,232,255,.055);color:#d9f8ff;font-size:12px;font-weight:900;
+
+.btn:hover:not(:disabled) {
+  background: var(--cyan);
+  color: #000;
+  box-shadow: 0 0 25px var(--cyan);
 }
-.desc{color:#71819a;font-size:12px;line-height:1.45;margin-top:8px}
-.mode-group{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.mode-btn{
-  min-height:88px;text-align:left;background:rgba(255,255,255,.025);
-  border:1px solid #ffffff10;color:#dfe8f6;border-radius:14px;padding:12px;
-  cursor:pointer;font-weight:900;transition:.2s;position:relative;overflow:hidden;
+
+.btn-secondary {
+  background: linear-gradient(135deg, rgba(255,0,85,0.2), rgba(150,0,50,0.4));
+  border-color: var(--magenta);
+  box-shadow: 0 0 15px var(--magenta-glow);
 }
-.mode-btn:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(77,232,255,.06),transparent 55%);opacity:0;transition:.2s}
-.mode-btn:hover{border-color:rgba(77,232,255,.35);transform:translateY(-2px)}
-.mode-btn:hover:before,.mode-btn.active:before{opacity:1}
-.mode-btn.active{
-  border-color:rgba(77,232,255,.7);background:rgba(77,232,255,.08);
-  box-shadow:0 0 0 1px rgba(77,232,255,.12) inset,0 0 30px rgba(77,232,255,.06);
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--magenta);
+  color: #fff;
+  box-shadow: 0 0 25px var(--magenta);
 }
-.mode-btn small{display:block;color:#72839b;font-size:10px;font-weight:600;margin-top:6px;line-height:1.35}
-.mode-btn.active small{color:#94abc4}
-.mode-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.range-wrap{padding:4px 0}
-input[type=range]{
-  --fill:50%;appearance:none;width:100%;height:7px;margin:0;
-  background:linear-gradient(90deg,var(--cyan) 0,var(--blue) var(--fill),rgba(255,255,255,.09) var(--fill),rgba(255,255,255,.09) 100%);
-  border-radius:99px;outline:none;cursor:pointer;
-  box-shadow:0 0 16px rgba(77,232,255,.08);
+
+.btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+
+/* Status & Progress Bar */
+.status-bar {
+  margin-top: 15px;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
 }
-input[type=range]::-webkit-slider-runnable-track{height:7px;border-radius:99px;background:transparent}
-input[type=range]::-webkit-slider-thumb{
-  appearance:none;width:20px;height:20px;margin-top:-6.5px;border-radius:50%;
-  background:#dffbff;border:4px solid #10243a;box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(77,232,255,.6);cursor:pointer;
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--panel-border);
+  overflow: hidden;
 }
-input[type=range]::-moz-range-track{height:7px;border-radius:99px;background:rgba(255,255,255,.09)}
-input[type=range]::-moz-range-progress{height:7px;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
-input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#dffbff;border:4px solid #10243a;box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(77,232,255,.6)}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #ffffff0d;background:rgba(255,255,255,.025);border-radius:14px}
-.toggle{position:relative;width:48px;height:27px;flex:none}.toggle input{display:none}
-.toggle-track{position:absolute;inset:0;background:#172237;border:1px solid #ffffff14;border-radius:99px;cursor:pointer;transition:.2s}
-.toggle-track:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:#6f8198;transition:.2s}
-.toggle input:checked+.toggle-track{background:rgba(77,232,255,.18);border-color:var(--cyan);box-shadow:0 0 18px rgba(77,232,255,.12)}
-.toggle input:checked+.toggle-track:before{transform:translateX(21px);background:#dffbff;box-shadow:0 0 12px var(--cyan)}
-.previewbox{min-width:0;contain:layout paint}.ai-status{font-size:10px;letter-spacing:.12em;color:var(--cyan);padding:5px 8px;border:1px solid rgba(67,232,255,.18);border-radius:999px;background:rgba(67,232,255,.06);white-space:nowrap}
-.ai-setting .switch-copy b{display:block;font-size:13px}.ai-setting .switch-copy small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
-.preview-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.preview-title strong{font-size:13px;letter-spacing:.12em;text-transform:uppercase}
-.preview-meta{font-size:10px;color:#65758f}
-.previews{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pane{min-width:0}.pane label{display:flex;justify-content:space-between;color:#71839d;font-size:10px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px;padding:0 2px}
-.frame{
-  height:390px;border:1px solid #ffffff10;border-radius:16px;
-  background:
-    linear-gradient(45deg,#0c1423 25%,transparent 25%) 0 0/18px 18px,
-    linear-gradient(-45deg,#0c1423 25%,transparent 25%) 0 9px/18px 18px,
-    linear-gradient(45deg,transparent 75%,#0c1423 75%) 9px -9px/18px 18px,
-    linear-gradient(-45deg,transparent 75%,#0c1423 75%) -9px 0/18px 18px,#08101d;
-  display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  transition: width 0.1s linear;
 }
-.frame:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(transparent 50%,rgba(77,232,255,.025) 50%);background-size:100% 4px;mix-blend-mode:screen}
-.frame img{max-width:100%;max-height:100%;object-fit:contain;display:block;position:relative;z-index:1}
-.empty{color:#566781;font-size:12px;text-align:center;padding:20px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-button.action{
-  border:1px solid transparent;border-radius:14px;padding:14px 18px;font-weight:950;font-size:13px;cursor:pointer;
-  font-family:inherit;transition:.2s;position:relative;overflow:hidden
+
+.status-text {
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
-button.action:before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);transform:translateX(-120%);transition:.5s}
-button.action:hover:before{transform:translateX(120%)}
-button.action:hover{transform:translateY(-2px)}
-.primary{background:linear-gradient(100deg,var(--cyan),#5d8cff);color:#04101a;box-shadow:0 10px 30px rgba(77,232,255,.14)}
-.secondary{background:rgba(255,255,255,.035);border-color:#ffffff12!important;color:#dce8f7}
-button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-.note{text-align:center;color:#53637c;font-size:11px;margin-top:12px}
-.progress-card{margin-top:14px;padding:17px;display:none;animation:pop .4s ease both}
-.progress-top{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:#9badc6}
-.percent{color:var(--cyan);font-weight:950}
-.track{height:8px;background:#111a2a;border:1px solid #ffffff0b;border-radius:99px;overflow:hidden}
-.bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));border-radius:99px;box-shadow:0 0 18px rgba(77,232,255,.5);transition:width .12s}
-.status{font-size:11px;color:#63748e;margin-top:8px}
-.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:14px}
-.result{
-  background:rgba(9,17,32,.72);border:1px solid #ffffff0e;border-radius:16px;overflow:hidden;position:relative;
-  box-shadow:0 12px 35px rgba(0,0,0,.25);animation:cardIn .5s cubic-bezier(.2,.8,.2,1) both;
+
+/* Results Section */
+.results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 30px;
 }
-@keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:none}}
-.result:hover{transform:translateY(-4px);border-color:rgba(77,232,255,.25);transition:.2s}
-.result img{width:100%;height:155px;object-fit:contain;background:#050b15;display:block}
-.result-body{padding:10px}.result-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#cbd7e8}.result-size{font-size:10px;color:#62738d;margin-top:3px}
-.done{position:absolute;top:8px;left:8px;background:rgba(72,240,164,.16);border:1px solid rgba(72,240,164,.28);color:var(--green);border-radius:999px;padding:4px 7px;font-size:9px;font-weight:950}
-.download-one{position:absolute;right:8px;top:8px;width:29px;height:29px;padding:0;border-radius:9px!important;background:rgba(5,12,24,.82);color:#dffbff;border:1px solid #ffffff14!important;cursor:pointer;}
-.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:16px 0 0}
-.page-btn{min-width:38px;padding:9px 12px;background:rgba(255,255,255,.035);color:#cbd8e9;border:1px solid #ffffff10;border-radius:10px;cursor:pointer;}
-.page-btn.active{background:rgba(77,232,255,.14);color:#dffbff;border-color:rgba(77,232,255,.55)}
-.page-info{font-size:10px;color:#60718a;margin:0 8px}
-.locked{opacity:.55}
-@media(max-width:900px){.settings-preview{grid-template-columns:1fr}.frame{height:320px}}
-@media(max-width:600px){
-  main{width:calc(100% - 16px);padding-top:16px}
-  h1{letter-spacing:-2px}
-  .workspace{padding:9px}
-  .mode-group,.actions{grid-template-columns:1fr}
-  .previews{grid-template-columns:1fr}
-  .frame{height:285px}
+
+.result-item {
+  background: rgba(4, 9, 20, 0.85);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.result-item:hover {
+  transform: translateY(-3px);
+  border-color: var(--cyan);
+}
+
+.result-item img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  background: #020408;
+  padding: 8px;
+}
+
+.result-info {
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(0, 243, 255, 0.1);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.dl-btn {
+  background: rgba(0, 243, 255, 0.1);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.dl-btn:hover {
+  background: var(--cyan);
+  color: #000;
 }
 </style>
 </head>
 <body>
 
 <main>
-<header class="hero">
-  <div class="kicker"><i></i> CROP // CORE · LOCAL IMAGE ENGINE</div>
-  <h1>Cut It <span>Out!</span> ✂️</h1>
-  <p class="subtitle">Adaptive border detection for manga panels, screenshots and artwork — preserving the original pixels while trimming the outer background.</p>
-  <div class="badges">
-    <div class="badge">🔒 <b>LOCAL</b> processing</div>
-    <div class="badge">⚡ <b>HIGH-RES</b> export</div>
-    <div class="badge">🌈 <b>ADAPTIVE</b> color analysis</div>
-  </div>
-</header>
+  <header>
+    <h1>ArtExtract <span>// HUD v2.5</span></h1>
+    <p class="sub">Automated Panel Cutter &amp; Gradient Margin Isolator</p>
+  </header>
 
-<section class="card workspace">
-  <div class="drop" id="drop">
-    <div class="drop-icon">⌁</div>
-    <div class="drop-title">Import image into the scan core</div>
-    <div class="drop-sub">Tap here or drag &amp; drop an image</div>
-    <div class="count" id="count"><span>◌</span><strong>0</strong> images selected</div>
-    <input id="files" type="file" accept="image/*" multiple>
-  </div>
-
-  <div class="settings-preview">
-    <div class="settings" id="settings">
-      <div class="section-head">
-        <div class="section-title">Detection Core</div>
-        <div class="signal"><i></i> ONLINE</div>
+  <div class="card">
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-icon">⏏</div>
+      <strong>DROP BULK IMAGES OR CLICK TO SELECT</strong>
+      <div style="font-size:13px; color:var(--muted); margin-top:6px; letter-spacing:1px;">
+        BATCH PROCESSING ACTIVE &bull; SELECT MULTIPLE MANHWA / MANGA STRIPS
       </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Crop Mode <span class="help" title="Normal is conservative. Aggressive pushes deeper into connected outer background.">?</span></span>
-        </div>
-        <div class="mode-group">
-          <button type="button" class="mode-btn active" id="modeNormal">
-            NORMAL
-            <small>Balanced border segmentation with stronger artwork protection.</small>
-          </button>
-          <button type="button" class="mode-btn" id="modeAggressive">
-            AGGRESSIVE
-            <small>Stronger region growth and tighter boundary decisions.</small>
-          </button>
-        </div>
-      </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Adaptive Tolerance <span class="help" title="Controls how much local color variation can remain connected to the outside background.">?</span></span>
-          <span class="value" id="tolVal">34</span>
-        </div>
-        <div class="range-wrap"><input id="tol" type="range" min="1" max="100" value="34"></div>
-        <div class="desc">Higher values follow noisier borders and gradients. Lower values protect fine artwork edges.</div>
-      </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Safety Margin <span class="help" title="Adds pixels around the detected content box.">?</span></span>
-          <span class="value" id="padVal">2 px</span>
-        </div>
-        <div class="range-wrap"><input id="pad" type="range" min="0" max="30" value="2"></div>
-        <div class="desc">Keep a little breathing room when important artwork touches the detected boundary.</div>
-      </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Edge Learning</span>
-          <span id="selfState" class="value">ON</span>
-        </div>
-        <div class="toggle-row">
-          <div class="desc" style="margin:0">Learns the outer color/texture profile before growing the background region.</div>
-          <label class="toggle">
-            <input id="selfImprove" type="checkbox" checked>
-            <span class="toggle-track"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="setting ai-setting">
-        <div class="setting-head">
-          <span>AI Boundary Guard <span class="help" title="On-device AI gives the crop detector a second opinion and protects artwork edges.">?</span></span>
-          <span class="ai-status" id="aiStatus">STANDBY</span>
-        </div>
-        <div class="toggle-row">
-          <div class="switch-copy">
-            <b>AI Assist</b>
-            <small>Runs only in Aggressive mode and caches the result.</small>
-          </div>
-          <label class="toggle">
-            <input id="aiAssist" type="checkbox" checked>
-            <span class="toggle-track"></span>
-          </label>
-        </div>
-        <div class="desc">AI analyzes a small copy for speed. The final crop always uses the original pixels.</div>
-      </div>
-
-      <button type="button" class="action secondary" id="reset" style="width:100%;margin-top:18px">↻ RESET CORE</button>
+      <input type="file" id="fileInput" accept="image/*" multiple>
     </div>
 
-    <div class="previewbox">
-      <div class="preview-title">
-        <strong>Live Preview</strong>
-        <span class="preview-meta" id="previewMeta">WAITING FOR IMAGE</span>
+    <div class="controls">
+      <div class="control-group">
+        <label>Margin / Gradient Sensitivity <span class="val-display" id="tolVal">28</span></label>
+        <input type="range" id="tolerance" min="5" max="80" value="28">
       </div>
-      <div class="previews">
-        <div class="pane">
-          <label><span>Original</span><span id="originalMeta">—</span></label>
-          <div class="frame"><div class="empty" id="origEmpty">Choose an image to begin.</div><img id="origPreview" alt="" style="display:none"></div>
-        </div>
-        <div class="pane">
-          <label><span>Detected Content</span><span id="cropMeta">—</span></label>
-          <div class="frame"><div class="empty" id="cropEmpty">The detected crop will appear here.</div><img id="cropPreview" alt="" style="display:none"></div>
-        </div>
+      <div class="control-group">
+        <label>Min Panel Height (PX) <span class="val-display" id="minHVal">100px</span></label>
+        <input type="range" id="minHeight" min="40" max="400" value="100">
       </div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+      <div class="status-text" id="statusText">INITIALIZING SYSTEM...</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" id="processBtn">EXECUTE BATCH EXTRACTION</button>
+      <button class="btn btn-secondary" id="downloadAllBtn" disabled>SAVE ALL (.PNG)</button>
     </div>
   </div>
 
-  <div class="actions">
-    <button type="button" class="action secondary" id="clean">✦ RUN HIGH-QUALITY CROP</button>
-    <button type="button" class="action primary" id="downloadAll" disabled>⇩ DOWNLOAD ALL (.ZIP)</button>
-  </div>
-  <div class="note">Analysis is local and resolution-preserving. The exported image is cropped directly from the original source.</div>
-</section>
-
-<section class="card progress-card" id="progressCard">
-  <div class="progress-top"><span id="progressText">Processing…</span><span class="percent" id="percent">0%</span></div>
-  <div class="track"><div class="bar" id="bar"></div></div>
-  <div class="status" id="status"></div>
-</section>
-
-<div class="results" id="results"></div>
-<div class="pagination" id="pagination"></div>
+  <div class="results" id="resultsGrid"></div>
 </main>
 
 <script>
-const $=id=>document.getElementById(id);
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const processBtn = document.getElementById('processBtn');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+const resultsGrid = document.getElementById('resultsGrid');
+const toleranceInput = document.getElementById('tolerance');
+const minHeightInput = document.getElementById('minHeight');
+const tolVal = document.getElementById('tolVal');
+const minHVal = document.getElementById('minHVal');
+const statusBar = document.getElementById('statusBar');
+const statusText = document.getElementById('statusText');
+const progressFill = document.getElementById('progressFill');
 
-const filesEl=$('files');
-const drop=$('drop');
-const count=$('count');
-const tolEl=$('tol');
-const padEl=$('pad');
-const tolVal=$('tolVal');
-const padVal=$('padVal');
-const cleanBtn=$('clean');
-const downloadAll=$('downloadAll');
-const modeNormal=$('modeNormal');
-const modeAggressive=$('modeAggressive');
-const resetBtn=$('reset');
-const settingsBox=$('settings');
-const origPreview=$('origPreview');
-const cropPreview=$('cropPreview');
-const origEmpty=$('origEmpty');
-const cropEmpty=$('cropEmpty');
-const originalMeta=$('originalMeta');
-const cropMeta=$('cropMeta');
-const previewMeta=$('previewMeta');
-const results=$('results');
-const pagination=$('pagination');
-const progressCard=$('progressCard');
-const bar=$('bar');
-const percent=$('percent');
-const progressText=$('progressText');
-const status=$('status');
-const selfImprove=$('selfImprove');
-const selfState=$('selfState');
-const aiAssist=$('aiAssist');
-const aiStatus=$('aiStatus');
+let loadedFiles = [];
+let extractedPanels = [];
 
-let selected=[];
-let outputs=[];
-let previewUrl=null;
-let currentPage=1;
-let cropMode='normal';
-let previewToken=0;
-let busy=false;
-let previewTimer=null;
-let previewRunning=false;
-let aiPipeline=null;
-let aiLoading=null;
-let aiCacheKey='';
-let aiCache=null;
+// UI Slider Listeners
+toleranceInput.addEventListener('input', e => tolVal.textContent = e.target.value);
+minHeightInput.addEventListener('input', e => minHVal.textContent = `${e.target.value}px`);
 
-const PAGE_SIZE=20;
-
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function updateSlider(el){
-  const min=Number(el.min)||0;
-  const max=Number(el.max)||100;
-  const value=Number(el.value);
-  const pct=((value-min)/(max-min))*100;
-  el.style.setProperty('--fill',pct+'%');
-}
-updateSlider(tolEl);
-updateSlider(padEl);
-
-function setCount(){
-  count.innerHTML='<span style="color:var(--green)">✓</span><strong>'+selected.length+'</strong> image'+(selected.length===1?'':'s')+' selected';
-}
-function setPreviewMeta(text){previewMeta.textContent=text}
-function yieldUI(){return new Promise(r=>setTimeout(r,0))}
-
-drop.addEventListener('click',e=>{if(e.target!==filesEl&&!busy)filesEl.click()});
-drop.addEventListener('keydown',e=>{
-  if((e.key==='Enter'||e.key===' ')&&!busy){e.preventDefault();filesEl.click()}
+// Drag and Drop
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--cyan)'; });
+dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = 'var(--panel-border)');
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.style.borderColor = 'var(--panel-border)';
+  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
 });
-drop.setAttribute('role','button');
-drop.setAttribute('tabindex','0');
-drop.addEventListener('dragover',e=>{e.preventDefault();if(!busy)drop.classList.add('drag')});
-drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
-drop.addEventListener('drop',e=>{
-  e.preventDefault();drop.classList.remove('drag');
-  if(!busy)setFiles(Array.from(e.dataTransfer.files||[]));
-});
-filesEl.addEventListener('change',()=>setFiles(Array.from(filesEl.files||[])));
+fileInput.addEventListener('change', e => { if (e.target.files.length) handleFiles(e.target.files); });
 
-function setFiles(arr){
-  selected=arr.filter(f=>f&&f.type&&f.type.startsWith('image/'));
-  setCount();
-  outputs=[];
-  aiCacheKey='';aiCache=null;
-  results.innerHTML='';
-  pagination.innerHTML='';
-  downloadAll.disabled=true;
-  if(!selected.length){
-    origPreview.style.display='none';cropPreview.style.display='none';
-    origEmpty.style.display='block';cropEmpty.style.display='block';
-    originalMeta.textContent='—';cropMeta.textContent='—';setPreviewMeta('WAITING FOR IMAGE');
-    return;
-  }
-  showPreview(selected[0]);
+function handleFiles(files) {
+  loadedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  dropZone.querySelector('strong').textContent = `${loadedFiles.length} FILES LOADED IN QUEUE`;
 }
 
-function getImage(file){
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    const url=URL.createObjectURL(file);
-    img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};
-    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Could not load image'))};
-    img.src=url;
-  });
+function colorDiff(r1, g1, b1, r2, g2, b2) {
+  return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
 }
 
-function rgbDist(r1,g1,b1,r2,g2,b2){
-  const dr=r1-r2,dg=g1-g2,db=b1-b2;
-  return Math.sqrt(dr*dr+dg*dg+db*db);
-}
-function lum(r,g,b){return .2126*r+.7152*g+.0722*b}
-function clamp(v,a,b){return v<a?a:v>b?b:v}
-function median(a){
-  if(!a.length)return 0;
-  const b=Array.from(a).sort((x,y)=>x-y);
-  return b[(b.length-1)>>1];
-}
-function percentile(a,p){
-  if(!a.length)return 0;
-  const b=Array.from(a).sort((x,y)=>x-y);
-  return b[Math.min(b.length-1,Math.max(0,Math.floor((b.length-1)*p)))];
-}
+// Slice panels from full webtoon vertical image strips
+function processImage(img, tol, minPanelH) {
+  const canvas = document.createElement('canvas');
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
 
-function buildAnalysis(img,maxSide=900){
-  const ow=img.naturalWidth||img.width,oh=img.naturalHeight||img.height;
-  const scale=Math.min(1,maxSide/Math.max(ow,oh));
-  const w=Math.max(2,Math.round(ow*scale)),h=Math.max(2,Math.round(oh*scale));
-  const c=document.createElement('canvas');c.width=w;c.height=h;
-  const ctx=c.getContext('2d',{willReadFrequently:true});
-  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  ctx.drawImage(img,0,0,w,h);
-  const d=ctx.getImageData(0,0,w,h).data;
-  return {w,h,d,ow,oh,sx:ow/w,sy:oh/h};
-}
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
 
-function outerProfile(d,w,h){
-  const band=Math.max(3,Math.floor(Math.min(w,h)*.055));
-  const samples=[];
-  const sideMeans={top:[],right:[],bottom:[],left:[]};
+  // 1. Scan horizontal lines for color variance (detect gutters/backgrounds)
+  const rowVariance = new Float32Array(h);
+  for (let y = 0; y < h; y++) {
+    let diffSum = 0;
+    const firstIdx = y * w * 4;
+    const r0 = data[firstIdx], g0 = data[firstIdx + 1], b0 = data[firstIdx + 2];
 
-  function pix(x,y){
-    const p=(y*w+x)*4;
-    return [d[p],d[p+1],d[p+2],d[p+3]];
-  }
-  function collect(side){
-    const arr=sideMeans[side];
-    const count=side==='top'||side==='bottom'?w:h;
-    const stride=Math.max(1,Math.floor(count/180));
-    for(let q=0;q<count;q+=stride){
-      let x,y;
-      if(side==='top'){x=q;y=Math.min(h-1,Math.floor(band*.5))}
-      if(side==='bottom'){x=q;y=Math.max(0,h-1-Math.floor(band*.5))}
-      if(side==='left'){x=Math.min(w-1,Math.floor(band*.5));y=q}
-      if(side==='right'){x=Math.max(0,w-1-Math.floor(band*.5));y=q}
-      const p=pix(x,y);arr.push(p);
-      samples.push(p);
+    for (let x = 1; x < w; x += 4) {
+      const idx = (y * w + x) * 4;
+      diffSum += colorDiff(r0, g0, b0, data[idx], data[idx + 1], data[idx + 2]);
     }
+    rowVariance[y] = diffSum / (w / 4);
   }
-  collect('top');collect('right');collect('bottom');collect('left');
 
-  for(let y=0;y<h;y+=Math.max(1,Math.floor(h/90))){
-    for(let x=0;x<w;x+=Math.max(1,Math.floor(w/90))){
-      if(x<band||x>=w-band||y<band||y>=h-band){
-        const p=(y*w+x)*4;
-        samples.push([d[p],d[p+1],d[p+2],d[p+3]]);
+  // 2. Classify rows
+  const isContentRow = new Uint8Array(h);
+  for (let y = 0; y < h; y++) {
+    isContentRow[y] = rowVariance[y] > tol ? 1 : 0;
+  }
+
+  // 3. Find vertical panel blocks
+  const panels = [];
+  let inPanel = false;
+  let startY = 0;
+
+  for (let y = 0; y < h; y++) {
+    if (isContentRow[y] && !inPanel) {
+      inPanel = true;
+      startY = y;
+    } else if (!isContentRow[y] && inPanel) {
+      inPanel = false;
+      if ((y - startY) >= minPanelH) {
+        panels.push({ top: startY, bottom: y - 1 });
       }
     }
   }
-
-  const rs=samples.map(p=>p[0]),gs=samples.map(p=>p[1]),bs=samples.map(p=>p[2]);
-  const lumv=samples.map(p=>lum(p[0],p[1],p[2]));
-  return {
-    median:[median(rs),median(gs),median(bs)],
-    spread:[percentile(rs,.9)-percentile(rs,.1),percentile(gs,.9)-percentile(gs,.1),percentile(bs,.9)-percentile(bs,.1)],
-    lumaSpread:percentile(lumv,.9)-percentile(lumv,.1),
-    sides:sideMeans
-  };
-}
-
-function buildEdgeMap(d,w,h){
-  const edge=new Uint8Array(w*h);
-  const texture=new Uint8Array(w*h);
-  for(let y=0;y<h;y++){
-    for(let x=0;x<w;x++){
-      const i=(y*w+x)*4;
-      const r=d[i],g=d[i+1],b=d[i+2];
-      let sum=0,n=0,maxv=0;
-      if(x>0){
-        const q=i-4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
-      }
-      if(x<w-1){
-        const q=i+4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
-      }
-      if(y>0){
-        const q=i-w*4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
-      }
-      if(y<h-1){
-        const q=i+w*4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
-      }
-      edge[y*w+x]=Math.round(clamp((sum/Math.max(1,n))*.9+maxv*.35,0,255));
-      texture[y*w+x]=Math.round(clamp(sum/Math.max(1,n),0,255));
-    }
-  }
-  return {edge,texture};
-}
-
-function localColor(d,i,j){
-  return rgbDist(d[i],d[i+1],d[i+2],d[j],d[j+1],d[j+2]);
-}
-
-function growOuterBackground(info,features,tol,mode,learning){
-  const {w,h,d}=info;
-  const {edge,texture}=features;
-  const aggressive=mode==='aggressive';
-  const profile=outerProfile(d,w,h);
-
-  const borderNoise=Math.max(
-    2,
-    percentile(Array.from(texture).filter(v=>v>0),.72)
-  );
-  const edgeBase=Math.max(7,percentile(Array.from(edge),.78));
-
-  const colorLimit=(aggressive?18:12)+tol*.72+(profile.lumaSpread*.025);
-  const edgeLimit=(aggressive?42:30)+tol*.48+edgeBase*.35;
-  const noisyLimit=borderNoise*.95+tol*.55;
-
-  const state=new Uint8Array(w*h);
-  const q=new Int32Array(w*h);
-  const seedCost=new Float32Array(w*h);
-  let head=0,tail=0;
-
-  function push(i,cost){
-    if(state[i]!==0)return;
-    state[i]=2;q[tail]=i;seedCost[i]=cost;tail++;
+  if (inPanel && (h - startY) >= minPanelH) {
+    panels.push({ top: startY, bottom: h - 1 });
   }
 
-  for(let x=0;x<w;x++){push(x,0);if(h>1)push((h-1)*w+x,0)}
-  for(let y=1;y<h-1;y++){push(y*w,0);if(w>1)push(y*w+w-1,0)}
+  // 4. Crop horizontal margins (left and right) per panel
+  const croppedCanvases = [];
+  for (const panel of panels) {
+    const ph = panel.bottom - panel.top + 1;
+    let minX = w, maxX = 0;
 
-  let learnedR=profile.median[0],learnedG=profile.median[1],learnedB=profile.median[2];
-  let learnedN=0;
-  const learnCap=Math.max(120,Math.floor(w*h*.035));
+    for (let y = panel.top; y <= panel.bottom; y += 2) {
+      const rowIdx = y * w * 4;
+      const bgR = data[rowIdx], bgG = data[rowIdx + 1], bgB = data[rowIdx + 2];
 
-  function accept(cur,next){
-    const ci=cur*4,ni=next*4;
-    const cd=localColor(d,ci,ni);
-    const e=Math.max(edge[cur],edge[next]);
-    const t=Math.max(texture[cur],texture[next]);
-
-    if(cd>colorLimit*1.75 && t>noisyLimit)return false;
-    if(e>edgeLimit && cd>colorLimit*.72)return false;
-
-    if(learning&&learnedN>24){
-      const drift=rgbDist(d[ni],d[ni+1],d[ni+2],learnedR,learnedG,learnedB);
-      const driftLimit=colorLimit*(aggressive?4.8:3.6);
-      if(drift>driftLimit && e>edgeLimit*.7)return false;
-    }
-    return true;
-  }
-
-  while(head<tail){
-    const cur=q[head++];state[cur]=1;
-    const y=Math.floor(cur/w),x=cur-y*w;
-    const ns=[];
-    if(x>0)ns.push(cur-1);
-    if(x<w-1)ns.push(cur+1);
-    if(y>0)ns.push(cur-w);
-    if(y<h-1)ns.push(cur+w);
-
-    for(const next of ns){
-      if(state[next]!==0||!accept(cur,next))continue;
-      push(next,0);
-      if(learning&&learnedN<learnCap){
-        const p=next*4;
-        learnedR=(learnedR*learnedN+d[p])/(learnedN+1);
-        learnedG=(learnedG*learnedN+d[p+1])/(learnedN+1);
-        learnedB=(learnedB*learnedN+d[p+2])/(learnedN+1);
-        learnedN++;
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        if (colorDiff(bgR, bgG, bgB, data[idx], data[idx + 1], data[idx + 2]) > tol) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+        }
       }
     }
+
+    if (maxX <= minX) { minX = 0; maxX = w - 1; }
+
+    const pw = maxX - minX + 1;
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = pw;
+    pCanvas.height = ph;
+    const pCtx = pCanvas.getContext('2d');
+    pCtx.drawImage(img, minX, panel.top, pw, ph, 0, 0, pw, ph);
+
+    croppedCanvases.push(pCanvas);
   }
 
-  return {
-    mask:state,
-    colorLimit,
-    edgeLimit,
-    profile,
-    backgroundCount:state.reduce((n,v)=>n+(v===1?1:0),0)
-  };
+  return croppedCanvases;
 }
 
-function sideScore(mask,w,h,side,offset){
-  let bg=0,total=0;
-  const span=side==='top'||side==='bottom'?w:h;
-  const step=Math.max(1,Math.floor(span/500));
-  if(side==='top'||side==='bottom'){
-    const y=side==='top'?offset:h-1-offset;
-    for(let x=0;x<w;x+=step){total++;if(mask[y*w+x]===1)bg++}
-  }else{
-    const x=side==='left'?offset:w-1-offset;
-    for(let y=0;y<h;y+=step){total++;if(mask[y*w+x]===1)bg++}
-  }
-  return bg/Math.max(1,total);
-}
+// Execute Bulk Processing
+processBtn.addEventListener('click', async () => {
+  if (!loadedFiles.length) return alert('SELECT OR DROP IMAGES FIRST');
 
-function sideEdgeProfile(d,w,h,side,depth){
-  let sum=0, strong=0, total=0;
-  const span=side==='top'||side==='bottom'?w:h;
-  const stride=Math.max(1,Math.floor(span/420));
+  processBtn.disabled = true;
+  downloadAllBtn.disabled = true;
+  statusBar.style.display = 'flex';
+  resultsGrid.innerHTML = '';
+  extractedPanels = [];
 
-  if(side==='top'||side==='bottom'){
-    const y=side==='top'?depth:h-1-depth;
-    if(y<1||y>=h-1)return {mean:0,strong:0};
-    for(let x=1;x<w-1;x+=stride){
-      const p=(y*w+x)*4;
-      const q1=((y-1)*w+x)*4;
-      const q2=((y+1)*w+x)*4;
-      const v=(rgbDist(d[p],d[p+1],d[p+2],d[q1],d[q1+1],d[q1+2])+
-               rgbDist(d[p],d[p+1],d[p+2],d[q2],d[q2+1],d[q2+2]))*.5;
-      sum+=v;
-      if(v>24)strong++;
-      total++;
-    }
-  }else{
-    const x=side==='left'?depth:w-1-depth;
-    if(x<1||x>=w-1)return {mean:0,strong:0};
-    for(let y=1;y<h-1;y+=stride){
-      const p=(y*w+x)*4;
-      const q1=(y*w+x-1)*4;
-      const q2=(y*w+x+1)*4;
-      const v=(rgbDist(d[p],d[p+1],d[p+2],d[q1],d[q1+1],d[q1+2])+
-               rgbDist(d[p],d[p+1],d[p+2],d[q2],d[q2+1],d[q2+2]))*.5;
-      sum+=v;
-      if(v>24)strong++;
-      total++;
-    }
-  }
+  const tol = Number(toleranceInput.value);
+  const minH = Number(minHeightInput.value);
+  const total = loadedFiles.length;
 
-  return {
-    mean:sum/Math.max(1,total),
-    strong:strong/Math.max(1,total)
-  };
-}
+  for (let i = 0; i < total; i++) {
+    const file = loadedFiles[i];
+    statusText.textContent = `PROCESSING IMAGE [${i + 1}/${total}]: ${file.name.substring(0, 25)}...`;
+    progressFill.style.width = `${((i + 1) / total) * 100}%`;
 
-function aggressiveBoundary(mask,info,side,tol){
-  const {w,h,d}=info;
-  const span=side==='top'||side==='bottom'?h:w;
-  const maxDepth=Math.floor(span*.44);
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    await img.decode();
 
-  let best=-1;
-  let bestScore=0;
+    const panels = processImage(img, tol, minH);
 
-  const baseNeed=Math.max(.56,Math.min(.82,.74-tol*.0025));
+    panels.forEach((pCanvas, pIdx) => {
+      const dataUrl = pCanvas.toDataURL('image/png');
+      const fileName = `art_panel_img${i + 1}_crop${pIdx + 1}.png`;
 
-  for(let depth=2;depth<maxDepth;depth++){
-    const bg0=sideScore(mask,w,h,side,Math.max(0,depth-2));
-    const bg1=sideScore(mask,w,h,side,depth);
-    const bg2=sideScore(mask,w,h,side,Math.min(maxDepth,depth+2));
+      extractedPanels.push({ dataUrl, fileName });
 
-    const transition=Math.max(0,bg0-Math.min(bg1,bg2));
-    const edge=sideEdgeProfile(d,w,h,side,depth);
-    const persistence=Math.max(0,bg0-bg2);
+      const container = document.createElement('div');
+      container.className = 'result-item';
 
-    const score=
-      transition*1.55+
-      persistence*0.75+
-      Math.min(1,edge.strong*2.4)*0.85+
-      Math.min(1,edge.mean/80)*0.45;
+      const previewImg = document.createElement('img');
+      previewImg.src = dataUrl;
 
-    if(bg0>=baseNeed &&
-       transition>=.11 &&
-       (edge.strong>=.12 || edge.mean>=30) &&
-       bg2<=bg0-.07 &&
-       score>bestScore){
-      bestScore=score;
-      best=depth;
-    }
-  }
+      const info = document.createElement('div');
+      info.className = 'result-info';
+      info.innerHTML = `<span>${pCanvas.width}x${pCanvas.height}PX</span>`;
 
-  if(best<0)return 0;
+      const dl = document.createElement('button');
+      dl.className = 'dl-btn';
+      dl.textContent = 'EXPORT';
+      dl.onclick = () => {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = fileName;
+        a.click();
+      };
 
-  let confirmations=0;
-  for(let d=Math.max(2,best-3);d<=Math.min(maxDepth,best+3);d++){
-    const s=sideScore(mask,w,h,side,d);
-    if(s<baseNeed-.03)confirmations++;
-  }
-
-  if(confirmations<3)return 0;
-
-  return best;
-}
-
-function persistentBoundary(mask,w,h,side,mode,info,tol){
-  const aggressive=mode==='aggressive';
-  const span=side==='top'||side==='bottom'?h:w;
-  const maxDepth=Math.floor(span*.48);
-
-  let previous=sideScore(mask,w,h,side,0);
-  let bestDepth=0;
-  let bestDrop=0;
-
-  for(let d=1;d<=maxDepth;d++){
-    const s=sideScore(mask,w,h,side,d);
-    const drop=previous-s;
-    if(drop>bestDrop){
-      bestDrop=drop;
-      bestDepth=d;
-    }
-    previous=s;
-  }
-
-  if(aggressive && info){
-    const strong=aggressiveBoundary(mask,info,side,tol);
-    if(strong>0){
-      const cap=Math.min(
-        Math.floor(span*.44),
-        Math.max(strong,Math.floor(bestDepth*1.55)+3)
-      );
-      return Math.min(strong,cap);
-    }
-  }
-
-  const threshold=aggressive?.58:.70;
-  let run=0;
-
-  for(let d=0;d<=maxDepth;d++){
-    const s=sideScore(mask,w,h,side,d);
-    if(s<threshold){
-      run++;
-      if(run>=Math.max(2,Math.floor(span*.006))){
-        return Math.max(0,d-run+1);
-      }
-    }else{
-      run=0;
-    }
-  }
-
-  if(bestDrop>0.18)return bestDepth;
-  return 0;
-}
-
-function setAIStatus(text,good=false){
-  if(!aiStatus)return;
-  aiStatus.textContent=text;
-  aiStatus.style.color=good?'#8fffd0':'var(--cyan)';
-}
-function currentAIKey(){
-  const f=selected[0];
-  return f?[f.name,f.size,f.lastModified].join('|'):'';
-}
-async function getAIPipeline(){
-  if(aiPipeline)return aiPipeline;
-  if(aiLoading)return aiLoading;
-  aiLoading=(async()=>{
-    setAIStatus('LOADING AI');
-    try{
-      const mod=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1');
-      aiPipeline=await mod.pipeline('background-removal','briaai/RMBG-1.4',{device:'wasm'});
-      setAIStatus('AI READY',true);
-      return aiPipeline;
-    }catch(e){
-      console.error('AI load failed',e);
-      setAIStatus('AI UNAVAILABLE');
-      throw e;
-    }finally{aiLoading=null}
-  })();
-  return aiLoading;
-}
-async function getAIBoundaryInfo(img){
-  const key=currentAIKey();
-  if(aiCache&&aiCacheKey===key)return aiCache;
-  const pipe=await getAIPipeline();
-  const ow=img.naturalWidth||img.width,oh=img.naturalHeight||img.height;
-  const maxSide=512,scale=Math.min(1,maxSide/Math.max(ow,oh));
-  const w=Math.max(2,Math.round(ow*scale)),h=Math.max(2,Math.round(oh*scale));
-  const input=document.createElement('canvas');input.width=w;input.height=h;
-  const ictx=input.getContext('2d',{willReadFrequently:true});ictx.drawImage(img,0,0,w,h);
-  setAIStatus('AI SCANNING');
-  
-  const out=await pipe(input);
-  if(!out||!out.length)throw new Error('AI returned no mask.');
-  const first=out[0];
-  
-  const maskCanvas=document.createElement('canvas');
-  maskCanvas.width=first.width||w;
-  maskCanvas.height=first.height||h;
-  const mctx=maskCanvas.getContext('2d');
-  
-  if(first.toCanvas){
-    const c=await first.toCanvas();
-    mctx.drawImage(c,0,0);
-  } else if (first.data) {
-    const imgData = new ImageData(new Uint8ClampedArray(first.data), first.width, first.height);
-    mctx.putImageData(imgData, 0, 0);
-  } else {
-    throw new Error('Unsupported AI output format.');
-  }
-
-  const mw=maskCanvas.width,mh=maskCanvas.height;
-  const md=mctx.getImageData(0,0,mw,mh).data;
-  const threshold=34;
-  let minX=mw,maxX=-1,minY=mh,maxY=-1;
-  for(let y=0;y<mh;y++)for(let x=0;x<mw;x++){
-    const p=(y*mw+x)*4,v=Math.max(md[p+3],(md[p]+md[p+1]+md[p+2])/3);
-    if(v>=threshold){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y}
-  }
-  if(maxX<0)return null;
-  const band=Math.max(2,Math.round(Math.min(mw,mh)*.035));
-  function occ(side){
-    let hit=0,total=0;
-    if(side==='left'||side==='right'){
-      const x0=side==='left'?0:mw-band;
-      for(let y=0;y<mh;y+=2)for(let x=x0;x<x0+band;x++){const p=(y*mw+x)*4,v=Math.max(md[p+3],(md[p]+md[p+1]+md[p+2])/3);if(v>=threshold)hit++;total++}
-    }else{
-      const y0=side==='top'?0:mh-band;
-      for(let y=y0;y<y0+band;y++)for(let x=0;x<mw;x+=2){const p=(y*mw+x)*4,v=Math.max(md[p+3],(md[p]+md[p+1]+md[p+2])/3);if(v>=threshold)hit++;total++}
-    }
-    return hit/Math.max(1,total);
-  }
-  aiCache={minX,maxX,minY,maxY,w:mw,h:mh,occupancy:{left:occ('left'),right:occ('right'),top:occ('top'),bottom:occ('bottom')}};
-  aiCacheKey=key;setAIStatus('AI CACHED',true);return aiCache;
-}
-
-function applyAIGuard(bounds,ai,ow,oh,mode,pad){
-  if(!ai||mode!=='aggressive')return bounds;
-  const sx=ow/ai.w,sy=oh/ai.h;
-  const depths={left:bounds.left,right:ow-1-bounds.right,top:bounds.top,bottom:oh-1-bounds.bottom};
-  const aiDepth={left:ai.minX*sx,right:(ai.w-1-ai.maxX)*sx,top:ai.minY*sy,bottom:(ai.h-1-ai.maxY)*sy};
-  for(const side of ['left','right','top','bottom']){
-    const d=depths[side],ad=aiDepth[side],o=ai.occupancy[side];
-    if(o>.12)depths[side]=Math.min(d,Math.max(0,ad+pad*2));
-    else if(ad>2)depths[side]=Math.min(d,ad*.90+pad*2);
-  }
-  const next={...bounds,left:Math.floor(Math.max(0,depths.left)),right:ow-1-Math.floor(Math.max(0,depths.right)),top:Math.floor(Math.max(0,depths.top)),bottom:oh-1-Math.floor(Math.max(0,depths.bottom))};
-  const cw=next.right-next.left+1,ch=next.bottom-next.top+1;
-  if(cw<Math.max(8,ow*.08)||ch<Math.max(8,oh*.08))return bounds;
-  next.removed=next.left+(ow-1-next.right)+next.top+(oh-1-next.bottom);
-  next.sides={left:next.left,right:ow-1-next.right,top:next.top,bottom:oh-1-next.bottom};
-  next.aiGuard=true;next.confidence='high';return next;
-}
-
-async function refineBounds(info,grown,pad,mode,aiInfo=null){
-  const {w,h,ow,oh}=info;
-  const mask=grown.mask;
-
-  const leftA=persistentBoundary(mask,w,h,'left',mode,info,info._tol);
-  const rightA=persistentBoundary(mask,w,h,'right',mode,info,info._tol);
-  const topA=persistentBoundary(mask,w,h,'top',mode,info,info._tol);
-  const bottomA=persistentBoundary(mask,w,h,'bottom',mode,info,info._tol);
-
-  let left=Math.floor(Math.max(0,leftA-1)*ow/w);
-  let right=Math.ceil(Math.min(w-1,w-1-rightA+1)*ow/w)-1;
-  let top=Math.floor(Math.max(0,topA-1)*oh/h);
-  let bottom=Math.ceil(Math.min(h-1,h-1-bottomA+1)*oh/h)-1;
-
-  left=clamp(left,0,ow-1);right=clamp(right,0,ow-1);
-  top=clamp(top,0,oh-1);bottom=clamp(bottom,0,oh-1);
-
-  left=Math.max(0,left-pad);top=Math.max(0,top-pad);
-  right=Math.min(ow-1,right+pad);bottom=Math.min(oh-1,bottom+pad);
-
-  const cw=right-left+1,ch=bottom-top+1;
-  const area=cw*ch/(ow*oh);
-
-  if(cw<Math.max(8,ow*.035)||ch<Math.max(8,oh*.035)||area<.035){
-    return {left:0,top:0,right:ow-1,bottom:oh-1,confidence:'low',removed:0};
-  }
-
-  const removed=(left)+(ow-1-right)+(top)+(oh-1-bottom);
-  const maxSideRemoved=Math.max(left,ow-1-right,top,oh-1-bottom);
-  const confidence=removed===0?'none':maxSideRemoved>Math.max(ow,oh)*.42?'medium':'high';
-
-  let bounds={
-    left,top,right,bottom,confidence,
-    removed,
-    sides:{left,right:ow-1-right,top,bottom:oh-1-bottom}
-  };
-  if(aiInfo)bounds=applyAIGuard(bounds,aiInfo,ow,oh,mode,pad);
-  return bounds;
-}
-
-async function analyzeCrop(img,tol,pad,mode,maxSide=900,aiInfo=null){
-  const info=buildAnalysis(img,maxSide);
-  info._tol=tol;
-  if(info.w<2||info.h<2){
-    return {left:0,top:0,right:info.ow-1,bottom:info.oh-1,confidence:'low',removed:0};
-  }
-
-  const features=buildEdgeMap(info.d,info.w,info.h);
-  const grown=growOuterBackground(info,features,tol,mode,selfImprove.checked);
-  const bounds=await refineBounds(info,grown,pad,mode,aiInfo);
-
-  bounds.analysis={
-    width:info.w,height:info.h,
-    backgroundRatio:grown.backgroundCount/(info.w*info.h),
-    colorLimit:grown.colorLimit,
-    edgeLimit:grown.edgeLimit
-  };
-  return bounds;
-}
-
-async function cropImage(img,tol,pad,mode,maxSide=900,aiInfo=null){
-  const w=img.naturalWidth||img.width;
-  const h=img.naturalHeight||img.height;
-  const bounds=await analyzeCrop(img,tol,pad,mode,maxSide,aiInfo);
-
-  const out=document.createElement('canvas');
-  out.width=Math.max(1,bounds.right-bounds.left+1);
-  out.height=Math.max(1,bounds.bottom-bounds.top+1);
-
-  const ctx=out.getContext('2d');
-  ctx.imageSmoothingEnabled=true;
-  ctx.imageSmoothingQuality='high';
-  ctx.drawImage(
-    img,
-    bounds.left,bounds.top,out.width,out.height,
-    0,0,out.width,out.height
-  );
-  out._bounds=bounds;
-  return out;
-}
-
-function schedulePreview(delay=160){
-  if(previewTimer)clearTimeout(previewTimer);
-  previewTimer=setTimeout(()=>refreshPreview(),delay);
-}
-
-async function showPreview(file){
-  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
-  previewUrl=URL.createObjectURL(file);
-  origPreview.src=previewUrl;origPreview.style.display='block';origEmpty.style.display='none';
-  const img=await getImage(file);
-  originalMeta.textContent=(img.naturalWidth||img.width)+' × '+(img.naturalHeight||img.height);
-  setPreviewMeta('READY');schedulePreview(20);
-}
-
-async function refreshPreview(){
-  if(!selected.length||busy)return;
-  const token=++previewToken;
-  if(previewRunning)return;
-  previewRunning=true;
-  setPreviewMeta(cropMode==='aggressive'&&aiAssist.checked?'FAST SCAN + AI':'FAST SCAN');
-  try{
-    await yieldUI();
-    const img=await getImage(selected[0]);
-    let aiInfo=null;
-    if(cropMode==='aggressive'&&aiAssist.checked){
-      try{aiInfo=await getAIBoundaryInfo(img)}catch(e){console.warn(e);aiInfo=null}
-    }
-    if(token!==previewToken)return;
-    const result=await cropImage(img,Number(tolEl.value),Number(padEl.value),cropMode,640,aiInfo);
-    if(token!==previewToken)return;
-    const max=1000,scale=Math.min(1,max/Math.max(result.width,result.height));
-    const pw=Math.max(1,Math.round(result.width*scale)),ph=Math.max(1,Math.round(result.height*scale));
-    const pc=document.createElement('canvas');pc.width=pw;pc.height=ph;
-    const ctx=pc.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-    ctx.drawImage(result,0,0,result.width,result.height,0,0,pw,ph);
-    const blob=await new Promise(r=>pc.toBlob(r,'image/jpeg',.86));
-    if(!blob||token!==previewToken)return;
-    const url=URL.createObjectURL(blob);
-    cropPreview.onload=()=>URL.revokeObjectURL(url);
-    cropPreview.src=url;cropPreview.style.display='block';cropEmpty.style.display='none';
-    cropMeta.textContent=result.width+' × '+result.height;
-    setPreviewMeta(result._bounds&&result._bounds.aiGuard?'AI-GUARDED':result._bounds&&result._bounds.confidence?'BOUNDARY '+result._bounds.confidence.toUpperCase():'READY');
-  }catch(e){
-    console.error(e);
-    if(token===previewToken){setPreviewMeta('SCAN ERROR');cropMeta.textContent='—'}
-  }finally{previewRunning=false}
-}
-
-function setLocked(locked){
-  settingsBox.classList.toggle('locked',locked);
-  filesEl.disabled=locked;
-  tolEl.disabled=locked;
-  padEl.disabled=locked;
-  resetBtn.disabled=locked;
-  modeNormal.disabled=locked;
-  modeAggressive.disabled=locked;
-  selfImprove.disabled=locked;
-  aiAssist.disabled=locked;
-  busy=locked;
-  drop.style.pointerEvents=locked?'none':'';
-}
-
-function setMode(mode){
-  cropMode=mode;
-  modeNormal.classList.toggle('active',mode==='normal');
-  modeAggressive.classList.toggle('active',mode==='aggressive');
-  setAIStatus(mode==='aggressive'&&aiAssist.checked?'AI READY':'STANDBY',true);
-  schedulePreview(80);
-}
-
-modeNormal.addEventListener('click',()=>{if(!modeNormal.disabled)setMode('normal')});
-modeAggressive.addEventListener('click',()=>{if(!modeAggressive.disabled)setMode('aggressive')});
-
-tolEl.addEventListener('input',()=>{
-  tolVal.textContent=tolEl.value;
-  updateSlider(tolEl);
-  schedulePreview(180);
-});
-padEl.addEventListener('input',()=>{
-  padVal.textContent=padEl.value+' px';
-  updateSlider(padEl);
-  schedulePreview(180);
-});
-selfImprove.addEventListener('change',()=>{
-  selfState.textContent=selfImprove.checked?'ON':'OFF';
-  setAIStatus('STANDBY',true);
-  schedulePreview(140);
-});
-aiAssist.addEventListener('change',()=>{
-  if(!aiAssist.checked){aiCacheKey='';aiCache=null;setAIStatus('OFF')}
-  else setAIStatus(cropMode==='aggressive'?'AI READY':'STANDBY',true);
-  schedulePreview(140);
-});
-
-resetBtn.addEventListener('click',()=>{
-  tolEl.value='34';padEl.value='2';selfImprove.checked=true;cropMode='normal';
-  tolVal.textContent='34';padVal.textContent='2 px';selfState.textContent='ON';
-  updateSlider(tolEl);updateSlider(padEl);
-  modeNormal.classList.add('active');modeAggressive.classList.remove('active');
-  aiCacheKey='';aiCache=null;setAIStatus('STANDBY',true);schedulePreview(60);
-});
-
-setCount();
-
-function renderPage(){
-  results.innerHTML='';
-
-  const totalPages=Math.max(1,Math.ceil(outputs.length/PAGE_SIZE));
-
-  if(currentPage>totalPages){
-    currentPage=totalPages;
-  }
-
-  const start=(currentPage-1)*PAGE_SIZE;
-  const pageItems=outputs.slice(start,start+PAGE_SIZE);
-
-  for(const item of pageItems){
-    const div=document.createElement('div');
-    div.className='result';
-
-    const im=document.createElement('img');
-    im.src=URL.createObjectURL(item.blob);
-    im.alt=item.name;
-
-    const done=document.createElement('div');
-    done.className='done';
-    done.textContent='DONE';
-
-    const one=document.createElement('button');
-    one.type='button';
-    one.className='download-one';
-    one.textContent='⇩';
-
-    one.addEventListener('click',function(e){
-      e.stopPropagation();
-      downloadBlob(item.blob,item.name);
+      info.appendChild(dl);
+      container.appendChild(previewImg);
+      container.appendChild(info);
+      resultsGrid.appendChild(container);
     });
 
-    const body=document.createElement('div');
-    body.className='result-body';
-
-    const nameDiv=document.createElement('div');
-    nameDiv.className='result-name';
-    nameDiv.title=item.name;
-    nameDiv.textContent=item.name;
-
-    const sizeDiv=document.createElement('div');
-    sizeDiv.className='result-size';
-    sizeDiv.textContent=item.width+' × '+item.height;
-
-    body.append(nameDiv,sizeDiv);
-    div.append(im,done,one,body);
-    results.append(div);
+    URL.revokeObjectURL(img.src);
+    // Yield execution frame to keep browser UI smooth during heavy batch loads
+    await new Promise(r => setTimeout(r, 10));
   }
 
-  pagination.innerHTML='';
-
-  if(totalPages<=1)return;
-
-  const prev=document.createElement('button');
-  prev.type='button';
-  prev.className='page-btn';
-  prev.textContent='‹';
-  prev.disabled=currentPage===1;
-
-  prev.addEventListener('click',function(){
-    if(currentPage>1){
-      currentPage--;
-      renderPage();
-      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-    }
-  });
-
-  pagination.append(prev);
-
-  const maxButtons=7;
-  let first=1;
-  let last=totalPages;
-
-  if(totalPages>maxButtons){
-    first=Math.max(1,currentPage-3);
-    last=Math.min(totalPages,first+6);
-
-    if(last-first<6){
-      first=Math.max(1,last-6);
-    }
-  }
-
-  for(let p=first;p<=last;p++){
-    const btn=document.createElement('button');
-
-    btn.type='button';
-    btn.className='page-btn'+(p===currentPage?' active':'');
-    btn.textContent=p;
-
-    btn.addEventListener('click',function(){
-      currentPage=p;
-      renderPage();
-      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-    });
-
-    pagination.append(btn);
-  }
-
-  const next=document.createElement('button');
-  next.type='button';
-  next.className='page-btn';
-  next.textContent='›';
-  next.disabled=currentPage===totalPages;
-
-  next.addEventListener('click',function(){
-    if(currentPage<totalPages){
-      currentPage++;
-      renderPage();
-      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-    }
-  });
-
-  pagination.append(next);
-
-  const info=document.createElement('span');
-  info.className='page-info';
-  info.textContent='Page '+currentPage+' of '+totalPages+' • '+outputs.length+' images';
-
-  pagination.append(info);
-}
-
-function crc32(buf){
-  let table=crc32.table;
-
-  if(!table){
-    table=crc32.table=new Uint32Array(256);
-
-    for(let n=0;n<256;n++){
-      let c=n;
-
-      for(let k=0;k<8;k++){
-        c=(c&1)?0xedb88320^(c>>>1):c>>>1;
-      }
-
-      table[n]=c>>>0;
-    }
-  }
-
-  let c=0xffffffff;
-
-  for(let i=0;i<buf.length;i++){
-    c=table[(c^buf[i])&255]^(c>>>8);
-  }
-
-  return(c^0xffffffff)>>>0;
-}
-
-function u16(a,n){
-  a.push(n&255,(n>>>8)&255);
-}
-
-function u32(a,n){
-  a.push(
-    n&255,
-    (n>>>8)&255,
-    (n>>>16)&255,
-    (n>>>24)&255
-  );
-}
-
-function strBytes(s){
-  return new TextEncoder().encode(s);
-}
-
-async function makeZip(items){
-  const chunks=[];
-  const central=[];
-  let offset=0;
-
-  for(const item of items){
-    const data=new Uint8Array(await item.blob.arrayBuffer());
-    const name=strBytes(item.name);
-    const crc=crc32(data);
-    const local=[];
-
-    u32(local,0x04034b50);
-    u16(local,20);
-    u16(local,0);
-    u16(local,0);
-    u16(local,0);
-    u16(local,0);
-    u32(local,crc);
-    u32(local,data.length);
-    u32(local,data.length);
-    u16(local,name.length);
-    u16(local,0);
-
-    const localBytes=new Uint8Array(local);
-
-    chunks.push(localBytes);
-    chunks.push(name);
-    chunks.push(data);
-
-    const cen=[];
-
-    u32(cen,0x02014b50);
-    u16(cen,20);
-    u16(cen,20);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u32(cen,crc);
-    u32(cen,data.length);
-    u32(cen,data.length);
-    u16(cen,name.length);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u32(cen,0);
-    u32(cen,offset);
-
-    central.push(new Uint8Array(cen));
-    central.push(name);
-
-    offset+=localBytes.length+name.length+data.length;
-  }
-
-  const centralOffset=offset;
-  let centralSize=0;
-
-  for(const c of central){
-    chunks.push(c);
-    centralSize+=c.length;
-  }
-
-  const end=[];
-
-  u32(end,0x06054b50);
-  u16(end,0);
-  u16(end,0);
-  u16(end,items.length);
-  u16(end,items.length);
-  u32(end,centralSize);
-  u32(end,centralOffset);
-  u16(end,0);
-
-  chunks.push(new Uint8Array(end));
-
-  return new Blob(chunks,{type:'application/zip'});
-}
-
-cleanBtn.addEventListener('click',async function(){
-  if(!selected.length){
-    alert('Select some images first.');
-    return;
-  }
-
-  outputs=[];
-  currentPage=1;
-
-  results.innerHTML='';
-  pagination.innerHTML='';
-
-  downloadAll.disabled=true;
-  cleanBtn.disabled=true;
-
-  setLocked(true);
-
-  progressCard.style.display='block';
-  bar.style.width='0%';
-  percent.textContent='0%';
-
-  const tol=Number(tolEl.value);
-  const pad=Number(padEl.value);
-  const mode=cropMode;
-
-  try{
-    for(let i=0;i<selected.length;i++){
-      progressText.textContent='Processing '+(i+1)+' of '+selected.length+' images…';
-      status.textContent=selected[i].name;
-
-      const img=await getImage(selected[i]);
-      let aiInfo=null;
-      if(mode==='aggressive'&&aiAssist.checked){
-        try{status.textContent=selected[i].name+' • AI guard…';aiInfo=await getAIBoundaryInfo(img)}catch(e){console.warn(e);aiInfo=null}
-      }
-      const out=await cropImage(img,tol,pad,mode,900,aiInfo);
-
-      const blob=await new Promise(function(resolve,reject){
-        out.toBlob(function(result){
-          if(result)resolve(result);
-          else reject(new Error('Could not create PNG'));
-        },'image/png');
-      });
-
-      const name=selected[i].name.replace(/\.[^.]+$/,'')+'_clean.png';
-
-      outputs.push({
-        blob:blob,
-        name:name,
-        width:out.width,
-        height:out.height
-      });
-
-      const p=((i+1)/selected.length)*100;
-
-      bar.style.width=p+'%';
-      percent.textContent=Math.round(p)+'%';
-
-      await new Promise(function(resolve){
-        setTimeout(resolve,0);
-      });
-    }
-
-    progressText.textContent='Finished '+selected.length+' images';
-    status.textContent='All processed images are ready.';
-
-    renderPage();
-
-    downloadAll.disabled=false;
-
-  }catch(err){
-    console.error(err);
-    status.textContent='Something went wrong while processing an image.';
-    alert('Something went wrong while processing an image. Check the browser console for details.');
-  }finally{
-    cleanBtn.disabled=false;
-    setLocked(false);
-  }
+  statusText.textContent = `EXTRACTION COMPLETE: ${extractedPanels.length} PANELS ISOLATED`;
+  processBtn.disabled = false;
+  if (extractedPanels.length > 0) downloadAllBtn.disabled = false;
 });
 
-downloadAll.addEventListener('click',async function(){
-  if(!outputs.length)return;
-
-  downloadAll.disabled=true;
-  downloadAll.textContent='Creating ZIP…';
-
-  try{
-    const zip=await makeZip(outputs);
-    downloadBlob(zip,'cut-it-out-cleaned-images.zip');
-  }catch(err){
-    console.error(err);
-    alert('Could not create the ZIP file.');
-  }finally{
-    downloadAll.disabled=false;
-    downloadAll.textContent='⇩ Download All (.ZIP)';
-  }
+// Bulk Batch Download Trigger
+downloadAllBtn.addEventListener('click', () => {
+  extractedPanels.forEach((item, index) => {
+    setTimeout(() => {
+      const a = document.createElement('a');
+      a.href = item.dataUrl;
+      a.download = item.fileName;
+      a.click();
+    }, index * 150); // Stagger downloads to prevent browser blocking
+  });
 });
-
-setLocked(false);
-updateSlider(tolEl);
-updateSlider(padEl);
-selfState.textContent=selfImprove.checked?'ON':'OFF';
-
 </script>
 </body>
 </html>
