@@ -2,2255 +2,253 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b14">
 
 <title>Cut It Out! — AI Background Remover</title>
 
 <style>
 :root{
-  --bg:#050711;
-  --bg2:#090d1c;
-  --glass:rgba(13,18,38,.62);
-  --glass2:rgba(18,25,52,.72);
-  --line:rgba(150,190,255,.16);
-  --line2:rgba(255,255,255,.10);
-
-  --text:#f4f8ff;
-  --muted:#8d99b5;
-
-  --cyan:#45e7ff;
-  --cyan2:#16bde0;
-  --purple:#9d72ff;
-  --pink:#ef6cff;
-
-  --green:#52f5a0;
-  --red:#ff647c;
-
-  --shadow:0 24px 80px rgba(0,0,0,.45);
+--bg:#050810;
+--bg2:#09101d;
+--glass:rgba(14,20,34,.62);
+--glass2:rgba(18,27,45,.72);
+--line:rgba(120,170,255,.18);
+--line2:rgba(120,190,255,.32);
+--text:#f4f8ff;
+--muted:#8f9db3;
+--cyan:#4de7ff;
+--blue:#5c7cff;
+--violet:#9d6cff;
+--green:#38e98b;
+--danger:#ff637c;
+--shadow:0 25px 80px rgba(0,0,0,.48);
 }
 
 *{
-  box-sizing:border-box;
+box-sizing:border-box;
 }
 
 html{
-  min-height:100%;
-  background:var(--bg);
+scroll-behavior:smooth;
 }
 
 body{
-  margin:0;
-  min-height:100vh;
-
-  color:var(--text);
-
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
-  background:
-    radial-gradient(
-      900px 520px at 8% -8%,
-      rgba(69,231,255,.19),
-      transparent 65%
-    ),
-    radial-gradient(
-      760px 560px at 95% 4%,
-      rgba(157,114,255,.22),
-      transparent 64%
-    ),
-    radial-gradient(
-      700px 600px at 50% 100%,
-      rgba(239,108,255,.12),
-      transparent 68%
-    ),
-    linear-gradient(
-      135deg,
-      #050711 0%,
-      #080b18 48%,
-      #050611 100%
-    );
-
-  overflow-x:hidden;
+margin:0;
+min-height:100vh;
+color:var(--text);
+font-family:
+Inter,
+ui-sans-serif,
+system-ui,
+-apple-system,
+BlinkMacSystemFont,
+"Segoe UI",
+sans-serif;
+background:
+radial-gradient(
+circle at 15% 5%,
+rgba(50,110,255,.24),
+transparent 30%
+),
+radial-gradient(
+circle at 85% 12%,
+rgba(0,229,255,.19),
+transparent 28%
+),
+radial-gradient(
+circle at 50% 75%,
+rgba(130,70,255,.16),
+transparent 34%
+),
+linear-gradient(
+145deg,
+#050810 0%,
+#091120 48%,
+#050812 100%
+);
+overflow-x:hidden;
 }
 
-body:before{
-  content:"";
-
-  position:fixed;
-  inset:0;
-
-  pointer-events:none;
-
-  opacity:.24;
-
-  background-image:
-    linear-gradient(
-      rgba(255,255,255,.025) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255,255,255,.025) 1px,
-      transparent 1px
-    );
-
-  background-size:42px 42px;
-
-  mask-image:
-    linear-gradient(
-      to bottom,
-      black,
-      transparent 85%
-    );
+body::before{
+content:"";
+position:fixed;
+inset:0;
+pointer-events:none;
+background:
+linear-gradient(
+rgba(255,255,255,.018) 1px,
+transparent 1px
+),
+linear-gradient(
+90deg,
+rgba(255,255,255,.018) 1px,
+transparent 1px
+);
+background-size:42px 42px;
+mask-image:linear-gradient(
+to bottom,
+rgba(0,0,0,.7),
+transparent 80%
+);
 }
 
-body:after{
-  content:"";
+body::after{
+content:"";
+position:fixed;
+width:600px;
+height:600px;
+left:50%;
+top:-350px;
+transform:translateX(-50%);
+background:
+radial-gradient(
+circle,
+rgba(75,220,255,.14),
+transparent 65%
+);
+filter:blur(20px);
+pointer-events:none;
+}
 
-  position:fixed;
+button,
+input{
+font:inherit;
+}
 
-  width:420px;
-  height:420px;
-
-  left:-160px;
-  top:42%;
-
-  border-radius:50%;
-
-  background:
-    rgba(69,231,255,.09);
-
-  filter:blur(80px);
-
-  pointer-events:none;
+button{
+-webkit-tap-highlight-color:transparent;
 }
 
 main{
-  width:min(
-    1220px,
-    calc(100% - 28px)
-  );
-
-  margin:auto;
-
-  padding:
-    30px
-    0
-    64px;
-
-  position:relative;
-  z-index:1;
+position:relative;
+z-index:1;
+width:min(1220px,calc(100% - 28px));
+margin:auto;
+padding:42px 0 70px;
 }
 
 .hero{
-  display:flex;
-
-  justify-content:space-between;
-  align-items:flex-end;
-
-  gap:22px;
-
-  margin-bottom:20px;
+text-align:center;
+margin-bottom:28px;
 }
 
 .eyebrow{
-  display:inline-flex;
-
-  align-items:center;
-
-  gap:8px;
-
-  padding:
-    7px
-    11px;
-
-  border:
-    1px solid
-    rgba(69,231,255,.20);
-
-  background:
-    rgba(69,231,255,.06);
-
-  border-radius:999px;
-
-  color:#9defff;
-
-  font-size:11px;
-  font-weight:900;
-
-  letter-spacing:1.4px;
-
-  text-transform:uppercase;
-
-  box-shadow:
-    0 0 28px
-    rgba(69,231,255,.06)
-    inset;
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:7px 12px;
+border:1px solid var(--line2);
+border-radius:999px;
+background:rgba(10,18,32,.6);
+box-shadow:
+0 0 25px rgba(77,231,255,.07),
+inset 0 1px rgba(255,255,255,.06);
+color:#b8dfff;
+font-size:11px;
+font-weight:800;
+letter-spacing:1.5px;
+text-transform:uppercase;
 }
 
-.eyebrow i{
-  width:7px;
-  height:7px;
-
-  border-radius:50%;
-
-  background:var(--green);
-
-  box-shadow:
-    0 0 12px
-    var(--green);
+.eyebrow-dot{
+width:7px;
+height:7px;
+border-radius:50%;
+background:var(--green);
+box-shadow:0 0 12px var(--green);
 }
 
 h1{
-  margin:
-    13px
-    0
-    9px;
-
-  font-size:
-    clamp(
-      38px,
-      7vw,
-      68px
-    );
-
-  line-height:.94;
-
-  letter-spacing:-3px;
-
-  font-weight:950;
+margin:17px 0 10px;
+font-size:clamp(42px,7vw,76px);
+line-height:.92;
+font-weight:950;
+letter-spacing:-4px;
 }
 
-h1 .accent{
-  background:
-    linear-gradient(
-      90deg,
-      var(--cyan),
-      #a9f7ff 38%,
-      var(--purple) 80%
-    );
-
-  -webkit-background-clip:text;
-  background-clip:text;
-
-  color:transparent;
-
-  text-shadow:
-    0 0 40px
-    rgba(69,231,255,.12);
+h1 span{
+background:
+linear-gradient(
+110deg,
+var(--cyan),
+#83c8ff 35%,
+var(--violet)
+);
+-webkit-background-clip:text;
+background-clip:text;
+color:transparent;
+text-shadow:
+0 0 40px rgba(77,231,255,.12);
 }
 
 .subtitle{
-  margin:0;
-
-  max-width:690px;
-
-  color:#aab5cf;
-
-  line-height:1.55;
-
-  font-size:15px;
+max-width:650px;
+margin:0 auto;
+color:#aab7ca;
+font-size:15px;
+line-height:1.65;
 }
 
-.system-pill{
-  min-width:210px;
-
-  padding:
-    13px
-    15px;
-
-  border:
-    1px solid
-    var(--line);
-
-  background:
-    rgba(12,17,35,.56);
-
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-
-  border-radius:16px;
-
-  box-shadow:var(--shadow);
+.badges{
+display:flex;
+justify-content:center;
+gap:8px;
+flex-wrap:wrap;
+margin-top:17px;
 }
 
-.system-pill .top{
-  display:flex;
-
-  align-items:center;
-
-  gap:8px;
-
-  color:#dbe7ff;
-
-  font-weight:850;
-
-  font-size:12px;
+.badge{
+padding:7px 11px;
+border:1px solid var(--line);
+border-radius:999px;
+background:rgba(12,19,32,.62);
+color:#aebbd0;
+font-size:11px;
+backdrop-filter:blur(16px);
+-webkit-backdrop-filter:blur(16px);
 }
 
-.system-pill .dot{
-  width:8px;
-  height:8px;
-
-  border-radius:50%;
-
-  background:var(--green);
-
-  box-shadow:
-    0 0 14px
-    var(--green);
-}
-
-.system-pill small{
-  display:block;
-
-  color:var(--muted);
-
-  margin-top:5px;
-
-  font-size:11px;
+.badge b{
+color:#dcecff;
 }
 
 .glass{
-  border:
-    1px solid
-    var(--line);
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(18,25,52,.72),
-      rgba(7,11,25,.64)
-    );
-
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
-
-  box-shadow:
-    var(--shadow),
-    inset 0 1px
-    rgba(255,255,255,.035);
-
-  border-radius:24px;
+background:
+linear-gradient(
+145deg,
+rgba(20,30,50,.72),
+rgba(8,14,25,.62)
+);
+border:1px solid var(--line);
+border-radius:24px;
+box-shadow:var(--shadow);
+backdrop-filter:blur(24px);
+-webkit-backdrop-filter:blur(24px);
 }
 
-.import-card{
-  padding:16px;
+.main-card{
+padding:18px;
 }
 
 .drop{
-  min-height:235px;
-
-  border:
-    1px dashed
-    rgba(111,224,255,.30);
-
-  border-radius:19px;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  justify-content:center;
-
-  text-align:center;
-
-  cursor:pointer;
-
-  position:relative;
-
-  overflow:hidden;
-
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(69,231,255,.09),
-      transparent 55%
-    ),
-    rgba(4,8,20,.34);
-
-  transition:.2s ease;
-}
-
-.drop:before,
-.drop:after{
-  content:"";
-
-  position:absolute;
-
-  pointer-events:none;
-
-  border-radius:50%;
-
-  filter:blur(24px);
-}
-
-.drop:before{
-  width:120px;
-  height:120px;
-
-  background:
-    rgba(69,231,255,.08);
-
-  left:15%;
-  bottom:-75px;
-}
-
-.drop:after{
-  width:150px;
-  height:150px;
-
-  background:
-    rgba(157,114,255,.08);
-
-  right:10%;
-  top:-100px;
-}
-
-.drop:hover,
-.drop.drag{
-  border-color:
-    rgba(69,231,255,.85);
-
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(69,231,255,.15),
-      transparent 60%
-    ),
-    rgba(7,13,29,.55);
-
-  box-shadow:
-    0 0 0 1px
-    rgba(69,231,255,.10),
-
-    0 0 45px
-    rgba(69,231,255,.09)
-    inset;
-
-  transform:
-    translateY(-1px);
-}
-
-.drop-icon{
-  width:64px;
-  height:64px;
-
-  display:grid;
-
-  place-items:center;
-
-  border:
-    1px solid
-    rgba(69,231,255,.28);
-
-  background:
-    rgba(69,231,255,.07);
-
-  color:var(--cyan);
-
-  font-size:30px;
-
-  box-shadow:
-    0 0 30px
-    rgba(69,231,255,.10);
-
-  margin-bottom:13px;
-
-  border-radius:18px;
-}
-
-.drop-title{
-  font-size:19px;
-
-  font-weight:900;
-
-  letter-spacing:-.3px;
-}
-
-.drop-sub{
-  font-size:13px;
-
-  color:var(--muted);
-
-  margin-top:6px;
-}
-
-.count{
-  margin-top:15px;
-
-  display:inline-flex;
-
-  align-items:center;
-
-  gap:8px;
-
-  padding:
-    8px
-    12px;
-
-  border:
-    1px solid
-    var(--line);
-
-  background:
-    rgba(255,255,255,.035);
-
-  border-radius:999px;
-
-  color:#aebbd5;
-
-  font-size:12px;
-}
-
-.count strong{
-  color:var(--green);
-}
-
-input[type=file]{
-  display:none;
-}
-
-.workspace{
-  display:grid;
-
-  grid-template-columns:
-    350px
-    minmax(0,1fr);
-
-  gap:16px;
-
-  margin-top:16px;
-}
-
-.panel{
-  padding:17px;
-
-  border:
-    1px solid
-    var(--line2);
-
-  background:
-    rgba(5,9,22,.45);
-
-  border-radius:20px;
-}
-
-.panel-title{
-  display:flex;
-
-  align-items:center;
-
-  justify-content:space-between;
-
-  gap:10px;
-
-  margin-bottom:16px;
-}
-
-.panel-title h2{
-  margin:0;
-
-  font-size:14px;
-
-  letter-spacing:.3px;
-
-  font-weight:900;
-}
-
-.panel-title span{
-  font-size:10px;
-
-  color:#71809d;
-
-  text-transform:uppercase;
-
-  letter-spacing:1.1px;
-}
-
-.setting{
-  margin-bottom:19px;
-}
-
-.setting:last-child{
-  margin-bottom:0;
-}
-
-.setting-head{
-  display:flex;
-
-  align-items:center;
-
-  justify-content:space-between;
-
-  gap:10px;
-
-  margin-bottom:9px;
-}
-
-.setting-name{
-  font-size:13px;
-
-  font-weight:800;
-
-  color:#e8efff;
-}
-
-.value{
-  min-width:48px;
-
-  text-align:center;
-
-  padding:
-    5px
-    9px;
-
-  border-radius:8px;
-
-  border:
-    1px solid
-    rgba(69,231,255,.16);
-
-  background:
-    rgba(69,231,255,.05);
-
-  color:#a9f4ff;
-
-  font-weight:900;
-
-  font-size:11px;
-}
-
-.help{
-  display:inline-flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  width:16px;
-  height:16px;
-
-  border-radius:50%;
-
-  border:
-    1px solid
-    #ffffff1c;
-
-  color:#71809b;
-
-  font-size:10px;
-
-  margin-left:4px;
-
-  cursor:help;
-}
-
-.mode-grid{
-  display:grid;
-
-  grid-template-columns:
-    1fr
-    1fr;
-
-  gap:8px;
-}
-
-.mode-btn{
-  border:
-    1px solid
-    var(--line2);
-
-  background:
-    rgba(255,255,255,.035);
-
-  color:#c9d4ea;
-
-  border-radius:13px;
-
-  padding:11px;
-
-  text-align:left;
-
-  cursor:pointer;
-
-  transition:.16s;
-}
-
-.mode-btn:hover{
-  border-color:
-    rgba(69,231,255,.35);
-
-  background:
-    rgba(69,231,255,.045);
-}
-
-.mode-btn.active{
-  border-color:
-    rgba(69,231,255,.65);
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(69,231,255,.12),
-      rgba(157,114,255,.07)
-    );
-
-  box-shadow:
-    0 0 0 1px
-    rgba(69,231,255,.08)
-    inset,
-
-    0 0 24px
-    rgba(69,231,255,.07);
-
-  color:#f1fbff;
-}
-
-.mode-btn b{
-  display:block;
-
-  font-size:12px;
-}
-
-.mode-btn small{
-  display:block;
-
-  color:#74819a;
-
-  font-size:10px;
-
-  line-height:1.35;
-
-  margin-top:4px;
-}
-
-.mode-btn.active small{
-  color:#93a9c8;
-}
-
-.range-wrap{
-  padding:3px 0;
-}
-
-input[type=range]{
-  --fill:0%;
-
-  width:100%;
-
-  height:7px;
-
-  appearance:none;
-  -webkit-appearance:none;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--cyan) 0%,
-      var(--purple) var(--fill),
-      rgba(255,255,255,.09) var(--fill),
-      rgba(255,255,255,.09) 100%
-    );
-
-  border-radius:99px;
-
-  outline:none;
-
-  cursor:pointer;
-
-  box-shadow:
-    0 0 13px
-    rgba(69,231,255,.08);
-}
-
-input[type=range]::-webkit-slider-runnable-track{
-  height:7px;
-
-  background:transparent;
-
-  border-radius:99px;
-}
-
-input[type=range]::-webkit-slider-thumb{
-  appearance:none;
-  -webkit-appearance:none;
-
-  width:19px;
-  height:19px;
-
-  margin-top:-6px;
-
-  border-radius:50%;
-
-  background:#d9fbff;
-
-  border:
-    3px solid
-    #10182d;
-
-  box-shadow:
-    0 0 0 1px
-    var(--cyan),
-
-    0 0 16px
-    rgba(69,231,255,.65);
-}
-
-input[type=range]::-moz-range-track{
-  height:7px;
-
-  background:
-    rgba(255,255,255,.09);
-
-  border-radius:99px;
-}
-
-input[type=range]::-moz-range-progress{
-  height:7px;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--cyan),
-      var(--purple)
-    );
-
-  border-radius:99px;
-}
-
-input[type=range]::-moz-range-thumb{
-  width:15px;
-  height:15px;
-
-  border-radius:50%;
-
-  background:#d9fbff;
-
-  border:
-    3px solid
-    #10182d;
-
-  box-shadow:
-    0 0 0 1px
-    var(--cyan),
-
-    0 0 16px
-    rgba(69,231,255,.65);
-}
-
-.desc{
-  color:#71809b;
-
-  font-size:11px;
-
-  line-height:1.45;
-
-  margin-top:7px;
-}
-
-.switch-row{
-  display:flex;
-
-  align-items:center;
-
-  justify-content:space-between;
-
-  gap:12px;
-
-  padding:12px;
-
-  border:
-    1px solid
-    var(--line2);
-
-  border-radius:13px;
-
-  background:
-    rgba(255,255,255,.025);
-}
-
-.switch-text{
-  font-size:12px;
-
-  font-weight:800;
-
-  color:#dce7fb;
-}
-
-.switch-text small{
-  display:block;
-
-  color:#71809b;
-
-  font-size:10px;
-
-  font-weight:500;
-
-  margin-top:3px;
-
-  line-height:1.35;
-}
-
-.switch{
-  width:46px;
-  height:25px;
-
-  position:relative;
-
-  flex:none;
-}
-
-.switch input{
-  display:none;
-}
-
-.switch-slider{
-  position:absolute;
-
-  inset:0;
-
-  border-radius:99px;
-
-  background:#20283c;
-
-  border:
-    1px solid
-    #ffffff10;
-
-  cursor:pointer;
-
-  transition:.2s;
-}
-
-.switch-slider:before{
-  content:"";
-
-  position:absolute;
-
-  width:17px;
-  height:17px;
-
-  left:3px;
-  top:3px;
-
-  border-radius:50%;
-
-  background:#68738b;
-
-  transition:.2s;
-}
-
-.switch input:checked+.switch-slider{
-  background:
-    rgba(69,231,255,.14);
-
-  border-color:
-    rgba(69,231,255,.42);
-
-  box-shadow:
-    0 0 18px
-    rgba(69,231,255,.14)
-    inset;
-}
-
-.switch input:checked+.switch-slider:before{
-  transform:
-    translateX(21px);
-
-  background:
-    var(--cyan);
-
-  box-shadow:
-    0 0 13px
-    var(--cyan);
-}
-
-.btn{
-  border:
-    1px solid
-    transparent;
-
-  border-radius:13px;
-
-  min-height:43px;
-
-  padding:
-    11px
-    16px;
-
-  font-size:12px;
-
-  font-weight:900;
-
-  cursor:pointer;
-
-  transition:.16s;
-}
-
-.btn:disabled{
-  opacity:.38;
-
-  cursor:not-allowed;
-
-  transform:none!important;
-}
-
-.btn-secondary{
-  color:#dce7fb;
-
-  background:
-    rgba(255,255,255,.035);
-
-  border-color:
-    var(--line2);
-}
-
-.btn-secondary:hover:not(:disabled){
-  background:
-    rgba(255,255,255,.07);
-
-  border-color:
-    rgba(255,255,255,.18);
-
-  transform:
-    translateY(-1px);
-}
-
-.btn-primary{
-  color:#031016;
-
-  background:
-    linear-gradient(
-      100deg,
-      #55eeff,
-      #a1f7ff
-    );
-
-  box-shadow:
-    0 0 25px
-    rgba(69,231,255,.15);
-}
-
-.btn-primary:hover:not(:disabled){
-  transform:
-    translateY(-1px);
-
-  box-shadow:
-    0 0 32px
-    rgba(69,231,255,.25);
-}
-
-.btn-reset{
-  width:100%;
-
-  margin-top:16px;
-}.previewbox{
-  padding:17px;
-}
-
-.preview-head{
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:center;
-
-  gap:10px;
-
-  margin-bottom:13px;
-}
-
-.preview-head h2{
-  margin:0;
-
-  font-size:14px;
-
-  font-weight:900;
-}
-
-.preview-state{
-  color:#71809b;
-
-  font-size:10px;
-
-  text-transform:uppercase;
-
-  letter-spacing:1px;
-}
-
-.previews{
-  display:grid;
-
-  grid-template-columns:
-    1fr
-    1fr;
-
-  gap:11px;
-}
-
-.pane-label{
-  display:flex;
-
-  align-items:center;
-
-  justify-content:space-between;
-
-  color:#8795af;
-
-  font-size:10px;
-
-  text-transform:uppercase;
-
-  letter-spacing:1px;
-
-  margin:
-    0
-    0
-    7px
-    2px;
-}
-
-.frame{
-  height:340px;
-
-  border:
-    1px solid
-    var(--line2);
-
-  border-radius:15px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  overflow:hidden;
-
-  position:relative;
-
-  background:
-    linear-gradient(
-      45deg,
-      rgba(255,255,255,.045) 25%,
-      transparent 25%
-    )
-    0 0/22px 22px,
-
-    linear-gradient(
-      -45deg,
-      rgba(255,255,255,.045) 25%,
-      transparent 25%
-    )
-    0 11px/22px 22px,
-
-    linear-gradient(
-      45deg,
-      transparent 75%,
-      rgba(255,255,255,.045) 75%
-    )
-    11px -11px/22px 22px,
-
-    linear-gradient(
-      -45deg,
-      transparent 75%,
-      rgba(255,255,255,.045) 75%
-    )
-    -11px 0/22px 22px,
-
-    #080d1a;
-}
-
-.frame:after{
-  content:"";
-
-  position:absolute;
-
-  inset:0;
-
-  pointer-events:none;
-
-  border:
-    1px solid
-    rgba(69,231,255,.04);
-
-  border-radius:15px;
-}
-
-.frame img{
-  max-width:100%;
-  max-height:100%;
-
-  object-fit:contain;
-
-  display:block;
-
-  position:relative;
-
-  z-index:1;
-}
-
-.empty-preview{
-  padding:24px;
-
-  color:#56627a;
-
-  font-size:12px;
-
-  text-align:center;
-
-  line-height:1.5;
-}
-
-.processing-overlay{
-  position:absolute;
-
-  inset:0;
-
-  z-index:3;
-
-  display:none;
-
-  align-items:center;
-
-  justify-content:center;
-
-  background:
-    rgba(4,8,20,.62);
-
-  backdrop-filter:blur(5px);
-}
-
-.processing-overlay.show{
-  display:flex;
-}
-
-.spinner{
-  width:34px;
-  height:34px;
-
-  border-radius:50%;
-
-  border:
-    3px solid
-    rgba(255,255,255,.10);
-
-  border-top-color:
-    var(--cyan);
-
-  border-right-color:
-    var(--purple);
-
-  animation:
-    spin .8s linear infinite;
-
-  box-shadow:
-    0 0 25px
-    rgba(69,231,255,.20);
-}
-
-@keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
-}
-
-.actions{
-  display:flex;
-
-  justify-content:center;
-
-  gap:9px;
-
-  flex-wrap:wrap;
-
-  margin-top:15px;
-}
-
-.progress-card{
-  margin-top:16px;
-
-  padding:16px;
-
-  display:none;
-}
-
-.progress-top{
-  display:flex;
-
-  justify-content:space-between;
-
-  gap:12px;
-
-  font-size:12px;
-
-  color:#b9c7df;
-
-  margin-bottom:8px;
-}
-
-.percent{
-  color:#9df4ff;
-
-  font-weight:900;
-}
-
-.track{
-  height:9px;
-
-  border-radius:99px;
-
-  overflow:hidden;
-
-  background:
-    rgba(255,255,255,.07);
-
-  border:
-    1px solid
-    rgba(255,255,255,.05);
-}
-
-.bar{
-  height:100%;
-
-  width:0;
-
-  border-radius:99px;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--cyan),
-      var(--purple),
-      var(--pink)
-    );
-
-  box-shadow:
-    0 0 18px
-    rgba(69,231,255,.45);
-
-  transition:
-    width .16s;
-}
-
-.status{
-  margin-top:8px;
-
-  color:#71809b;
-
-  font-size:11px;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-}
-
-.results{
-  display:grid;
-
-  grid-template-columns:
-    repeat(
-      auto-fill,
-      minmax(190px,1fr)
-    );
-
-  gap:12px;
-
-  margin-top:16px;
-}
-
-.result{
-  border:
-    1px solid
-    var(--line);
-
-  background:
-    rgba(10,15,31,.68);
-
-  border-radius:17px;
-
-  overflow:hidden;
-
-  position:relative;
-
-  box-shadow:
-    0 15px 40px
-    rgba(0,0,0,.25);
-}
-
-.result img{
-  width:100%;
-
-  height:165px;
-
-  object-fit:contain;
-
-  display:block;
-
-  background:
-    linear-gradient(
-      45deg,
-      rgba(255,255,255,.04) 25%,
-      transparent 25%
-    )
-    0 0/18px 18px,
-
-    linear-gradient(
-      -45deg,
-      rgba(255,255,255,.04) 25%,
-      transparent 25%
-    )
-    0 9px/18px 18px,
-
-    linear-gradient(
-      45deg,
-      transparent 75%,
-      rgba(255,255,255,.04) 75%
-    )
-    9px -9px/18px 18px,
-
-    linear-gradient(
-      -45deg,
-      transparent 75%,
-      rgba(255,255,255,.04) 75%
-    )
-    -9px 0/18px 18px,
-
-    #080d18;
-}
-
-.result-body{
-  padding:10px;
-}
-
-.result-name{
-  font-size:11px;
-
-  color:#c6d1e6;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-}
-
-.result-size{
-  font-size:10px;
-
-  color:#65728a;
-
-  margin-top:4px;
-}
-
-.done{
-  position:absolute;
-
-  top:8px;
-  left:8px;
-
-  padding:
-    4px
-    7px;
-
-  border-radius:999px;
-
-  background:
-    rgba(24,168,102,.86);
-
-  color:#eafff5;
-
-  font-size:8px;
-
-  font-weight:950;
-
-  letter-spacing:.7px;
-
-  border:
-    1px solid
-    rgba(82,245,160,.3);
-}
-
-.download-one{
-  position:absolute;
-
-  right:8px;
-  top:8px;
-
-  width:30px;
-  height:30px;
-
-  padding:0;
-
-  border-radius:9px;
-
-  color:#dffaff;
-
-  background:
-    rgba(5,10,22,.78);
-
-  border:
-    1px solid
-    rgba(69,231,255,.18);
-
-  cursor:pointer;
-}
-
-.download-one:hover{
-  background:
-    rgba(69,231,255,.12);
-
-  border-color:
-    rgba(69,231,255,.5);
-}
-
-.pagination{
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:6px;
-
-  flex-wrap:wrap;
-
-  margin-top:16px;
-}
-
-.page-btn{
-  min-width:37px;
-
-  padding:
-    9px
-    11px;
-
-  border-radius:10px;
-
-  color:#bfcce3;
-
-  background:
-    rgba(255,255,255,.035);
-
-  border:
-    1px solid
-    var(--line2);
-
-  cursor:pointer;
-
-  font-weight:800;
-
-  font-size:11px;
-}
-
-.page-btn:hover:not(:disabled){
-  border-color:
-    rgba(69,231,255,.3);
-}
-
-.page-btn.active{
-  color:#041117;
-
-  background:
-    var(--cyan);
-
-  border-color:
-    var(--cyan);
-
-  box-shadow:
-    0 0 17px
-    rgba(69,231,255,.2);
-}
-
-.page-btn:disabled{
-  opacity:.35;
-
-  cursor:not-allowed;
-}
-
-.page-info{
-  font-size:10px;
-
-  color:#68758d;
-
-  margin:
-    0
-    6px;
-}
-
-.note{
-  margin-top:14px;
-
-  text-align:center;
-
-  color:#56627a;
-
-  font-size:10px;
-
-  line-height:1.5;
-}
-
-.toast{
-  position:fixed;
-
-  left:50%;
-  bottom:22px;
-
-  z-index:20;
-
-  transform:
-    translate(
-      -50%,
-      20px
-    );
-
-  opacity:0;
-
-  pointer-events:none;
-
-  padding:
-    11px
-    15px;
-
-  border-radius:12px;
-
-  border:
-    1px solid
-    rgba(69,231,255,.24);
-
-  background:
-    rgba(7,12,27,.90);
-
-  backdrop-filter:blur(18px);
-
-  color:#dceeff;
-
-  font-size:12px;
-
-  font-weight:800;
-
-  box-shadow:
-    0 18px 50px
-    rgba(0,0,0,.4),
-
-    0 0 28px
-    rgba(69,231,255,.08);
-
-  transition:.22s;
-}
-
-.toast.show{
-  opacity:1;
-
-  transform:
-    translate(
-      -50%,
-      0
-    );
-}
-
-.toast.error{
-  border-color:
-    rgba(255,100,124,.4);
-
-  color:#ffd8df;
-}
-
-.locked{
-  opacity:.58;
-
-  pointer-events:none;
-}
-
-@media(max-width:850px){
-
-  .hero{
-    align-items:flex-start;
-
-    flex-direction:column;
-  }
-
-  .system-pill{
-    width:100%;
-  }
-
-  .workspace{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:620px){
-
-  main{
-    width:
-      min(
-        100% - 16px,
-        1220px
-      );
-
-    padding-top:18px;
-  }
-
-  h1{
-    letter-spacing:-2px;
-  }
-
-  .import-card{
-    padding:10px;
-  }
-
-  .drop{
-    min-height:210px;
-  }
-
-  .mode-grid{
-    grid-template-columns:
-      1fr
-      1fr;
-  }
-
-  .previews{
-    grid-template-columns:1fr;
-  }
-
-  .frame{
-    height:270px;
-  }
-
-  .actions .btn{
-    width:100%;
-  }
-
-}
-
-@media(max-width:430px){
-
-  .mode-grid{
-    grid-template-columns:1fr;
-  }
-
-}
-</style>
-</head>
-
-<body>
-
-<main>
-
-<header class="hero">
-
-  <div>
-
-    <div class="eyebrow">
-      <i></i>
-      Local AI processing
-    </div>
-
-    <h1>
-      Cut It
-      <span class="accent">Out!</span>
-    </h1>
-
-    <p class="subtitle">
-      A futuristic, browser-based background remover.
-      Your images stay on your device while the AI isolates
-      the subject.
-    </p>
-
-  </div>
-
-  <div class="system-pill">
-
-    <div class="top">
-      <span class="dot"></span>
-
-      <span id="systemState">
-        SYSTEM READY
-      </span>
-    </div>
-
-    <small id="systemDetail">
-      Waiting for an image
-    </small>
-
-  </div>
-
-</header>
-
-
-<section class="glass import-card">
-
-  <div class="drop" id="drop">
-
-    <div class="drop-icon">
-      ⌁
-    </div>
-
-    <div class="drop-title">
-      Import your image matrix
-    </div>
-
-    <div class="drop-sub">
-      Click here or drag & drop PNG, JPG, WEBP and other image files
-    </div>
-
-    <div class="count" id="count">
-      ◉
-      <strong>0</strong>
-      images loaded
-    </div>
-
-    <input
-      id="files"
-      type="file"
-      accept="image/*"
-      multiple
-    >
-
-  </div>
-
-
-  <div class="workspace">
-
-
-    <section class="panel" id="settings">
-
-      <div class="panel-title">
-
-        <h2>
-          CONTROL CORE
-        </h2>
-
-        <span>
-          v2.0
-        </span>
-
-      </div>
-
-
-      <div class="setting">
-
-        <div class="setting-head">
-
-          <span class="setting-name">
-
-            Removal Mode
-
-            <span
-              class="help"
-              title="Normal preserves more uncertain edge pixels. Aggressive pushes the segmentation harder."
-            >
-              ?
-            </span>
-
-          </span>
-
-        </div>
-
-
-        <div class="mode-grid">
-
-          <button
-            type="button"
-            class="mode-btn active"
-            id="modeNormal"
-          >
-
-            <b>
-              STANDARD
-            </b>
-
-            <small>
-              Balanced subject isolation.
-            </small>
-
-          </button>
-
-
-          <button
-            type="button"
-            class="mode-btn"
-            id="modeAggressive"
-          >
-
-            <b>
-              AGGRESSIVE
-            </b>
-
-            <small>
-              Stronger difficult-background cleanup.
-            </small>
-
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <div class="setting">
-
-        <div class="setting-head">
-
-          <span class="setting-name">
-
-            Tolerance
-
-            <span
-              class="help"
-              title="Controls how much low-confidence mask information is discarded."
-            >
-              ?
-            </span>
-
-          </span>
-
-          <span
-            class="value"
-            id="tolVal"
-          >
-            18
-          </span>
-
-        </div>
-
-
-        <div class="range-wrap">
-
-          <input
-            id="tol"
-            type="range"
-            min="1"
-            max="100"
-            value="18"
-          >
-
-        </div>
-
-
-        <div class="desc">
-          Higher values remove more uncertain pixels.
-        </div>
-
-      </div>
-
-
-      <div class="setting">
-
-        <div class="setting-head">
-
-          <span class="setting-name">
-
-            Safety Margin
-
-            <span
-              class="help"
-              title="Keeps a tiny amount of uncertain edge information instead of making a hard cut."
-            >
-              ?
-            </span>
-
-          </span>
-
-          <span
-            class="value"
-            id="padVal"
-          >
-            2 px
-          </span>
-
-        </div>
-
-
-        <div class="range-wrap">
-
-          <input
-            id="pad"
-            type="range"
-            min="0"
-            max="20"
-            value="2"
-          >
-
-        </div>
-
-
-        <div class="desc">
-          Protects uncertain pixels around subject boundaries.
-        </div>
-
-      </div>
-
-
-      <div class="setting">
-
-        <div class="setting-head">
-
-          <span class="setting-name">
-            Self Improvement
-          </span>
-
-        </div>
-
-
-        <div class="switch-row">
-
-          <div class="switch-text">
-
-            Edge Refinement
-
-            <small>
-              Runs a lightweight local cleanup pass after AI segmentation.
-            </small>
-
-          </div>
-
-
-          <label class="switch">
-
-            <input
-              type="checkbox"
-              id="selfImprove"
-              checked
-            >
-
-            <span class="switch-slider"></span>
-
-          </label>
-
-        </div>
-
-      </div>
-
-
-      <button
-        type="button"
-        class="btn btn-secondary btn-reset"
-        id="reset"
-      >
-        ↻ Reset controls
-      </button>
-
-    </section>
-
-
-    <section class="panel previewbox">
-
-      <div class="preview-head">
-
-        <h2>
-          VISUAL FEED
-        </h2>
-
-        <span
-          class="preview-state"
-          id="previewState"
-        >
-          NO SIGNAL
-        </span>
-
-      </div>
-
-
-      <div class="previews">
-
-
-        <div class="pane">
-
-          <div class="pane-label">
-
-            <span>
-              Input
-            </span>
-
-            <span>
-              ORIGINAL
-            </span>
-
-          </div>
-
-
-          <div
-            class="frame"
-            id="originalFrame"
-          >
-
-            <div class="empty-preview">
-              Load an image to establish the visual feed.
-            </div>
-
-            <img
-              id="origPreview"
-              style="display:none"
-              alt="Original preview"
-            >
-
-          </div>
-
-        </div>
-
-
-        <div class="pane">
-
-          <div class="pane-label">
-
-            <span>
-              Output
-            </span>
-
-            <span>
-              TRANSPARENT
-            </span>
-
-          </div>
-
-
-          <div
-            class="frame"
-            id="resultFrame"
-          >
-
-            <div class="empty-preview">
-              The transparent result will appear here.
-            </div>
-
-            <img
-              id="resultPreview"
-              style="display:none"
-              alt="Background removed preview"
-            >
-
-            <div
-              class="processing-overlay"
-              id="previewOverlay"
-            >
-
-              <div class="spinner"></div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </div>
-
-
-  <div class="actions">
-
-    <button
-      type="button"
-      class="btn btn-secondary"
-      id="clean"
-    >
-      ✦ Remove Background
-    </button>
-
-
-    <button
-      type="button"
-      class="btn btn-primary"
-      id="downloadAll"
-      disabled
-    >
-      ⇩ Download All (.ZIP)
-    </button>
-
-  </div>
-
-
-  <div class="note">
-
-    Local processing • Original dimensions preserved •
-    AI model is downloaded once and then cached by your browser.
-
-  </div>
-
-</section>
-
-
-<section
-  class="glass progress-card"
-  id="progressCard"
->
-
-  <div class="progress-top">
-
-    <span id="progressText">
-      Preparing AI engine…
-    </span>
-
-    <span
-      class="percent"
-      id="percent"
-    >
-      0%
-    </span>
-
-  </div>
-
-
-  <div class="track">
-
-    <div
-      class="bar"
-      id="bar"
-    ></div>
-
-  </div>
-
-
-  <div
-    class="status"
-    id="status"
-  >
-    Stand by.
-  </div>
-
-</section>
-
-
-<div
-  class="results"
-  id="results"
-></div>
-
-
-<div
-  class="pagination"
-  id="pagination"
-></div>
-
-</main>
-
-
-<div
-  class="toast"
-  id="toast"
-></div><script type="module">
-
-const $ = id =>
-  document.getElementById(id);
-
-
-/* =========================
-   DOM REFERENCES
-========================= */
+position:relative;
+min-height:235px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+border:1px dashed rgba(90,180,255,.28);
+border-radius:19px;
+cursor:pointer;
+overflow:hidden;
+transition:
+transform .2s ease,
+border-color .2s ease,<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
 
 const filesEl = $("files");
 const drop = $("drop");
@@ -2258,1976 +256,2530 @@ const count = $("count");
 
 const settings = $("settings");
 
-const modeNormal =
-  $("modeNormal");
+const modeNormal = $("modeNormal");
+const modeAggressive = $("modeAggressive");
 
-const modeAggressive =
-  $("modeAggressive");
+const tolEl = $("tol");
+const padEl = $("pad");
 
-const tolEl =
-  $("tol");
+const tolVal = $("tolVal");
+const padVal = $("padVal");
 
-const padEl =
-  $("pad");
+const selfImprove = $("selfImprove");
+const resetBtn = $("reset");
 
-const tolVal =
-  $("tolVal");
+const origPreview = $("origPreview");
+const cropPreview = $("cropPreview");
 
-const padVal =
-  $("padVal");
+const originalFrame = $("originalFrame");
+const resultFrame = $("resultFrame");
 
-const selfImprove =
-  $("selfImprove");
+const cleanBtn = $("clean");
+const downloadAll = $("downloadAll");
 
-const resetBtn =
-  $("reset");
+const progressCard = $("progressCard");
+const progressText = $("progressText");
+const percent = $("percent");
+const bar = $("bar");
+const status = $("status");
 
-const origPreview =
-  $("origPreview");
-
-const resultPreview =
-  $("resultPreview");
-
-const originalFrame =
-  $("originalFrame");
-
-const resultFrame =
-  $("resultFrame");
-
-const previewOverlay =
-  $("previewOverlay");
-
-const previewState =
-  $("previewState");
-
-const cleanBtn =
-  $("clean");
-
-const downloadAll =
-  $("downloadAll");
-
-const progressCard =
-  $("progressCard");
-
-const progressText =
-  $("progressText");
-
-const percent =
-  $("percent");
-
-const bar =
-  $("bar");
-
-const status =
-  $("status");
-
-const results =
-  $("results");
-
-const pagination =
-  $("pagination");
-
-const toast =
-  $("toast");
-
-const systemState =
-  $("systemState");
-
-const systemDetail =
-  $("systemDetail");
-
-
-/* =========================
-   STATE
-========================= */
+const results = $("results");
+const pagination = $("pagination");
 
 let selected = [];
-
 let outputs = [];
 
 let currentPage = 1;
-
 let cropMode = "normal";
 
 let previewURL = null;
-
 let previewToken = 0;
 
-let remover = null;
-
-let modelLoading = null;
-
-let toastTimer = null;
+let resultPreviewURL = null;
 
 const PAGE_SIZE = 20;
 
 
-/* =========================
-   TOAST
-========================= */
-
-function showToast(
-  message,
-  error = false
-){
-
-  clearTimeout(toastTimer);
-
-  toast.textContent =
-    message;
-
-  toast.classList.toggle(
-    "error",
-    error
-  );
-
-  toast.classList.add(
-    "show"
-  );
-
-  toastTimer =
-    setTimeout(
-      () =>
-        toast.classList.remove(
-          "show"
-        ),
-      3200
-    );
-}
-
-
-/* =========================
-   SLIDER
-========================= */
+/* -----------------------------
+   SLIDER VISUALS
+----------------------------- */
 
 function updateSlider(el){
 
-  const min =
-    Number(el.min);
+    const min = Number(el.min);
+    const max = Number(el.max);
+    const value = Number(el.value);
 
-  const max =
-    Number(el.max);
+    const pct =
+        ((value - min) / (max - min)) * 100;
 
-  const value =
-    Number(el.value);
-
-  const pct =
-    ((value - min) /
-      (max - min)) *
-    100;
-
-  el.style.setProperty(
-    "--fill",
-    pct + "%"
-  );
+    el.style.setProperty(
+        "--fill",
+        pct + "%"
+    );
 }
 
+updateSlider(tolEl);
+updateSlider(padEl);
 
-/* =========================
-   COUNT
-========================= */
+
+/* -----------------------------
+   FILE COUNT
+----------------------------- */
 
 function updateCount(){
 
-  count.innerHTML =
-    `
-      ◉
-      <strong>
-        ${selected.length}
-      </strong>
-
-      ${
-        selected.length === 1
-          ? "image"
-          : "images"
-      }
-
-      loaded
+    count.innerHTML = `
+        <span style="color:#38e98b">✓</span>
+        <strong>${selected.length}</strong>
+        ${selected.length === 1 ? "image" : "images"} selected
     `;
-
-  systemDetail.textContent =
-    selected.length
-      ? `${selected.length} visual${
-          selected.length === 1
-            ? ""
-            : "s"
-        } ready`
-      : "Waiting for an image";
 }
 
 
-/* =========================
-   CLEAR RESULT PREVIEW
-========================= */
+/* -----------------------------
+   IMAGE IMPORT
+----------------------------- */
 
-function clearResultPreview(){
+function setFiles(files){
 
-  resultPreview.style.display =
-    "none";
-
-  resultPreview.removeAttribute(
-    "src"
-  );
-
-  const empty =
-    resultFrame.querySelector(
-      ".empty-preview"
+    const valid = files.filter(
+        file =>
+            file &&
+            file.type &&
+            file.type.startsWith("image/")
     );
 
-  if(empty){
-    empty.style.display =
-      "block";
-  }
+    selected = valid;
+
+    updateCount();
+
+    previewToken++;
+
+    if(resultPreviewURL){
+        URL.revokeObjectURL(resultPreviewURL);
+        resultPreviewURL = null;
+    }
+
+    cropPreview.src = "";
+    cropPreview.style.display = "none";
+
+    const resultEmpty =
+        resultFrame.querySelector(".empty-preview");
+
+    if(resultEmpty){
+        resultEmpty.style.display = "block";
+    }
+
+    if(!selected.length){
+
+        origPreview.src = "";
+        origPreview.style.display = "none";
+
+        const originalEmpty =
+            originalFrame.querySelector(".empty-preview");
+
+        if(originalEmpty){
+            originalEmpty.style.display = "block";
+        }
+
+        return;
+    }
+
+    showPreview(selected[0]);
 }
 
 
-/* =========================
-   FILE IMPORT
-========================= */
+/* Clicking anywhere in drop zone */
 
-function setFiles(fileList){
+drop.addEventListener("click", event => {
 
-  const valid =
-    Array.from(
-      fileList || []
-    ).filter(
-      file =>
-        file &&
-        file.type &&
-        file.type.startsWith(
-          "image/"
+    if(event.target === filesEl){
+        return;
+    }
+
+    filesEl.click();
+
+});
+
+
+/* File picker */
+
+filesEl.addEventListener("change", () => {
+
+    setFiles(
+        Array.from(filesEl.files || [])
+    );
+
+});
+
+
+/* Drag over */
+
+drop.addEventListener("dragover", event => {
+
+    event.preventDefault();
+
+    event.dataTransfer.dropEffect = "copy";
+
+    drop.classList.add("drag");
+
+});
+
+
+/* Drag leave */
+
+drop.addEventListener("dragleave", event => {
+
+    if(!drop.contains(event.relatedTarget)){
+        drop.classList.remove("drag");
+    }
+
+});
+
+
+/* Drop */
+
+drop.addEventListener("drop", event => {
+
+    event.preventDefault();
+
+    drop.classList.remove("drag");
+
+    setFiles(
+        Array.from(
+            event.dataTransfer.files || []
         )
     );
 
-  if(!valid.length){
-
-    showToast(
-      "No supported image files were detected.",
-      true
-    );
-
-    return;
-  }
-
-  selected = valid;
-
-  updateCount();
-
-  clearResultPreview();
-
-  showPreview(
-    selected[0]
-  );
-
-  showToast(
-    `${selected.length} image${
-      selected.length === 1
-        ? ""
-        : "s"
-    } imported.`
-  );
-}
-
-
-/* =========================
-   IMPORT BUTTON
-========================= */
-
-drop.addEventListener(
-  "click",
-  () =>
-    filesEl.click()
-);
-
-
-/* =========================
-   FILE INPUT
-========================= */
-
-filesEl.addEventListener(
-  "change",
-  () => {
-
-    setFiles(
-      filesEl.files
-    );
-
-    /*
-      Reset the input so selecting
-      the exact same image again
-      still triggers change.
-    */
-
-    filesEl.value = "";
-
-  }
-);
-
-
-/* =========================
-   DRAG ENTER
-========================= */
-
-[
-  "dragenter",
-  "dragover"
-].forEach(type => {
-
-  drop.addEventListener(
-    type,
-    event => {
-
-      event.preventDefault();
-
-      event.stopPropagation();
-
-      drop.classList.add(
-        "drag"
-      );
-
-    }
-  );
-
 });
 
 
-/* =========================
-   DRAG LEAVE
-========================= */
-
-[
-  "dragleave",
-  "drop"
-].forEach(type => {
-
-  drop.addEventListener(
-    type,
-    event => {
-
-      event.preventDefault();
-
-      event.stopPropagation();
-
-      drop.classList.remove(
-        "drag"
-      );
-
-    }
-  );
-
-});
-
-
-/* =========================
-   DROP
-========================= */
-
-drop.addEventListener(
-  "drop",
-  event => {
-
-    setFiles(
-      event.dataTransfer.files
-    );
-
-  }
-);
-
-
-/* =========================
-   IMAGE PREVIEW
-========================= */
+/* -----------------------------
+   PREVIEW
+----------------------------- */
 
 async function showPreview(file){
 
-  if(previewURL){
+    if(previewURL){
+        URL.revokeObjectURL(previewURL);
+        previewURL = null;
+    }
 
-    URL.revokeObjectURL(
-      previewURL
-    );
+    previewURL =
+        URL.createObjectURL(file);
 
-  }
+    origPreview.src = previewURL;
 
-  previewURL =
-    URL.createObjectURL(
-      file
-    );
+    origPreview.style.display = "block";
 
-  origPreview.src =
-    previewURL;
+    const empty =
+        originalFrame.querySelector(".empty-preview");
 
-  origPreview.style.display =
-    "block";
+    if(empty){
+        empty.style.display = "none";
+    }
 
-  const empty =
-    originalFrame.querySelector(
-      ".empty-preview"
-    );
-
-  if(empty){
-    empty.style.display =
-      "none";
-  }
-
-  previewState.textContent =
-    "READY";
-
-  systemState.textContent =
-    "IMAGE LINKED";
-
-  await updatePreview();
+    await updatePreview();
 
 }
 
 
-/* =========================
-   LOAD IMAGE
-========================= */
+/* -----------------------------
+   IMAGE LOADER
+----------------------------- */
 
 function loadImage(file){
 
-  return new Promise(
-    (resolve,reject) => {
+    return new Promise((resolve, reject) => {
 
-      const url =
-        URL.createObjectURL(
-          file
-        );
+        const url =
+            URL.createObjectURL(file);
 
-      const img =
-        new Image();
+        const img =
+            new Image();
 
-      img.onload = () => {
+        img.onload = () => {
 
-        URL.revokeObjectURL(
-          url
-        );
+            URL.revokeObjectURL(url);
 
-        resolve(img);
+            resolve(img);
 
-      };
+        };
 
-      img.onerror = () => {
+        img.onerror = () => {
 
-        URL.revokeObjectURL(
-          url
-        );
+            URL.revokeObjectURL(url);
 
-        reject(
-          new Error(
-            "Could not load this image."
-          )
-        );
+            reject(
+                new Error(
+                    "Could not load image."
+                )
+            );
 
-      };
+        };
 
-      img.src =
-        url;
+        img.src = url;
 
-    }
-  );
+    });
 
 }
 
 
-/* =========================
+/* -----------------------------
    MODE
-========================= */
+----------------------------- */
 
 function setMode(mode){
 
-  cropMode =
-    mode;
+    cropMode = mode;
 
-  modeNormal.classList.toggle(
-    "active",
-    mode === "normal"
-  );
+    modeNormal.classList.toggle(
+        "active",
+        mode === "normal"
+    );
 
-  modeAggressive.classList.toggle(
-    "active",
-    mode === "aggressive"
-  );
+    modeAggressive.classList.toggle(
+        "active",
+        mode === "aggressive"
+    );
 
-  if(selected.length){
-
-    updatePreview();
-
-  }
+    if(selected.length){
+        updatePreview();
+    }
 
 }
 
 
 modeNormal.addEventListener(
-  "click",
-  () =>
-    setMode(
-      "normal"
-    )
+    "click",
+    () => {
+
+        if(!modeNormal.disabled){
+            setMode("normal");
+        }
+
+    }
 );
 
 
 modeAggressive.addEventListener(
-  "click",
-  () =>
-    setMode(
-      "aggressive"
-    )
+    "click",
+    () => {
+
+        if(!modeAggressive.disabled){
+            setMode("aggressive");
+        }
+
+    }
 );
 
 
-/* =========================
+/* -----------------------------
    TOLERANCE
-========================= */
+----------------------------- */
 
 tolEl.addEventListener(
-  "input",
-  () => {
+    "input",
+    () => {
 
-    tolVal.textContent =
-      tolEl.value;
+        tolVal.textContent =
+            tolEl.value;
 
-    updateSlider(
-      tolEl
-    );
+        updateSlider(tolEl);
 
-    if(selected.length){
-
-      updatePreview();
+        if(selected.length){
+            updatePreview();
+        }
 
     }
-
-  }
 );
 
 
-/* =========================
+/* -----------------------------
    SAFETY MARGIN
-========================= */
+----------------------------- */
 
 padEl.addEventListener(
-  "input",
-  () => {
+    "input",
+    () => {
 
-    padVal.textContent =
-      padEl.value +
-      " px";
+        padVal.textContent =
+            padEl.value + " px";
 
-    updateSlider(
-      padEl
-    );
+        updateSlider(padEl);
 
-    if(selected.length){
-
-      updatePreview();
+        if(selected.length){
+            updatePreview();
+        }
 
     }
-
-  }
 );
 
 
-/* =========================
-   SELF IMPROVEMENT
-========================= */
-
-selfImprove.addEventListener(
-  "change",
-  () => {
-
-    if(selected.length){
-
-      updatePreview();
-
-    }
-
-  }
-);
-
-
-/* =========================
+/* -----------------------------
    RESET
-========================= */
+----------------------------- */
 
 resetBtn.addEventListener(
-  "click",
-  () => {
+    "click",
+    () => {
 
-    tolEl.value =
-      "18";
+        tolEl.value = "18";
+        padEl.value = "2";
 
-    padEl.value =
-      "2";
+        selfImprove.checked = true;
 
-    selfImprove.checked =
-      true;
+        tolVal.textContent = "18";
+        padVal.textContent = "2 px";
 
-    tolVal.textContent =
-      "18";
+        updateSlider(tolEl);
+        updateSlider(padEl);
 
-    padVal.textContent =
-      "2 px";
+        setMode("normal");
 
-    updateSlider(
-      tolEl
-    );
-
-    updateSlider(
-      padEl
-    );
-
-    setMode(
-      "normal"
-    );
-
-    showToast(
-      "Controls reset."
-    );
-
-  }
+    }
 );
 
 
-/* =========================
-   LOCK SETTINGS
-========================= */
+/* -----------------------------
+   LOCK CONTROLS
+----------------------------- */
 
 function setLocked(value){
 
-  settings.classList.toggle(
-    "locked",
-    value
-  );
-
-  resetBtn.disabled =
-    value;
-
-}
-
-
-/* =========================
-   PROGRESS
-========================= */
-
-function setProgress(
-  value,
-  text
-){
-
-  const v =
-    Math.max(
-      0,
-      Math.min(
-        100,
+    settings.classList.toggle(
+        "locked",
         value
-      )
     );
 
-  bar.style.width =
-    v + "%";
+    tolEl.disabled = value;
+    padEl.disabled = value;
 
-  percent.textContent =
-    Math.round(v) +
-    "%";
+    resetBtn.disabled = value;
 
-  if(text){
+    modeNormal.disabled = value;
+    modeAggressive.disabled = value;
 
-    progressText.textContent =
-      text;
-
-  }
+    selfImprove.disabled = value;
 
 }
 
 
-/* =========================
-   INITIALIZE UI
-========================= */
+/* -----------------------------
+   PROGRESS
+----------------------------- */
 
-updateSlider(
-  tolEl
-);
+function setProgress(value, text){
 
-updateSlider(
-  padEl
-);
+    const v =
+        Math.max(
+            0,
+            Math.min(100, value)
+        );
+
+    bar.style.width =
+        v + "%";
+
+    percent.textContent =
+        Math.round(v) + "%";
+
+    if(text){
+        progressText.textContent =
+            text;
+    }
+
+}
+
+
+/* -----------------------------
+   INITIAL STATE
+----------------------------- */
 
 updateCount();
 
-setMode(
-  "normal"
-);
+updateSlider(tolEl);
+updateSlider(padEl);
 
-</script><script type="module">
+setMode("normal");
 
-/* =========================
-   OUTPUT NAME
-========================= */
+</script><script>
 
-function outputName(name){
+/* =========================================================
+   AI BACKGROUND REMOVER
+   BRIA RMBG-1.4
+========================================================= */
 
-  const dot =
-    name.lastIndexOf(
-      "."
-    );
+let remover = null;
+let modelLoading = null;
 
 
-  const base =
-    dot > 0
-      ? name.slice(
-          0,
-          dot
-        )
-      : name;
+/* -----------------------------
+   LOAD MODEL
+----------------------------- */
 
+async function getRemover(){
 
-  return (
-    base +
-    ".png"
-  );
+    if(remover){
+        return remover;
+    }
 
-}
+    if(modelLoading){
+        return modelLoading;
+    }
 
+    modelLoading = (async () => {
 
-/* =========================
-   DOWNLOAD BLOB
-========================= */
+        status.textContent =
+            "Loading BRIA AI model…";
 
-function downloadBlob(
-  blob,
-  name
-){
+        progressText.textContent =
+            "Downloading AI model…";
 
-  const url =
-    URL.createObjectURL(
-      blob
-    );
+        try{
 
-
-  const a =
-    document.createElement(
-      "a"
-    );
-
-
-  a.href =
-    url;
-
-  a.download =
-    name;
-
-
-  document.body.appendChild(
-    a
-  );
-
-
-  a.click();
-
-
-  a.remove();
-
-
-  setTimeout(
-    () =>
-      URL.revokeObjectURL(
-        url
-      ),
-    4000
-  );
-
-}
-
-
-/* =========================
-   RENDER RESULTS
-========================= */
-
-function renderResults(){
-
-  results.innerHTML =
-    "";
-
-
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        outputs.length /
-        PAGE_SIZE
-      )
-    );
-
-
-  if(
-    currentPage >
-    totalPages
-  ){
-
-    currentPage =
-      totalPages;
-
-  }
-
-
-  const start =
-    (currentPage - 1) *
-    PAGE_SIZE;
-
-
-  outputs
-    .slice(
-      start,
-      start + PAGE_SIZE
-    )
-    .forEach(
-      item => {
-
-        const card =
-          document.createElement(
-            "div"
-          );
-
-        card.className =
-          "result";
-
-
-        const img =
-          document.createElement(
-            "img"
-          );
-
-        img.src =
-          URL.createObjectURL(
-            item.blob
-          );
-
-        img.alt =
-          item.name;
-
-
-        img.onload =
-          () => {
-
-            URL.revokeObjectURL(
-              img.src
+            const mod = await import(
+                "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1"
             );
 
-          };
+            const pipeline =
+                mod.pipeline;
 
+            /*
+             * BRIA RMBG-1.4 officially uses
+             * the image-segmentation pipeline
+             * in Transformers.js.
+             */
 
-        const done =
-          document.createElement(
-            "div"
-          );
-
-        done.className =
-          "done";
-
-        done.textContent =
-          "DONE";
-
-
-        const button =
-          document.createElement(
-            "button"
-          );
-
-        button.type =
-          "button";
-
-        button.className =
-          "download-one";
-
-        button.textContent =
-          "⇩";
-
-        button.title =
-          "Download PNG";
-
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            downloadBlob(
-              item.blob,
-              item.name
+            remover = await pipeline(
+                "image-segmentation",
+                "briaai/RMBG-1.4"
             );
 
-          }
-        );
+            status.textContent =
+                "AI model ready.";
 
+            return remover;
 
-        const body =
-          document.createElement(
-            "div"
-          );
+        }catch(error){
 
-        body.className =
-          "result-body";
+            console.error(
+                "AI MODEL ERROR:",
+                error
+            );
 
+            throw new Error(
+                "The AI model could not load. Make sure the page is running on HTTPS or localhost, then try again."
+            );
 
-        const name =
-          document.createElement(
-            "div"
-          );
+        }finally{
 
-        name.className =
-          "result-name";
+            modelLoading = null;
 
-        name.textContent =
-          item.name;
+        }
 
-        name.title =
-          item.name;
+    })();
 
-
-        const size =
-          document.createElement(
-            "div"
-          );
-
-        size.className =
-          "result-size";
-
-        size.textContent =
-          `${item.width} × ${item.height}`;
-
-
-        body.append(
-          name,
-          size
-        );
-
-
-        card.append(
-          img,
-          done,
-          button,
-          body
-        );
-
-
-        results.appendChild(
-          card
-        );
-
-      }
-    );
-
-
-  renderPagination();
+    return modelLoading;
 
 }
 
 
-/* =========================
-   PAGINATION
-========================= */
-
-function renderPagination(){
-
-  pagination.innerHTML =
-    "";
-
-
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        outputs.length /
-        PAGE_SIZE
-      )
-    );
-
-
-  if(
-    totalPages <= 1
-  ){
-
-    return;
-
-  }
-
-
-  const prev =
-    document.createElement(
-      "button"
-    );
-
-
-  prev.type =
-    "button";
-
-  prev.className =
-    "page-btn";
-
-  prev.textContent =
-    "‹";
-
-  prev.disabled =
-    currentPage === 1;
-
-
-  prev.addEventListener(
-    "click",
-    () => {
-
-      if(
-        currentPage > 1
-      ){
-
-        currentPage--;
-
-        renderResults();
-
-      }
-
-    }
-  );
-
-
-  pagination.appendChild(
-    prev
-  );
-
-
-  const first =
-    Math.max(
-      1,
-      Math.min(
-        currentPage - 3,
-        totalPages - 6
-      )
-    );
-
-
-  const last =
-    Math.min(
-      totalPages,
-      first + 6
-    );
-
-
-  for(
-    let p=first;
-    p<=last;
-    p++
-  ){
-
-    const button =
-      document.createElement(
-        "button"
-      );
-
-
-    button.type =
-      "button";
-
-    button.className =
-      "page-btn" +
-      (
-        p === currentPage
-          ? " active"
-          : ""
-      );
-
-
-    button.textContent =
-      p;
-
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        currentPage =
-          p;
-
-        renderResults();
-
-      }
-    );
-
-
-    pagination.appendChild(
-      button
-    );
-
-  }
-
-
-  const next =
-    document.createElement(
-      "button"
-    );
-
-
-  next.type =
-    "button";
-
-  next.className =
-    "page-btn";
-
-  next.textContent =
-    "›";
-
-  next.disabled =
-    currentPage ===
-    totalPages;
-
-
-  next.addEventListener(
-    "click",
-    () => {
-
-      if(
-        currentPage <
-        totalPages
-      ){
-
-        currentPage++;
-
-        renderResults();
-
-      }
-
-    }
-  );
-
-
-  pagination.appendChild(
-    next
-  );
-
-
-  const info =
-    document.createElement(
-      "span"
-    );
-
-
-  info.className =
-    "page-info";
-
-
-  info.textContent =
-    `Page ${currentPage} / ${totalPages} • ${outputs.length} images`;
-
-
-  pagination.appendChild(
-    info
-  );
-
-}
-
-
-/* =========================
-   MAIN PROCESS BUTTON
-========================= */
-
-cleanBtn.addEventListener(
-  "click",
-  async () => {
+/* -----------------------------
+   RAW IMAGE -> CANVAS
+----------------------------- */
+
+function rawImageToCanvas(raw){
 
     if(
-      !selected.length
+        !raw ||
+        !raw.data ||
+        !raw.width ||
+        !raw.height
     ){
 
-      showToast(
-        "Import at least one image first.",
-        true
-      );
+        throw new Error(
+            "Invalid AI mask returned."
+        );
 
-      return;
+    }
+
+    const width =
+        Number(raw.width);
+
+    const height =
+        Number(raw.height);
+
+    const channels =
+        Number(raw.channels || 1);
+
+    const data =
+        new Uint8ClampedArray(raw.data);
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx =
+        canvas.getContext(
+            "2d",
+            {
+                willReadFrequently:true
+            }
+        );
+
+    const rgba =
+        new Uint8ClampedArray(
+            width * height * 4
+        );
+
+
+    /*
+     * Single-channel mask.
+     */
+
+    if(channels === 1){
+
+        for(
+            let p = 0,
+                i = 0;
+
+            p < width * height;
+
+            p++,
+            i += 4
+        ){
+
+            const value =
+                data[p];
+
+            rgba[i] = 255;
+            rgba[i + 1] = 255;
+            rgba[i + 2] = 255;
+            rgba[i + 3] = value;
+
+        }
+
+    }
+
+    /*
+     * RGBA mask.
+     */
+
+    else if(channels === 4){
+
+        for(
+            let p = 0,
+                i = 0;
+
+            p < width * height;
+
+            p++,
+            i += 4
+        ){
+
+            const r =
+                data[i];
+
+            const g =
+                data[i + 1];
+
+            const b =
+                data[i + 2];
+
+            const a =
+                data[i + 3];
+
+            const value =
+                Math.round(
+                    (r + g + b) / 3
+                );
+
+            rgba[i] = 255;
+            rgba[i + 1] = 255;
+            rgba[i + 2] = 255;
+
+            /*
+             * Some models use alpha,
+             * some use RGB grayscale.
+             */
+
+            rgba[i + 3] =
+                Math.max(
+                    value,
+                    a
+                );
+
+        }
+
+    }
+
+    /*
+     * RGB mask.
+     */
+
+    else if(channels === 3){
+
+        for(
+            let p = 0,
+                i = 0;
+
+            p < width * height;
+
+            p++,
+            i += 4
+        ){
+
+            const value =
+                Math.round(
+                    (
+                        data[p * 3] +
+                        data[p * 3 + 1] +
+                        data[p * 3 + 2]
+                    ) / 3
+                );
+
+            rgba[i] = 255;
+            rgba[i + 1] = 255;
+            rgba[i + 2] = 255;
+            rgba[i + 3] = value;
+
+        }
+
+    }
+
+    else{
+
+        throw new Error(
+            "Unsupported AI mask format."
+        );
+
+    }
+
+    ctx.putImageData(
+        new ImageData(
+            rgba,
+            width,
+            height
+        ),
+        0,
+        0
+    );
+
+    return canvas;
+
+}
+
+
+/* -----------------------------
+   GET AI MASK
+----------------------------- */
+
+async function removeBackground(file){
+
+    const pipe =
+        await getRemover();
+
+    const url =
+        URL.createObjectURL(file);
+
+    try{
+
+        status.textContent =
+            "Running AI segmentation…";
+
+        const output =
+            await pipe(url);
+
+        console.log(
+            "BRIA OUTPUT:",
+            output
+        );
+
+
+        if(!output){
+            throw new Error(
+                "The AI model returned nothing."
+            );
+        }
+
+
+        /*
+         * Normal image-segmentation output:
+         *
+         * [
+         *   {
+         *      label,
+         *      score,
+         *      mask: RawImage
+         *   }
+         * ]
+         */
+
+        if(
+            Array.isArray(output) &&
+            output.length
+        ){
+
+            /*
+             * Find an item containing a mask.
+             */
+
+            const item =
+                output.find(
+                    entry =>
+                        entry &&
+                        entry.mask &&
+                        entry.mask.data
+                );
+
+            if(item){
+
+                return rawImageToCanvas(
+                    item.mask
+                );
+
+            }
+
+
+            /*
+             * Some models may return
+             * RawImage directly.
+             */
+
+            const direct =
+                output.find(
+                    entry =>
+                        entry &&
+                        entry.data &&
+                        entry.width &&
+                        entry.height
+                );
+
+            if(direct){
+
+                return rawImageToCanvas(
+                    direct
+                );
+
+            }
+
+        }
+
+
+        /*
+         * Direct RawImage fallback.
+         */
+
+        if(
+            output.data &&
+            output.width &&
+            output.height
+        ){
+
+            return rawImageToCanvas(
+                output
+            );
+
+        }
+
+
+        throw new Error(
+            "The AI model returned an unsupported mask format."
+        );
+
+    }finally{
+
+        URL.revokeObjectURL(url);
+
+    }
+
+}
+
+
+/* -----------------------------
+   RESIZE MASK
+----------------------------- */
+
+function resizeMask(
+    mask,
+    width,
+    height
+){
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+    const ctx =
+        canvas.getContext(
+            "2d",
+            {
+                willReadFrequently:true
+            }
+        );
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    ctx.drawImage(
+        mask,
+        0,
+        0,
+        width,
+        height
+    );
+
+    return canvas;
+
+}
+
+</script><script>
+
+/* =========================================================
+   MASK PROCESSING
+========================================================= */
+
+
+/* -----------------------------
+   EDGE REFINEMENT
+----------------------------- */
+
+function refineAlpha(
+    alpha,
+    width,
+    height,
+    aggressive
+){
+
+    const result =
+        new Uint8ClampedArray(alpha);
+
+    const threshold =
+        aggressive ? 24 : 12;
+
+
+    for(
+        let y = 1;
+        y < height - 1;
+        y++
+    ){
+
+        for(
+            let x = 1;
+            x < width - 1;
+            x++
+        ){
+
+            const i =
+                y * width + x;
+
+            const current =
+                alpha[i];
+
+
+            if(current === 0){
+                continue;
+            }
+
+
+            let neighbors = 0;
+
+
+            if(alpha[i - 1] > 100){
+                neighbors++;
+            }
+
+            if(alpha[i + 1] > 100){
+                neighbors++;
+            }
+
+            if(alpha[i - width] > 100){
+                neighbors++;
+            }
+
+            if(alpha[i + width] > 100){
+                neighbors++;
+            }
+
+
+            /*
+             * Remove isolated weak pixels.
+             */
+
+            if(
+                neighbors === 0 &&
+                current < 150
+            ){
+
+                result[i] = 0;
+
+            }
+
+            /*
+             * Strengthen uncertain pixels
+             * surrounded by foreground.
+             */
+
+            else if(
+                neighbors >= 3 &&
+                current > 35 &&
+                current < 220
+            ){
+
+                result[i] =
+                    Math.min(
+                        255,
+                        current + threshold
+                    );
+
+            }
+
+        }
+
+    }
+
+    return result;
+
+}
+
+
+/* -----------------------------
+   SAFETY MARGIN
+----------------------------- */
+
+function applySafety(
+    alpha,
+    width,
+    height,
+    pad
+){
+
+    if(pad <= 0){
+        return alpha;
+    }
+
+    const result =
+        new Uint8ClampedArray(alpha);
+
+
+    for(
+        let y = 0;
+        y < height;
+        y++
+    ){
+
+        for(
+            let x = 0;
+            x < width;
+            x++
+        ){
+
+            const i =
+                y * width + x;
+
+
+            if(alpha[i] > 0){
+                continue;
+            }
+
+
+            let nearby = false;
+
+
+            for(
+                let yy =
+                    Math.max(0,y-pad);
+
+                yy <=
+                    Math.min(height-1,y+pad)
+                    && !nearby;
+
+                yy++
+            ){
+
+                for(
+                    let xx =
+                        Math.max(0,x-pad);
+
+                    xx <=
+                        Math.min(width-1,x+pad);
+
+                    xx++
+                ){
+
+                    if(
+                        alpha[
+                            yy * width + xx
+                        ] > 180
+                    ){
+
+                        nearby = true;
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+
+            if(nearby){
+
+                /*
+                 * Small semi-transparent
+                 * protective edge.
+                 */
+
+                result[i] = 12;
+
+            }
+
+        }
+
+    }
+
+    return result;
+
+}
+
+
+/* -----------------------------
+   CREATE TRANSPARENT PNG
+----------------------------- */
+
+async function createTransparentPNG(file){
+
+    const img =
+        await loadImage(file);
+
+    const width =
+        img.naturalWidth;
+
+    const height =
+        img.naturalHeight;
+
+
+    /*
+     * Get AI segmentation mask.
+     */
+
+    const mask =
+        await removeBackground(file);
+
+
+    /*
+     * Resize AI mask back to the
+     * ORIGINAL image resolution.
+     */
+
+    const fitted =
+        resizeMask(
+            mask,
+            width,
+            height
+        );
+
+
+    const maskCtx =
+        fitted.getContext(
+            "2d",
+            {
+                willReadFrequently:true
+            }
+        );
+
+
+    const maskData =
+        maskCtx.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+    /*
+     * IMPORTANT:
+     *
+     * The mask is stored in the
+     * alpha channel by rawImageToCanvas().
+     */
+
+    const alpha =
+        new Uint8ClampedArray(
+            width * height
+        );
+
+
+    for(
+        let i = 0,
+            p = 0;
+
+        i < maskData.data.length;
+
+        i += 4,
+        p++
+    ){
+
+        alpha[p] =
+            maskData.data[i + 3];
 
     }
 
 
-    outputs = [];
+    /*
+     * User settings.
+     */
 
-    currentPage = 1;
+    const aggressive =
+        cropMode === "aggressive";
 
-
-    results.innerHTML =
-      "";
-
-    pagination.innerHTML =
-      "";
-
-
-    downloadAll.disabled =
-      true;
+    const tolerance =
+        Number(tolEl.value);
 
 
-    cleanBtn.disabled =
-      true;
+    /*
+     * Higher tolerance =
+     * stronger removal.
+     */
+
+    const cutoff =
+        aggressive
+            ? Math.max(
+                8,
+                60 - tolerance * 0.5
+            )
+            : Math.max(
+                4,
+                35 - tolerance * 0.25
+            );
 
 
-    setLocked(
-      true
+    for(
+        let i = 0;
+        i < alpha.length;
+        i++
+    ){
+
+        let a =
+            alpha[i];
+
+
+        if(a <= cutoff){
+
+            a = 0;
+
+        }
+
+
+        /*
+         * Slightly strengthen
+         * very strong foreground.
+         */
+
+        if(
+            aggressive &&
+            a > 190
+        ){
+
+            a =
+                Math.min(
+                    255,
+                    a + 8
+                );
+
+        }
+
+
+        alpha[i] = a;
+
+    }
+
+
+    /*
+     * Optional self improvement.
+     */
+
+    if(selfImprove.checked){
+
+        for(
+            let pass = 0;
+            pass < 1;
+            pass++
+        ){
+
+            const refined =
+                refineAlpha(
+                    alpha,
+                    width,
+                    height,
+                    aggressive
+                );
+
+            alpha.set(refined);
+
+        }
+
+    }
+
+
+    /*
+     * Safety margin.
+     */
+
+    const finalAlpha =
+        applySafety(
+            alpha,
+            width,
+            height,
+            Number(padEl.value)
+        );
+
+
+    /*
+     * Create full-resolution output.
+     */
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+
+    const ctx =
+        canvas.getContext(
+            "2d",
+            {
+                willReadFrequently:true
+            }
+        );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
     );
 
 
-    progressCard.style.display =
-      "block";
+    /*
+     * Draw ORIGINAL image.
+     */
 
-
-    setProgress(
-      0,
-      "Starting AI processor…"
+    ctx.drawImage(
+        img,
+        0,
+        0,
+        width,
+        height
     );
+
+
+    /*
+     * Apply AI alpha mask.
+     */
+
+    const imageData =
+        ctx.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+    for(
+        let i = 0,
+            p = 0;
+
+        i < imageData.data.length;
+
+        i += 4,
+        p++
+    ){
+
+        imageData.data[i + 3] =
+            finalAlpha[p];
+
+    }
+
+
+    ctx.putImageData(
+        imageData,
+        0,
+        0
+    );
+
+
+    /*
+     * Export PNG.
+     */
+
+    const blob =
+        await new Promise(
+            (resolve,reject) => {
+
+                canvas.toBlob(
+                    result => {
+
+                        if(result){
+
+                            resolve(result);
+
+                        }else{
+
+                            reject(
+                                new Error(
+                                    "Could not create PNG."
+                                )
+                            );
+
+                        }
+
+                    },
+                    "image/png"
+                );
+
+            }
+        );
+
+
+    return {
+        blob,
+        width,
+        height
+    };
+
+}
+
+</script><script>
+
+/* =========================================================
+   LIVE PREVIEW
+========================================================= */
+
+async function updatePreview(){
+
+    if(!selected.length){
+        return;
+    }
+
+
+    const token =
+        ++previewToken;
+
+
+    cropPreview.style.display =
+        "none";
 
 
     try{
 
-      /*
-        Force AI initialization
-        before processing the files.
-      */
-
-      await getRemover();
-
-
-      for(
-        let i=0;
-        i<selected.length;
-        i++
-      ){
-
-        const file =
-          selected[i];
-
-
-        setProgress(
-          (
-            i /
-            selected.length
-          ) * 100,
-
-          `Processing ${
-            i + 1
-          } of ${
-            selected.length
-          }…`
-        );
-
-
         status.textContent =
-          file.name;
-
-
-        systemState.textContent =
-          "PROCESSING";
-
-
-        systemDetail.textContent =
-          `${
-            i + 1
-          } / ${
-            selected.length
-          }`;
+            "Generating live preview…";
 
 
         const result =
-          await createTransparentPNG(
-            file
-          );
+            await createTransparentPNG(
+                selected[0]
+            );
 
 
-        outputs.push({
+        /*
+         * User changed the image/settings
+         * while the old preview was processing.
+         */
 
-          blob:
-            result.blob,
+        if(token !== previewToken){
+            return;
+        }
 
-          name:
-            outputName(
-              file.name
-            ),
 
-          width:
-            result.width,
+        if(resultPreviewURL){
 
-          height:
-            result.height
+            URL.revokeObjectURL(
+                resultPreviewURL
+            );
+
+        }
+
+
+        resultPreviewURL =
+            URL.createObjectURL(
+                result.blob
+            );
+
+
+        cropPreview.src =
+            resultPreviewURL;
+
+        cropPreview.style.display =
+            "block";
+
+
+        const empty =
+            resultFrame.querySelector(
+                ".empty-preview"
+            );
+
+
+        if(empty){
+
+            empty.style.display =
+                "none";
+
+        }
+
+
+        status.textContent =
+            "Preview ready.";
+
+    }catch(error){
+
+        console.error(
+            "PREVIEW ERROR:",
+            error
+        );
+
+
+        if(token === previewToken){
+
+            cropPreview.style.display =
+                "none";
+
+            status.textContent =
+                error.message ||
+                "Preview failed.";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   DOWNLOAD
+========================================================= */
+
+function downloadBlob(
+    blob,
+    name
+){
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+
+    a.download = name;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+
+    setTimeout(
+        () => {
+
+            URL.revokeObjectURL(url);
+
+        },
+        4000
+    );
+
+}
+
+
+/* =========================================================
+   FILE NAME
+========================================================= */
+
+function outputName(name){
+
+    const dot =
+        name.lastIndexOf(".");
+
+
+    const base =
+        dot > 0
+            ? name.slice(0,dot)
+            : name;
+
+
+    return base +
+        "-no-bg.png";
+
+}
+
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+function renderResults(){
+
+    results.innerHTML = "";
+
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                outputs.length /
+                PAGE_SIZE
+            )
+        );
+
+
+    if(currentPage > totalPages){
+
+        currentPage =
+            totalPages;
+
+    }
+
+
+    const start =
+        (currentPage - 1) *
+        PAGE_SIZE;
+
+
+    outputs
+        .slice(
+            start,
+            start + PAGE_SIZE
+        )
+        .forEach(item => {
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "result";
+
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+
+            const imageURL =
+                URL.createObjectURL(
+                    item.blob
+                );
+
+
+            img.src =
+                imageURL;
+
+            img.alt =
+                item.name;
+
+
+            img.onload =
+                () => {
+
+                    URL.revokeObjectURL(
+                        imageURL
+                    );
+
+                };
+
+
+            const done =
+                document.createElement(
+                    "div"
+                );
+
+            done.className =
+                "done";
+
+            done.textContent =
+                "DONE";
+
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.className =
+                "download-one";
+
+            button.textContent =
+                "⇩";
+
+            button.title =
+                "Download image";
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    downloadBlob(
+                        item.blob,
+                        item.name
+                    );
+
+                }
+            );
+
+
+            const body =
+                document.createElement(
+                    "div"
+                );
+
+            body.className =
+                "result-body";
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+            name.className =
+                "result-name";
+
+            name.textContent =
+                item.name;
+
+            name.title =
+                item.name;
+
+
+            const size =
+                document.createElement(
+                    "div"
+                );
+
+            size.className =
+                "result-size";
+
+            size.textContent =
+                `${item.width} × ${item.height}`;
+
+
+            body.append(
+                name,
+                size
+            );
+
+
+            card.append(
+                img,
+                done,
+                button,
+                body
+            );
+
+
+            results.appendChild(
+                card
+            );
 
         });
 
 
-        setProgress(
-          (
-            (i + 1) /
-            selected.length
-          ) * 100,
+    renderPagination();
 
-          `Processing ${
-            i + 1
-          } of ${
-            selected.length
-          }…`
-        );
+}
 
 
-        renderResults();
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+function renderPagination(){
+
+    pagination.innerHTML = "";
 
 
-        /*
-          Give the browser a chance
-          to update the interface.
-        */
-
-        await new Promise(
-          resolve =>
-            setTimeout(
-              resolve,
-              0
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                outputs.length /
+                PAGE_SIZE
             )
         );
 
-      }
 
-
-      setProgress(
-        100,
-
-        `Finished ${
-          selected.length
-        } image${
-          selected.length === 1
-            ? ""
-            : "s"
-        }`
-      );
-
-
-      status.textContent =
-        "Transparent PNGs are ready.";
-
-
-      systemState.textContent =
-        "PROCESS COMPLETE";
-
-
-      systemDetail.textContent =
-        `${
-          outputs.length
-        } PNG${
-          outputs.length === 1
-            ? ""
-            : "s"
-        } generated`;
-
-
-      downloadAll.disabled =
-        false;
-
-
-      showToast(
-        "Background removal complete."
-      );
-
-
-    }catch(error){
-
-      console.error(
-        error
-      );
-
-
-      status.textContent =
-        error.message ||
-        "Something went wrong.";
-
-
-      systemState.textContent =
-        "PROCESS ERROR";
-
-
-      systemDetail.textContent =
-        "Check the browser console.";
-
-
-      showToast(
-        error.message ||
-        "Background removal failed.",
-        true
-      );
-
-
-    }finally{
-
-      cleanBtn.disabled =
-        false;
-
-
-      setLocked(
-        false
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================
-   DOWNLOAD ALL
-========================= */
-
-downloadAll.addEventListener(
-  "click",
-  async () => {
-
-    if(
-      !outputs.length
-    ){
-
-      return;
-
+    if(totalPages <= 1){
+        return;
     }
 
 
-    downloadAll.disabled =
-      true;
+    const prev =
+        document.createElement(
+            "button"
+        );
+
+    prev.type =
+        "button";
+
+    prev.className =
+        "page-btn";
+
+    prev.textContent =
+        "‹";
+
+    prev.disabled =
+        currentPage === 1;
 
 
-    downloadAll.textContent =
-      "Creating ZIP…";
+    prev.addEventListener(
+        "click",
+        () => {
+
+            if(currentPage > 1){
+
+                currentPage--;
+
+                renderResults();
+
+            }
+
+        }
+    );
 
 
-    try{
+    pagination.appendChild(
+        prev
+    );
 
-      const zip =
-        await makeZip(
-          outputs
+
+    const first =
+        Math.max(
+            1,
+            Math.min(
+                currentPage - 3,
+                totalPages - 6
+            )
         );
 
 
-      downloadBlob(
-        zip,
-        "cut-it-out-background-removed.zip"
-      );
-
-
-      showToast(
-        "ZIP download started."
-      );
-
-
-    }catch(error){
-
-      console.error(
-        error
-      );
-
-
-      showToast(
-        "Could not create the ZIP.",
-        true
-      );
-
-
-    }finally{
-
-      downloadAll.disabled =
-        false;
-
-
-      downloadAll.textContent =
-        "⇩ Download All (.ZIP)";
-
-    }
-
-  }
-);
-
-
-/* =========================
-   CRC32
-========================= */
-
-function crc32(data){
-
-  let table =
-    crc32.table;
-
-
-  if(!table){
-
-    table =
-      new Uint32Array(
-        256
-      );
+    const last =
+        Math.min(
+            totalPages,
+            first + 6
+        );
 
 
     for(
-      let n=0;
-      n<256;
-      n++
+        let p = first;
+        p <= last;
+        p++
     ){
 
-      let c =
-        n;
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type =
+            "button";
+
+        button.className =
+            "page-btn" +
+            (
+                p === currentPage
+                    ? " active"
+                    : ""
+            );
+
+        button.textContent =
+            p;
 
 
-      for(
-        let k=0;
-        k<8;
-        k++
-      ){
+        button.addEventListener(
+            "click",
+            () => {
 
-        c =
-          (
-            c & 1
-          )
+                currentPage =
+                    p;
 
-          ?
+                renderResults();
 
-          (
-            0xedb88320 ^
-            (c >>> 1)
-          )
-
-          :
-
-          (
-            c >>> 1
-          );
-
-      }
+            }
+        );
 
 
-      table[n] =
-        c >>> 0;
+        pagination.appendChild(
+            button
+        );
 
     }
 
 
-    crc32.table =
-      table;
+    const next =
+        document.createElement(
+            "button"
+        );
 
-  }
+    next.type =
+        "button";
 
+    next.className =
+        "page-btn";
 
-  let c =
-    0xffffffff;
+    next.textContent =
+        "›";
 
-
-  for(
-    let i=0;
-    i<data.length;
-    i++
-  ){
-
-    c =
-      table[
-        (c ^ data[i]) &
-        255
-      ] ^
-      (c >>> 8);
-
-  }
+    next.disabled =
+        currentPage === totalPages;
 
 
-  return (
-    c ^
-    0xffffffff
-  ) >>> 0;
+    next.addEventListener(
+        "click",
+        () => {
+
+            if(
+                currentPage <
+                totalPages
+            ){
+
+                currentPage++;
+
+                renderResults();
+
+            }
+
+        }
+    );
+
+
+    pagination.appendChild(
+        next
+    );
+
+
+    const info =
+        document.createElement(
+            "span"
+        );
+
+    info.className =
+        "page-info";
+
+    info.textContent =
+        `Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
+
+
+    pagination.appendChild(
+        info
+    );
+
+}
+
+</script><script>
+
+/* =========================================================
+   MAIN PROCESSING
+========================================================= */
+
+cleanBtn.addEventListener(
+    "click",
+    async () => {
+
+        if(!selected.length){
+
+            alert(
+                "Select at least one image first."
+            );
+
+            return;
+
+        }
+
+
+        outputs = [];
+
+        currentPage = 1;
+
+        results.innerHTML = "";
+        pagination.innerHTML = "";
+
+        downloadAll.disabled = true;
+
+        cleanBtn.disabled = true;
+
+        setLocked(true);
+
+        progressCard.style.display =
+            "block";
+
+
+        try{
+
+            /*
+             * Load model once before processing
+             * the first image.
+             */
+
+            await getRemover();
+
+
+            for(
+                let i = 0;
+                i < selected.length;
+                i++
+            ){
+
+                const file =
+                    selected[i];
+
+
+                setProgress(
+                    (i / selected.length) *
+                    100,
+                    `Processing ${i + 1} of ${selected.length}…`
+                );
+
+
+                status.textContent =
+                    file.name;
+
+
+                const result =
+                    await createTransparentPNG(
+                        file
+                    );
+
+
+                outputs.push({
+
+                    blob:
+                        result.blob,
+
+                    name:
+                        outputName(
+                            file.name
+                        ),
+
+                    width:
+                        result.width,
+
+                    height:
+                        result.height
+
+                });
+
+
+                setProgress(
+                    (
+                        (i + 1) /
+                        selected.length
+                    ) * 100,
+                    `Processing ${i + 1} of ${selected.length}…`
+                );
+
+
+                /*
+                 * Give the browser a chance
+                 * to update the UI.
+                 */
+
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            20
+                        )
+                );
+
+            }
+
+
+            setProgress(
+                100,
+                `Finished ${selected.length} image${selected.length === 1 ? "" : "s"}`
+            );
+
+
+            status.textContent =
+                "Transparent PNGs are ready.";
+
+
+            renderResults();
+
+
+            downloadAll.disabled =
+                false;
+
+
+        }catch(error){
+
+            console.error(
+                "PROCESSING ERROR:",
+                error
+            );
+
+
+            status.textContent =
+                error.message ||
+                "Something went wrong.";
+
+
+            alert(
+                "Background removal failed.\n\n" +
+                (
+                    error.message ||
+                    "Unknown error."
+                )
+            );
+
+
+        }finally{
+
+            cleanBtn.disabled =
+                false;
+
+            setLocked(false);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ZIP DOWNLOAD
+========================================================= */
+
+downloadAll.addEventListener(
+    "click",
+    async () => {
+
+        if(!outputs.length){
+            return;
+        }
+
+
+        downloadAll.disabled =
+            true;
+
+        downloadAll.textContent =
+            "Creating ZIP…";
+
+
+        try{
+
+            const zip =
+                await makeZip(
+                    outputs
+                );
+
+
+            downloadBlob(
+                zip,
+                "cut-it-out-background-removed.zip"
+            );
+
+
+        }catch(error){
+
+            console.error(
+                "ZIP ERROR:",
+                error
+            );
+
+
+            alert(
+                "Could not create the ZIP file."
+            );
+
+
+        }finally{
+
+            downloadAll.disabled =
+                false;
+
+            downloadAll.textContent =
+                "⇩ Download All (.ZIP)";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   CRC32
+========================================================= */
+
+function crc32(data){
+
+    let table =
+        crc32.table;
+
+
+    if(!table){
+
+        table =
+            new Uint32Array(256);
+
+
+        for(
+            let n = 0;
+            n < 256;
+            n++
+        ){
+
+            let c = n;
+
+
+            for(
+                let k = 0;
+                k < 8;
+                k++
+            ){
+
+                c =
+                    (c & 1)
+                        ? (
+                            0xedb88320 ^
+                            (c >>> 1)
+                        )
+                        : (
+                            c >>> 1
+                        );
+
+            }
+
+
+            table[n] =
+                c >>> 0;
+
+        }
+
+
+        crc32.table =
+            table;
+
+    }
+
+
+    let c =
+        0xffffffff;
+
+
+    for(
+        let i = 0;
+        i < data.length;
+        i++
+    ){
+
+        c =
+            table[
+                (c ^ data[i]) & 255
+            ] ^
+            (c >>> 8);
+
+    }
+
+
+    return (
+        c ^
+        0xffffffff
+    ) >>> 0;
 
 }
 
 
-/* =========================
+/* =========================================================
    ZIP HELPERS
-========================= */
+========================================================= */
 
-function u16(
-  a,
-  n
-){
+function u16(a,n){
 
-  a.push(
-    n & 255,
-    (n >>> 8) & 255
-  );
+    a.push(
+        n & 255,
+        (n >>> 8) & 255
+    );
 
 }
 
 
-function u32(
-  a,
-  n
-){
+function u32(a,n){
 
-  a.push(
-    n & 255,
-    (n >>> 8) & 255,
-    (n >>> 16) & 255,
-    (n >>> 24) & 255
-  );
+    a.push(
+        n & 255,
+        (n >>> 8) & 255,
+        (n >>> 16) & 255,
+        (n >>> 24) & 255
+    );
 
 }
 
 
 function bytes(text){
 
-  return new TextEncoder()
-    .encode(
-      text
-    );
+    return new TextEncoder()
+        .encode(text);
 
 }
 
 
-/* =========================
+/* =========================================================
    CREATE ZIP
-========================= */
+========================================================= */
 
-async function makeZip(
-  items
-){
+async function makeZip(items){
 
-  const chunks =
-    [];
+    const chunks = [];
+    const central = [];
 
-  const central =
-    [];
+    let offset = 0;
 
-  let offset =
-    0;
 
+    for(
+        const item of items
+    ){
 
-  for(
-    const item of items
-  ){
+        const data =
+            new Uint8Array(
+                await item.blob.arrayBuffer()
+            );
 
-    const data =
-      new Uint8Array(
-        await item.blob.arrayBuffer()
-      );
 
+        const name =
+            bytes(item.name);
 
-    const name =
-      bytes(
-        item.name
-      );
 
+        const crc =
+            crc32(data);
 
-    const crc =
-      crc32(
-        data
-      );
 
+        /*
+         * Local file header.
+         */
 
-    /*
-      Local file header.
-    */
+        const local = [];
 
-    const local =
-      [];
 
+        u32(
+            local,
+            0x04034b50
+        );
 
-    u32(
-      local,
-      0x04034b50
-    );
+        u16(local,20);
+        u16(local,0);
+        u16(local,0);
+        u16(local,0);
+        u16(local,0);
 
+        u32(
+            local,
+            crc
+        );
 
-    u16(
-      local,
-      20
-    );
+        u32(
+            local,
+            data.length
+        );
 
+        u32(
+            local,
+            data.length
+        );
 
-    u16(
-      local,
-      0
-    );
+        u16(
+            local,
+            name.length
+        );
 
+        u16(
+            local,
+            0
+        );
 
-    u16(
-      local,
-      0
-    );
 
+        chunks.push(
+            new Uint8Array(local),
+            name,
+            data
+        );
 
-    u16(
-      local,
-      0
-    );
 
+        /*
+         * Central directory entry.
+         */
 
-    u16(
-      local,
-      0
-    );
+        const cen = [];
 
 
-    u32(
-      local,
-      crc
-    );
+        u32(
+            cen,
+            0x02014b50
+        );
 
+        u16(cen,20);
+        u16(cen,20);
+        u16(cen,0);
+        u16(cen,0);
+        u16(cen,0);
+        u16(cen,0);
 
-    u32(
-      local,
-      data.length
-    );
+        u32(
+            cen,
+            crc
+        );
 
+        u32(
+            cen,
+            data.length
+        );
 
-    u32(
-      local,
-      data.length
-    );
+        u32(
+            cen,
+            data.length
+        );
 
+        u16(
+            cen,
+            name.length
+        );
 
-    u16(
-      local,
-      name.length
-    );
+        u16(cen,0);
+        u16(cen,0);
+        u16(cen,0);
+        u16(cen,0);
 
+        u32(cen,0);
 
-    u16(
-      local,
-      0
-    );
+        u32(
+            cen,
+            offset
+        );
 
 
-    chunks.push(
-      new Uint8Array(
-        local
-      ),
-      name,
-      data
-    );
+        central.push(
+            new Uint8Array(cen),
+            name
+        );
 
 
-    /*
-      Central directory entry.
-    */
+        offset +=
+            local.length +
+            name.length +
+            data.length;
 
-    const cen =
-      [];
-
-
-    u32(
-      cen,
-      0x02014b50
-    );
-
-
-    u16(
-      cen,
-      20
-    );
-
-
-    u16(
-      cen,
-      20
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u32(
-      cen,
-      crc
-    );
-
-
-    u32(
-      cen,
-      data.length
-    );
-
-
-    u32(
-      cen,
-      data.length
-    );
-
-
-    u16(
-      cen,
-      name.length
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u16(
-      cen,
-      0
-    );
-
-
-    u32(
-      cen,
-      0
-    );
-
-
-    u32(
-      cen,
-      offset
-    );
-
-
-    central.push(
-      new Uint8Array(
-        cen
-      ),
-      name
-    );
-
-
-    offset +=
-      local.length +
-      name.length +
-      data.length;
-
-  }
-
-
-  const centralOffset =
-    offset;
-
-
-  let centralSize =
-    0;
-
-
-  for(
-    const part of central
-  ){
-
-    chunks.push(
-      part
-    );
-
-
-    centralSize +=
-      part.length;
-
-  }
-
-
-  /*
-    End of central directory.
-  */
-
-  const end =
-    [];
-
-
-  u32(
-    end,
-    0x06054b50
-  );
-
-
-  u16(
-    end,
-    0
-  );
-
-
-  u16(
-    end,
-    0
-  );
-
-
-  u16(
-    end,
-    items.length
-  );
-
-
-  u16(
-    end,
-    items.length
-  );
-
-
-  u32(
-    end,
-    centralSize
-  );
-
-
-  u32(
-    end,
-    centralOffset
-  );
-
-
-  u16(
-    end,
-    0
-  );
-
-
-  chunks.push(
-    new Uint8Array(
-      end
-    )
-  );
-
-
-  return new Blob(
-    chunks,
-    {
-      type:
-        "application/zip"
     }
-  );
+
+
+    const centralOffset =
+        offset;
+
+
+    let centralSize = 0;
+
+
+    for(
+        const item of central
+    ){
+
+        chunks.push(item);
+
+        centralSize +=
+            item.length;
+
+    }
+
+
+    /*
+     * End of central directory.
+     */
+
+    const end = [];
+
+
+    u32(
+        end,
+        0x06054b50
+    );
+
+    u16(end,0);
+    u16(end,0);
+
+    u16(
+        end,
+        items.length
+    );
+
+    u16(
+        end,
+        items.length
+    );
+
+    u32(
+        end,
+        centralSize
+    );
+
+    u32(
+        end,
+        centralOffset
+    );
+
+    u16(end,0);
+
+
+    chunks.push(
+        new Uint8Array(end)
+    );
+
+
+    return new Blob(
+        chunks,
+        {
+            type:
+                "application/zip"
+        }
+    );
 
 }
 
+
+/* =========================================================
+   FINAL STARTUP
+========================================================= */
 
 console.log(
-  "Cut It Out! futuristic background remover loaded."
+    "Cut It Out! AI Background Remover loaded."
+);
+
+console.log(
+    "BRIA RMBG-1.4 segmentation pipeline ready to initialize."
 );
 
 </script>
