@@ -3,339 +3,361 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Free image background cropper/remover | Cut It Out!</title>
+<title>Cut It Out! — Adaptive Border Cropper</title>
 <style>
 :root{
---bg:#0b0d12;--panel:#13161d;--panel2:#171a22;--line:#ffffff14;
---text:#f5f5f7;--muted:#9297a3;--gold:#f1c33b;--gold2:#dcae27;
---green:#28d66f;--danger:#ff6464
+  --bg:#050814;
+  --bg2:#090e1d;
+  --glass:rgba(13,20,38,.68);
+  --glass2:rgba(18,28,52,.58);
+  --line:rgba(120,220,255,.15);
+  --line2:rgba(255,255,255,.09);
+  --text:#edf8ff;
+  --muted:#8290a8;
+  --cyan:#4de8ff;
+  --blue:#5d7cff;
+  --violet:#a46bff;
+  --green:#48f0a4;
+  --danger:#ff5e7a;
+  --shadow:0 25px 80px rgba(0,0,0,.42);
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
 body{
-margin:0;background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 45%);
-color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+  margin:0;min-height:100vh;color:var(--text);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(900px 500px at 8% -8%,rgba(77,232,255,.16),transparent 65%),
+    radial-gradient(850px 600px at 92% 4%,rgba(164,107,255,.15),transparent 64%),
+    radial-gradient(700px 500px at 50% 100%,rgba(93,124,255,.10),transparent 70%),
+    linear-gradient(145deg,#050814,#080d1a 48%,#060914);
+  overflow-x:hidden;
 }
-main{width:min(1180px,calc(100% - 28px));margin:auto;padding:28px 0 45px}
-h1{font-size:clamp(30px,5vw,50px);line-height:1;margin:0 0 12px;font-weight:850;letter-spacing:-1.5px}
-h1 span{color:var(--gold)}
-.subtitle{font-size:16px;color:#c5c8d0;margin:0 0 13px}
-.badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.badge{background:#191c24;border:1px solid var(--line);padding:7px 11px;border-radius:9px;font-size:13px;color:#d8dbe2}
-.badge b{color:var(--gold)}
-.card{background:linear-gradient(145deg,#14171e,#11141a);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 40px #0004}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.32;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom,#000,transparent 82%);
+}
+body:after{
+  content:"";position:fixed;width:420px;height:420px;right:-180px;top:25%;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(77,232,255,.08),transparent 68%);
+  filter:blur(8px);
+}
+main{width:min(1220px,calc(100% - 28px));margin:auto;padding:30px 0 55px;position:relative;z-index:1}
+.hero{
+  padding:22px 0 24px;text-align:center;animation:boot .65s ease both;
+}
+@keyframes boot{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:none}}
+.kicker{
+  display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(10,20,38,.55);backdrop-filter:blur(16px);
+  color:#a9b8d0;font-size:11px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;
+  box-shadow:0 0 30px rgba(77,232,255,.06);
+}
+.kicker i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
+h1{
+  margin:15px 0 10px;font-size:clamp(42px,7vw,72px);line-height:.92;
+  letter-spacing:-3px;font-weight:950;
+  text-shadow:0 0 35px rgba(77,232,255,.12);
+}
+h1 span{
+  background:linear-gradient(100deg,var(--cyan),#8aa9ff 45%,var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.subtitle{margin:0 auto;color:#9eacc4;max-width:720px;font-size:15px;line-height:1.6}
+.badges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}
+.badge{
+  padding:7px 10px;border:1px solid var(--line2);border-radius:999px;
+  background:rgba(255,255,255,.035);backdrop-filter:blur(12px);
+  color:#aebbd0;font-size:11px;font-weight:750;
+}
+.badge b{color:#d9f8ff}
+.card,.panel{
+  position:relative;background:linear-gradient(145deg,rgba(18,29,52,.74),rgba(7,13,27,.72));
+  border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  overflow:hidden;
+}
+.card:before,.panel:before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(120deg,rgba(77,232,255,.045),transparent 28%,transparent 70%,rgba(164,107,255,.045));
+}
+.workspace{padding:14px;animation:pop .7s .08s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:none}}
 .drop{
-min-height:210px;border:2px dashed #ffffff24;border-radius:15px;
-display:flex;flex-direction:column;justify-content:center;align-items:center;
-text-align:center;cursor:pointer;transition:.15s
+  min-height:190px;border:1px dashed rgba(77,232,255,.30);border-radius:18px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+  cursor:pointer;transition:.2s;background:rgba(7,18,34,.48);position:relative;overflow:hidden;
 }
-.drop:hover,.drop.drag{border-color:var(--gold);background:#ffffff03}
-.drop-icon{font-size:34px;margin-bottom:7px}
-.drop-title{font-size:19px;font-weight:750}
-.drop-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.drop:before{
+  content:"";position:absolute;inset:-60%;
+  background:conic-gradient(from 180deg,transparent,rgba(77,232,255,.08),transparent,rgba(164,107,255,.07),transparent);
+  animation:spin 9s linear infinite;pointer-events:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.drop>*{position:relative;z-index:1}
+.drop:hover,.drop.drag{
+  border-color:rgba(77,232,255,.8);transform:translateY(-2px);
+  box-shadow:0 0 45px rgba(77,232,255,.08) inset,0 12px 45px rgba(0,0,0,.25);
+}
+.drop-icon{
+  width:58px;height:58px;border-radius:17px;display:grid;place-items:center;margin-bottom:11px;
+  border:1px solid rgba(77,232,255,.25);background:rgba(77,232,255,.07);
+  color:var(--cyan);font-size:27px;box-shadow:0 0 30px rgba(77,232,255,.08);
+}
+.drop-title{font-size:19px;font-weight:900}
+.drop-sub{font-size:13px;color:var(--muted);margin-top:4px}
 .count{
-display:inline-flex;align-items:center;gap:7px;margin-top:15px;padding:8px 13px;
-border:1px solid #ffffff18;background:#171a21;border-radius:10px;color:var(--muted)
+  display:inline-flex;align-items:center;gap:7px;margin-top:13px;padding:7px 11px;
+  border:1px solid var(--line2);background:rgba(255,255,255,.04);border-radius:999px;
+  color:#91a0b7;font-size:11px;
 }
 .count strong{color:var(--green)}
 input[type=file]{display:none}
-
-.settings-preview{
-display:grid;grid-template-columns:390px 1fr;gap:18px;margin-top:18px
+.settings-preview{display:grid;grid-template-columns:365px 1fr;gap:14px;margin-top:14px}
+.settings,.previewbox{
+  position:relative;background:rgba(5,12,27,.48);border:1px solid var(--line2);
+  border-radius:20px;padding:18px;backdrop-filter:blur(18px);
 }
-.settings{background:#12151c;border:1px solid var(--line);border-radius:15px;padding:18px}
-.setting{margin-bottom:23px}
-.setting:last-child{margin-bottom:0}
-.setting-head{
-display:flex;justify-content:space-between;align-items:center;
-font-weight:750;margin-bottom:8px
+.settings:after,.previewbox:after{
+  content:"";position:absolute;top:0;left:20px;right:20px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.55;
 }
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.section-title{
+  font-size:13px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;color:#dce9fa;
+}
+.section-title:before{content:"";display:inline-block;width:3px;height:14px;border-radius:4px;background:var(--cyan);margin-right:8px;vertical-align:-2px;box-shadow:0 0 12px var(--cyan)}
+.signal{font-size:10px;color:#6f819d;display:flex;gap:6px;align-items:center}
+.signal i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.setting{margin-bottom:21px}.setting:last-child{margin-bottom:0}
+.setting-head{display:flex;justify-content:space-between;align-items:center;font-weight:850;margin-bottom:9px}
+.help{color:#6f8099;border:1px solid #ffffff16;border-radius:50%;font-size:10px;width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
 .value{
-border:1px solid #ffffff1c;border-radius:8px;padding:6px 11px;
-min-width:52px;text-align:center;color:#f3f3f4
+  min-width:50px;text-align:center;padding:6px 9px;border-radius:9px;
+  border:1px solid rgba(77,232,255,.16);background:rgba(77,232,255,.055);color:#d9f8ff;font-size:12px;font-weight:900;
 }
-.help{
-color:#727784;border:1px solid #ffffff22;border-radius:50%;font-size:11px;
-width:18px;height:18px;display:inline-flex;align-items:center;
-justify-content:center;margin-left:4px
-}
-.desc{color:var(--muted);font-size:13px;line-height:1.4;margin-top:8px}
-.settings.locked{opacity:.55}
-.settings.locked input{cursor:not-allowed}
-
-.mode-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.desc{color:#71819a;font-size:12px;line-height:1.45;margin-top:8px}
+.mode-group{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .mode-btn{
-background:#171a21;border:1px solid #ffffff20;color:#dfe2e8;
-border-radius:10px;padding:10px 9px;text-align:left;cursor:pointer;
-font-weight:750;min-height:75px
+  min-height:88px;text-align:left;background:rgba(255,255,255,.025);
+  border:1px solid #ffffff10;color:#dfe8f6;border-radius:14px;padding:12px;
+  cursor:pointer;font-weight:900;transition:.2s;position:relative;overflow:hidden;
 }
-.mode-btn small{
-display:block;color:var(--muted);font-size:11px;font-weight:500;
-margin-top:3px;line-height:1.3
-}
+.mode-btn:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(77,232,255,.06),transparent 55%);opacity:0;transition:.2s}
+.mode-btn:hover{border-color:rgba(77,232,255,.35);transform:translateY(-2px)}
+.mode-btn:hover:before,.mode-btn.active:before{opacity:1}
 .mode-btn.active{
-border-color:var(--gold);background:#2a2413;
-box-shadow:0 0 0 1px #f1c33b33 inset
+  border-color:rgba(77,232,255,.7);background:rgba(77,232,255,.08);
+  box-shadow:0 0 0 1px rgba(77,232,255,.12) inset,0 0 30px rgba(77,232,255,.06);
 }
-.mode-btn:disabled{cursor:not-allowed;opacity:.5}
-
-.range-wrap{position:relative;width:100%;padding:4px 0}
+.mode-btn small{display:block;color:#72839b;font-size:10px;font-weight:600;margin-top:6px;line-height:1.35}
+.mode-btn.active small{color:#94abc4}
+.mode-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.range-wrap{padding:4px 0}
 input[type=range]{
---fill:50%;
-appearance:none;width:100%;height:8px;margin:0;
-background:linear-gradient(to right,var(--gold) 0,var(--gold) var(--fill),#292d36 var(--fill),#292d36 100%);
-border-radius:99px;outline:none;cursor:pointer
+  --fill:50%;appearance:none;width:100%;height:7px;margin:0;
+  background:linear-gradient(90deg,var(--cyan) 0,var(--blue) var(--fill),rgba(255,255,255,.09) var(--fill),rgba(255,255,255,.09) 100%);
+  border-radius:99px;outline:none;cursor:pointer;
+  box-shadow:0 0 16px rgba(77,232,255,.08);
 }
-input[type=range]::-webkit-slider-runnable-track{
-height:8px;border-radius:99px;background:transparent
-}
-input[type=range]::-moz-range-track{
-height:8px;border-radius:99px;background:transparent
-}
+input[type=range]::-webkit-slider-runnable-track{height:7px;border-radius:99px;background:transparent}
 input[type=range]::-webkit-slider-thumb{
-appearance:none;width:20px;height:20px;border-radius:50%;
-background:var(--gold);border:3px solid #15171d;
-box-shadow:0 0 0 1px #f1c33b88;cursor:pointer;margin-top:-6px
+  appearance:none;width:20px;height:20px;margin-top:-6.5px;border-radius:50%;
+  background:#dffbff;border:4px solid #10243a;box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(77,232,255,.6);cursor:pointer;
 }
-input[type=range]::-moz-range-thumb{
-width:20px;height:20px;border-radius:50%;
-background:var(--gold);border:3px solid #15171d;
-box-shadow:0 0 0 1px #f1c33b88;cursor:pointer
-}
-input[type=range]:disabled{cursor:not-allowed}
-input[type=range]:disabled::-webkit-slider-thumb{cursor:not-allowed}
-input[type=range]:disabled::-moz-range-thumb{cursor:not-allowed}
-
-.toggle-row{
-display:flex;align-items:center;justify-content:space-between;
-gap:12px;margin-top:8px
-}
-.toggle{
-position:relative;width:48px;height:27px;flex:none
-}
-.toggle input{display:none}
-.toggle-track{
-position:absolute;inset:0;background:#292d36;border:1px solid #ffffff22;
-border-radius:99px;cursor:pointer;transition:.15s
-}
-.toggle-track:before{
-content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;
-border-radius:50%;background:#aaa;transition:.15s
-}
-.toggle input:checked+.toggle-track{background:#7c6318;border-color:var(--gold)}
-.toggle input:checked+.toggle-track:before{
-transform:translateX(21px);background:var(--gold)
-}
-.toggle input:disabled+.toggle-track{opacity:.5;cursor:not-allowed}
-
-.previewbox{
-background:#10131a;border:1px solid var(--line);border-radius:15px;
-padding:16px;min-width:0
-}
-.preview-title{text-align:center;font-weight:750;margin-bottom:12px}
+input[type=range]::-moz-range-track{height:7px;border-radius:99px;background:rgba(255,255,255,.09)}
+input[type=range]::-moz-range-progress{height:7px;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#dffbff;border:4px solid #10243a;box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(77,232,255,.6)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #ffffff0d;background:rgba(255,255,255,.025);border-radius:14px}
+.toggle{position:relative;width:48px;height:27px;flex:none}.toggle input{display:none}
+.toggle-track{position:absolute;inset:0;background:#172237;border:1px solid #ffffff14;border-radius:99px;cursor:pointer;transition:.2s}
+.toggle-track:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:#6f8198;transition:.2s}
+.toggle input:checked+.toggle-track{background:rgba(77,232,255,.18);border-color:var(--cyan);box-shadow:0 0 18px rgba(77,232,255,.12)}
+.toggle input:checked+.toggle-track:before{transform:translateX(21px);background:#dffbff;box-shadow:0 0 12px var(--cyan)}
+.previewbox{min-width:0}
+.preview-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.preview-title strong{font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.preview-meta{font-size:10px;color:#65758f}
 .previews{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pane{min-width:0}
-.pane label{
-display:block;text-align:center;color:#aeb2bc;font-size:12px;margin-bottom:7px
-}
+.pane{min-width:0}.pane label{display:flex;justify-content:space-between;color:#71839d;font-size:10px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px;padding:0 2px}
 .frame{
-height:270px;border:1px solid #ffffff15;border-radius:10px;
-background:
-linear-gradient(45deg,#1a1d24 25%,transparent 25%) 0 0/18px 18px,
-linear-gradient(-45deg,#1a1d24 25%,transparent 25%) 0 9px/18px 18px,
-linear-gradient(45deg,transparent 75%,#1a1d24 75%) 9px -9px/18px 18px,
-linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,#11141a;
-display:flex;align-items:center;justify-content:center;overflow:hidden
+  height:390px;border:1px solid #ffffff10;border-radius:16px;
+  background:
+    linear-gradient(45deg,#0c1423 25%,transparent 25%) 0 0/18px 18px,
+    linear-gradient(-45deg,#0c1423 25%,transparent 25%) 0 9px/18px 18px,
+    linear-gradient(45deg,transparent 75%,#0c1423 75%) 9px -9px/18px 18px,
+    linear-gradient(-45deg,transparent 75%,#0c1423 75%) -9px 0/18px 18px,#08101d;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
 }
-.frame img{max-width:100%;max-height:100%;object-fit:contain;display:block}
-
-.actions{
-display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px
+.frame:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(transparent 50%,rgba(77,232,255,.025) 50%);background-size:100% 4px;mix-blend-mode:screen}
+.frame img{max-width:100%;max-height:100%;object-fit:contain;display:block;position:relative;z-index:1}
+.empty{color:#566781;font-size:12px;text-align:center;padding:20px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+button.action{
+  border:1px solid transparent;border-radius:14px;padding:14px 18px;font-weight:950;font-size:13px;cursor:pointer;
+  font-family:inherit;transition:.2s;position:relative;overflow:hidden
 }
-button{
-border:1px solid transparent;border-radius:10px;padding:12px 20px;
-font-weight:800;font-size:14px;cursor:pointer;font-family:inherit
-}
-.primary{background:var(--gold);color:#16120a}
-.primary:hover{background:#ffd14e}
-.secondary{background:#171a21;border-color:#ffffff26;color:#f4f4f5}
-.secondary:hover{background:#1d212a}
-button:disabled{opacity:.4;cursor:not-allowed}
-
-.progress-card{margin-top:18px;display:none}
-.progress-top{
-display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;color:#d9dce2
-}
-.percent{color:var(--gold);font-weight:800}
-.track{height:9px;background:#242832;border-radius:99px;overflow:hidden}
-.bar{height:100%;width:0;background:var(--gold);transition:width .12s}
-.status{font-size:13px;color:var(--muted);margin-top:8px}
-
-.results{
-display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-gap:12px;margin-top:18px
-}
+button.action:before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);transform:translateX(-120%);transition:.5s}
+button.action:hover:before{transform:translateX(120%)}
+button.action:hover{transform:translateY(-2px)}
+.primary{background:linear-gradient(100deg,var(--cyan),#5d8cff);color:#04101a;box-shadow:0 10px 30px rgba(77,232,255,.14)}
+.secondary{background:rgba(255,255,255,.035);border-color:#ffffff12!important;color:#dce8f7}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.note{text-align:center;color:#53637c;font-size:11px;margin-top:12px}
+.progress-card{margin-top:14px;padding:17px;display:none;animation:pop .4s ease both}
+.progress-top{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:#9badc6}
+.percent{color:var(--cyan);font-weight:950}
+.track{height:8px;background:#111a2a;border:1px solid #ffffff0b;border-radius:99px;overflow:hidden}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));border-radius:99px;box-shadow:0 0 18px rgba(77,232,255,.5);transition:width .12s}
+.status{font-size:11px;color:#63748e;margin-top:8px}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:14px}
 .result{
-background:#12151b;border:1px solid var(--line);border-radius:12px;
-overflow:hidden;position:relative
+  background:rgba(9,17,32,.72);border:1px solid #ffffff0e;border-radius:16px;overflow:hidden;position:relative;
+  box-shadow:0 12px 35px rgba(0,0,0,.25);animation:cardIn .5s cubic-bezier(.2,.8,.2,1) both;
 }
-.result img{
-width:100%;height:150px;object-fit:contain;background:#0d1015;display:block
-}
-.result-body{padding:9px}
-.result-name{
-font-size:11px;white-space:nowrap;overflow:hidden;
-text-overflow:ellipsis;color:#c8cbd2
-}
-.result-size{font-size:11px;color:#707580;margin-top:3px}
-.done{
-position:absolute;top:7px;left:7px;background:#0b8d43;color:white;
-border-radius:6px;padding:3px 6px;font-size:9px;font-weight:900
-}
-.download-one{
-position:absolute;right:7px;top:7px;width:27px;height:27px;padding:0;
-background:#171a20;color:white;border:1px solid #ffffff22
-}
-.pagination{
-display:flex;justify-content:center;align-items:center;gap:7px;
-flex-wrap:wrap;margin:18px 0 0
-}
-.page-btn{
-min-width:38px;padding:9px 12px;background:#171a21;
-color:#ddd;border:1px solid #ffffff1c
-}
-.page-btn.active{background:var(--gold);color:#17130a;border-color:var(--gold)}
-.page-btn:disabled{opacity:.35}
-.page-info{font-size:12px;color:var(--muted);margin:0 8px}
-.note{
-font-size:12px;color:#747985;text-align:center;margin-top:16px;line-height:1.5
-}
-@media(max-width:820px){
-.settings-preview{grid-template-columns:1fr}
-.previews{grid-template-columns:1fr 1fr}
-.frame{height:230px}
-}
-@media(max-width:520px){
-main{width:min(100% - 18px,1180px);padding-top:18px}
-.previews{grid-template-columns:1fr}
-.frame{height:260px}
-.settings-preview{gap:10px}
-.mode-group{grid-template-columns:1fr}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:none}}
+.result:hover{transform:translateY(-4px);border-color:rgba(77,232,255,.25);transition:.2s}
+.result img{width:100%;height:155px;object-fit:contain;background:#050b15;display:block}
+.result-body{padding:10px}.result-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#cbd7e8}.result-size{font-size:10px;color:#62738d;margin-top:3px}
+.done{position:absolute;top:8px;left:8px;background:rgba(72,240,164,.16);border:1px solid rgba(72,240,164,.28);color:var(--green);border-radius:999px;padding:4px 7px;font-size:9px;font-weight:950}
+.download-one{position:absolute;right:8px;top:8px;width:29px;height:29px;padding:0;border-radius:9px!important;background:rgba(5,12,24,.82);color:#dffbff;border:1px solid #ffffff14!important}
+.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:16px 0 0}
+.page-btn{min-width:38px;padding:9px 12px;background:rgba(255,255,255,.035);color:#cbd8e9;border:1px solid #ffffff10;border-radius:10px}
+.page-btn.active{background:rgba(77,232,255,.14);color:#dffbff;border-color:rgba(77,232,255,.55)}
+.page-info{font-size:10px;color:#60718a;margin:0 8px}
+.locked{opacity:.55}
+@media(max-width:900px){.settings-preview{grid-template-columns:1fr}.frame{height:320px}}
+@media(max-width:600px){
+  main{width:calc(100% - 16px);padding-top:16px}
+  h1{letter-spacing:-2px}
+  .workspace{padding:9px}
+  .mode-group,.actions{grid-template-columns:1fr}
+  .previews{grid-template-columns:1fr}
+  .frame{height:285px}
 }
 </style>
 </head>
 <body>
+
 <main>
-<header>
-<h1>Cut It <span>Out!</span> ✂️</h1>
-<p class="subtitle">Remove unwanted borders and backgrounds from images — fast, free, and right in your browser.</p>
-<div class="badges">
-<div class="badge">🔒 <b>100% Private</b></div>
-<div class="badge">☁️ <b>No Uploads</b></div>
-<div class="badge">💸 <b>100% Free</b></div>
-</div>
+<header class="hero">
+  <div class="kicker"><i></i> CROP // CORE · LOCAL IMAGE ENGINE</div>
+  <h1>Cut It <span>Out!</span> ✂️</h1>
+  <p class="subtitle">Adaptive border detection for manga panels, screenshots and artwork — preserving the original pixels while trimming the outer background.</p>
+  <div class="badges">
+    <div class="badge">🔒 <b>LOCAL</b> processing</div>
+    <div class="badge">⚡ <b>HIGH-RES</b> export</div>
+    <div class="badge">🌈 <b>ADAPTIVE</b> color analysis</div>
+  </div>
 </header>
 
-<section class="card">
-<div class="drop" id="drop">
-<div class="drop-icon">▧</div>
-<div class="drop-title">Tap to select images</div>
-<div class="drop-sub">or drag &amp; drop here</div>
-<div class="count" id="count"><span>○</span><strong>0</strong> images selected</div>
-<input id="files" type="file" accept="image/*" multiple>
-</div>
+<section class="card workspace">
+  <div class="drop" id="drop">
+    <div class="drop-icon">⌁</div>
+    <div class="drop-title">Import image into the scan core</div>
+    <div class="drop-sub">Tap here or drag &amp; drop an image</div>
+    <div class="count" id="count"><span>◌</span><strong>0</strong> images selected</div>
+    <input id="files" type="file" accept="image/*" multiple>
+  </div>
 
-<div class="settings-preview">
-<div class="settings" id="settings">
+  <div class="settings-preview">
+    <div class="settings" id="settings">
+      <div class="section-head">
+        <div class="section-title">Detection Core</div>
+        <div class="signal"><i></i> ONLINE</div>
+      </div>
 
-<div class="setting">
-<div class="setting-head">
-<span>Crop Mode <span class="help" title="Choose how much background is removed">?</span></span>
-</div>
-<div class="mode-group">
-<button type="button" class="mode-btn active" id="modeNormal">
-Normal
-<small>Safely removes the outer background while protecting artwork.</small>
-</button>
-<button type="button" class="mode-btn" id="modeAggressive">
-Aggressive
-<small>Removes more surrounding background and trims closer to the artwork.</small>
-</button>
-</div>
-</div>
+      <div class="setting">
+        <div class="setting-head">
+          <span>Crop Mode <span class="help" title="Normal is conservative. Aggressive pushes deeper into connected outer background.">?</span></span>
+        </div>
+        <div class="mode-group">
+          <button type="button" class="mode-btn active" id="modeNormal">
+            NORMAL
+            <small>Balanced border segmentation with stronger artwork protection.</small>
+          </button>
+          <button type="button" class="mode-btn" id="modeAggressive">
+            AGGRESSIVE
+            <small>Stronger region growth and tighter boundary decisions.</small>
+          </button>
+        </div>
+      </div>
 
-<div class="setting">
-<div class="setting-head">
-<span>Tolerance <span class="help" title="How different a pixel can be from the detected background">?</span></span>
-<span class="value" id="tolVal">18</span>
-</div>
-<div class="range-wrap">
-<input id="tol" type="range" min="1" max="100" value="18">
-</div>
-<div class="desc">Higher removes more colors similar to the detected background. Lower preserves more edge detail.</div>
-</div>
+      <div class="setting">
+        <div class="setting-head">
+          <span>Adaptive Tolerance <span class="help" title="Controls how much local color variation can remain connected to the outside background.">?</span></span>
+          <span class="value" id="tolVal">34</span>
+        </div>
+        <div class="range-wrap"><input id="tol" type="range" min="1" max="100" value="34"></div>
+        <div class="desc">Higher values follow noisier borders and gradients. Lower values protect fine artwork edges.</div>
+      </div>
 
-<div class="setting">
-<div class="setting-head">
-<span>Safety Margin (px) <span class="help" title="Adds space around detected artwork">?</span></span>
-<span class="value" id="padVal">2</span>
-</div>
-<div class="range-wrap">
-<input id="pad" type="range" min="0" max="20" value="2">
-</div>
-<div class="desc">Keeps a small margin around the content so important details don't get cut off.</div>
-</div>
+      <div class="setting">
+        <div class="setting-head">
+          <span>Safety Margin <span class="help" title="Adds pixels around the detected content box.">?</span></span>
+          <span class="value" id="padVal">2 px</span>
+        </div>
+        <div class="range-wrap"><input id="pad" type="range" min="0" max="30" value="2"></div>
+        <div class="desc">Keep a little breathing room when important artwork touches the detected boundary.</div>
+      </div>
 
-<div class="setting">
-<div class="setting-head">
-<span>Self Improvement <span class="help" title="Makes the cropper learn more from the detected outer background">?</span></span>
-<span id="selfState" class="value">ON</span>
-</div>
-<div class="toggle-row">
-<div class="desc" style="margin:0">Automatically improves background detection using the image edges.</div>
-<label class="toggle">
-<input id="selfImprove" type="checkbox" checked>
-<span class="toggle-track"></span>
-</label>
-</div>
-</div>
+      <div class="setting">
+        <div class="setting-head">
+          <span>Edge Learning</span>
+          <span id="selfState" class="value">ON</span>
+        </div>
+        <div class="toggle-row">
+          <div class="desc" style="margin:0">Learns the outer color/texture profile before growing the background region.</div>
+          <label class="toggle">
+            <input id="selfImprove" type="checkbox" checked>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
 
-<button type="button" class="secondary" id="reset" style="width:100%;margin-top:18px">↻ Reset Settings</button>
-</div>
+      <button type="button" class="action secondary" id="reset" style="width:100%;margin-top:18px">↻ RESET CORE</button>
+    </div>
 
-<div class="previewbox">
-<div class="preview-title">Live Preview</div>
-<div class="previews">
-<div class="pane">
-<label>Original</label>
-<div class="frame"><img id="origPreview" alt=""></div>
-</div>
-<div class="pane">
-<label>Preview (Current Settings)</label>
-<div class="frame"><img id="cropPreview" alt=""></div>
-</div>
-</div>
-</div>
-</div>
+    <div class="previewbox">
+      <div class="preview-title">
+        <strong>Live Preview</strong>
+        <span class="preview-meta" id="previewMeta">WAITING FOR IMAGE</span>
+      </div>
+      <div class="previews">
+        <div class="pane">
+          <label><span>Original</span><span id="originalMeta">—</span></label>
+          <div class="frame"><div class="empty" id="origEmpty">Choose an image to begin.</div><img id="origPreview" alt="" style="display:none"></div>
+        </div>
+        <div class="pane">
+          <label><span>Detected Content</span><span id="cropMeta">—</span></label>
+          <div class="frame"><div class="empty" id="cropEmpty">The detected crop will appear here.</div><img id="cropPreview" alt="" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="actions">
-<button type="button" class="secondary" id="clean">✣ Clean Images</button>
-<button type="button" class="primary" id="downloadAll" disabled>⇩ Download All (.ZIP)</button>
-</div>
-<div class="note">The processing happens on your device. Your images are not sent anywhere.</div>
+  <div class="actions">
+    <button type="button" class="action secondary" id="clean">✦ RUN HIGH-QUALITY CROP</button>
+    <button type="button" class="action primary" id="downloadAll" disabled>⇩ DOWNLOAD ALL (.ZIP)</button>
+  </div>
+  <div class="note">Analysis is local and resolution-preserving. The exported image is cropped directly from the original source.</div>
 </section>
 
 <section class="card progress-card" id="progressCard">
-<div class="progress-top">
-<span id="progressText">Processing…</span>
-<span class="percent" id="percent">0%</span>
-</div>
-<div class="track"><div class="bar" id="bar"></div></div>
-<div class="status" id="status"></div>
+  <div class="progress-top"><span id="progressText">Processing…</span><span class="percent" id="percent">0%</span></div>
+  <div class="track"><div class="bar" id="bar"></div></div>
+  <div class="status" id="status"></div>
 </section>
 
 <div class="results" id="results"></div>
 <div class="pagination" id="pagination"></div>
 </main>
+
 <script>
 const $=id=>document.getElementById(id);
 
@@ -354,6 +376,11 @@ const resetBtn=$('reset');
 const settingsBox=$('settings');
 const origPreview=$('origPreview');
 const cropPreview=$('cropPreview');
+const origEmpty=$('origEmpty');
+const cropEmpty=$('cropEmpty');
+const originalMeta=$('originalMeta');
+const cropMeta=$('cropMeta');
+const previewMeta=$('previewMeta');
 const results=$('results');
 const pagination=$('pagination');
 const progressCard=$('progressCard');
@@ -369,1148 +396,547 @@ let outputs=[];
 let previewUrl=null;
 let currentPage=1;
 let cropMode='normal';
-let previewBusy=false;
+let previewToken=0;
+let busy=false;
 
 const PAGE_SIZE=20;
 
 function updateSlider(el){
-const min=Number(el.min)||0;
-const max=Number(el.max)||100;
-const value=Number(el.value);
-const pct=((value-min)/(max-min))*100;
-el.style.setProperty('--fill',pct+'%');
+  const min=Number(el.min)||0;
+  const max=Number(el.max)||100;
+  const value=Number(el.value);
+  const pct=((value-min)/(max-min))*100;
+  el.style.setProperty('--fill',pct+'%');
 }
-
 updateSlider(tolEl);
 updateSlider(padEl);
 
-drop.addEventListener('click',function(e){
-if(e.target===filesEl)return;
-filesEl.click();
-});
-
-drop.addEventListener('keydown',function(e){
-if(e.key==='Enter'||e.key===' '){
-e.preventDefault();
-filesEl.click();
+function setCount(){
+  count.innerHTML='<span style="color:var(--green)">✓</span><strong>'+selected.length+'</strong> image'+(selected.length===1?'':'s')+' selected';
 }
-});
+function setPreviewMeta(text){previewMeta.textContent=text}
+function yieldUI(){return new Promise(r=>setTimeout(r,0))}
 
+drop.addEventListener('click',e=>{if(e.target!==filesEl&&!busy)filesEl.click()});
+drop.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&!busy){e.preventDefault();filesEl.click()}
+});
 drop.setAttribute('role','button');
 drop.setAttribute('tabindex','0');
-
-drop.addEventListener('dragover',function(e){
-e.preventDefault();
-drop.classList.add('drag');
+drop.addEventListener('dragover',e=>{e.preventDefault();if(!busy)drop.classList.add('drag')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+drop.addEventListener('drop',e=>{
+  e.preventDefault();drop.classList.remove('drag');
+  if(!busy)setFiles(Array.from(e.dataTransfer.files||[]));
 });
-
-drop.addEventListener('dragleave',function(){
-drop.classList.remove('drag');
-});
-
-drop.addEventListener('drop',function(e){
-e.preventDefault();
-drop.classList.remove('drag');
-setFiles(Array.from(e.dataTransfer.files));
-});
-
-filesEl.addEventListener('change',function(){
-setFiles(Array.from(filesEl.files||[]));
-});
+filesEl.addEventListener('change',()=>setFiles(Array.from(filesEl.files||[])));
 
 function setFiles(arr){
-selected=arr.filter(function(f){
-return f && f.type && f.type.startsWith('image/');
-});
-
-count.innerHTML='<span style="color:#28d66f">✓</span><strong>'+selected.length+'</strong> images selected';
-
-if(selected.length){
-showPreview(selected[0]);
-}
+  selected=arr.filter(f=>f&&f.type&&f.type.startsWith('image/'));
+  setCount();
+  outputs=[];
+  results.innerHTML='';
+  pagination.innerHTML='';
+  downloadAll.disabled=true;
+  if(!selected.length){
+    origPreview.style.display='none';cropPreview.style.display='none';
+    origEmpty.style.display='block';cropEmpty.style.display='block';
+    originalMeta.textContent='—';cropMeta.textContent='—';setPreviewMeta('WAITING FOR IMAGE');
+    return;
+  }
+  showPreview(selected[0]);
 }
 
 function getImage(file){
-return new Promise(function(resolve,reject){
-const img=new Image();
-const url=URL.createObjectURL(file);
-
-img.onload=function(){
-URL.revokeObjectURL(url);
-resolve(img);
-};
-
-img.onerror=function(){
-URL.revokeObjectURL(url);
-reject(new Error('Could not load image'));
-};
-
-img.src=url;
-});
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Could not load image'))};
+    img.src=url;
+  });
 }
 
-
-/*
-====================================================================
- CUT IT OUT! — ADAPTIVE BORDER DETECTION ENGINE
- -------------------------------------------------------------------
- This is intentionally analysis-heavy but memory-conscious.
-
- Design goals:
- • Never assume the border is white, black, gray, or one flat color.
- • Follow smooth gradients through local color continuity.
- • Use edge strength to avoid crossing the actual artwork boundary.
- • Flood-fill only from the OUTSIDE, so interior colors are protected.
- • Analyze a reduced copy for speed, then map the result back to the
-   original image and crop at the ORIGINAL resolution.
- • Normal = conservative.
- • Aggressive = stronger region growth and tighter edge detection.
-====================================================================
-*/
-
-function rgbDistance(r1,g1,b1,r2,g2,b2){
-const dr=r1-r2;
-const dg=g1-g2;
-const db=b1-b2;
-return Math.sqrt(dr*dr+dg*dg+db*db);
+function rgbDist(r1,g1,b1,r2,g2,b2){
+  const dr=r1-r2,dg=g1-g2,db=b1-b2;
+  return Math.sqrt(dr*dr+dg*dg+db*db);
 }
-
-function luma(r,g,b){
-return 0.2126*r+0.7152*g+0.0722*b;
+function lum(r,g,b){return .2126*r+.7152*g+.0722*b}
+function clamp(v,a,b){return v<a?a:v>b?b:v}
+function median(a){
+  if(!a.length)return 0;
+  const b=Array.from(a).sort((x,y)=>x-y);
+  return b[(b.length-1)>>1];
 }
-
-function medianNumber(arr){
-if(!arr.length)return 0;
-const copy=Array.from(arr).sort((a,b)=>a-b);
-return copy[Math.floor(copy.length/2)];
+function percentile(a,p){
+  if(!a.length)return 0;
+  const b=Array.from(a).sort((x,y)=>x-y);
+  return b[Math.min(b.length-1,Math.max(0,Math.floor((b.length-1)*p)))];
 }
+function idx(x,y,w){return y*w+x}
 
-function clampNumber(v,min,max){
-return Math.max(min,Math.min(max,v));
-}
-
-function buildAnalysisCanvas(img){
-const iw=img.naturalWidth||img.width;
-const ih=img.naturalHeight||img.height;
-
-const maxSide=720;
-const scale=Math.min(1,maxSide/Math.max(iw,ih));
-
-const aw=Math.max(2,Math.round(iw*scale));
-const ah=Math.max(2,Math.round(ih*scale));
-
-const canvas=document.createElement('canvas');
-canvas.width=aw;
-canvas.height=ah;
-
-const ctx=canvas.getContext('2d',{
-willReadFrequently:true
-});
-
-ctx.imageSmoothingEnabled=true;
-ctx.imageSmoothingQuality='high';
-ctx.drawImage(img,0,0,aw,ah);
-
-return{
-canvas:canvas,
-width:aw,
-height:ah,
-scaleX:iw/aw,
-scaleY:ih/ah,
-originalWidth:iw,
-originalHeight:ih
-};
+function buildAnalysis(img){
+  const ow=img.naturalWidth||img.width,oh=img.naturalHeight||img.height;
+  const maxSide=900;
+  const scale=Math.min(1,maxSide/Math.max(ow,oh));
+  const w=Math.max(2,Math.round(ow*scale)),h=Math.max(2,Math.round(oh*scale));
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,0,0,w,h);
+  const d=ctx.getImageData(0,0,w,h).data;
+  return {w,h,d,ow,oh,sx:ow/w,sy:oh/h};
 }
 
 /*
-Returns a small sample of pixels from the outside border.
-It is used only to estimate how noisy the outer environment is.
+  ------------------------------------------------------------------
+  ADAPTIVE BORDER ENGINE
+  ------------------------------------------------------------------
+  This is deliberately not a "compare everything to white" cropper.
+
+  The engine:
+  1. Samples the four outer zones.
+  2. Measures local colour changes, luma changes and texture.
+  3. Builds an edge barrier map.
+  4. Grows a background region FROM THE OUTSIDE.
+  5. Allows slow colour drift, so gradients remain connected.
+  6. Uses multiple side profiles to locate the persistent boundary.
+  7. Applies the result to the ORIGINAL image dimensions.
+
+  This matters because a manga panel can have white, grey, coloured,
+  noisy, compressed, or gradient margins.
+  ------------------------------------------------------------------
 */
-function collectOuterStatistics(data,w,h){
-const samples=[];
-const gradients=[];
-
-const band=Math.max(2,Math.floor(Math.min(w,h)*0.035));
-const stride=Math.max(1,Math.floor(Math.max(w,h)/180));
-
-function read(x,y){
-const i=(y*w+x)*4;
-return[
-data[i],
-data[i+1],
-data[i+2]
-];
-}
-
-function pushPixel(x,y){
-const p=read(x,y);
-samples.push(p);
-}
-
-for(let x=0;x<w;x+=stride){
-for(let y=0;y<Math.min(h,band);y+=Math.max(1,Math.floor(band/5))){
-pushPixel(x,y);
-}
-for(let y=Math.max(0,h-band);y<h;y+=Math.max(1,Math.floor(band/5))){
-pushPixel(x,y);
-}
-}
-
-for(let y=0;y<h;y+=stride){
-for(let x=0;x<Math.min(w,band);x+=Math.max(1,Math.floor(band/5))){
-pushPixel(x,y);
-}
-for(let x=Math.max(0,w-band);x<w;x+=Math.max(1,Math.floor(band/5))){
-pushPixel(x,y);
-}
-}
-
-/* Local edge samples from the outer strips. */
-for(let x=0;x<w-1;x+=stride){
-let i=(0*w+x)*4;
-let j=(0*w+x+1)*4;
-gradients.push(rgbDistance(
-data[i],data[i+1],data[i+2],
-data[j],data[j+1],data[j+2]
-));
-
-i=((h-1)*w+x)*4;
-j=((h-1)*w+x+1)*4;
-gradients.push(rgbDistance(
-data[i],data[i+1],data[i+2],
-data[j],data[j+1],data[j+2]
-));
-}
-
-for(let y=0;y<h-1;y+=stride){
-let i=(y*w)*4;
-let j=((y+1)*w)*4;
-gradients.push(rgbDistance(
-data[i],data[i+1],data[i+2],
-data[j],data[j+1],data[j+2]
-));
-
-i=(y*w+w-1)*4;
-j=((y+1)*w+w-1)*4;
-gradients.push(rgbDistance(
-data[i],data[i+1],data[i+2],
-data[j],data[j+1],data[j+2]
-));
-}
-
-const r=samples.map(p=>p[0]);
-const g=samples.map(p=>p[1]);
-const b=samples.map(p=>p[2]);
-
-return{
-medianColor:[
-medianNumber(r),
-medianNumber(g),
-medianNumber(b)
-],
-medianGradient:medianNumber(gradients),
-gradientSpread:Math.max(
-1,
-medianNumber(gradients.map(v=>Math.abs(v-medianNumber(gradients))))
-),
-sampleCount:samples.length
-};
-}
-
-/*
-Create a compact edge-strength map.
-
-A high value means "there is probably a real visual boundary here".
-A low value means neighboring pixels are smoothly connected.
-
-We intentionally keep this in a Uint8Array so even a large source image
-never allocates a giant full-resolution floating point analysis buffer.
-*/
-function buildEdgeMap(data,w,h){
-const edge=new Uint8Array(w*h);
-
-function colorAt(x,y){
-const i=(y*w+x)*4;
-return[data[i],data[i+1],data[i+2]];
-}
-
-function distAt(a,b){
-return rgbDistance(
-a[0],a[1],a[2],
-b[0],b[1],b[2]
-);
-}
-
-for(let y=0;y<h;y++){
-for(let x=0;x<w;x++){
-const c=colorAt(x,y);
-
-let total=0;
-let count=0;
-
-if(x>0){
-total+=distAt(c,colorAt(x-1,y));
-count++;
-}
-if(x<w-1){
-total+=distAt(c,colorAt(x+1,y));
-count++;
-}
-if(y>0){
-total+=distAt(c,colorAt(x,y-1));
-count++;
-}
-if(y<h-1){
-total+=distAt(c,colorAt(x,y+1));
-count++;
-}
-
-const avg=total/Math.max(1,count);
-edge[y*w+x]=Math.round(clampNumber(avg,0,255));
-}
-}
-
-return edge;
-}
-
-/*
-The background may be a gradient. Comparing every pixel to one global
-background color fails badly in that situation.
-
-Instead, the detector walks outward-connected pixels and compares each
-new pixel with its immediate neighborhood. This allows a slow gradient
-to be followed even when its final color is very different from its
-starting color.
-*/
-function adaptiveBackgroundMask(data,edges,w,h,tol,mode,learning){
-const aggressive=mode==='aggressive';
-
-const stats=collectOuterStatistics(data,w,h);
-
-const baseLocal=
-6+
-tol*0.78+
-stats.medianGradient*0.90+
-stats.gradientSpread*0.65;
-
-const localThreshold=aggressive
-?baseLocal*1.58+7
-:baseLocal*1.16+4;
-
-const edgeBarrier=aggressive
-?Math.max(22,localThreshold*1.75)
-:Math.max(18,localThreshold*1.38);
-
-const colorDriftLimit=aggressive
-?localThreshold*3.7
-:localThreshold*2.7;
-
-/*
-Mask values:
- 0 = unknown/content
- 1 = background
- 2 = queued
-*/
-const state=new Uint8Array(w*h);
-const queue=new Int32Array(w*h);
-let head=0;
-let tail=0;
-
-function index(x,y){
-return y*w+x;
-}
-
-function rgbAt(i){
-const p=i*4;
-return[
-data[p],
-data[p+1],
-data[p+2]
-];
-}
-
-function push(i){
-if(state[i]!==0)return;
-state[i]=2;
-queue[tail++]=i;
-}
-
-/*
-Seed the outside, but do not blindly seed pixels that already look like
-strong internal edges. This protects artwork that genuinely touches an
-image edge.
-*/
-const seedBarrier=Math.max(
-18,
-localThreshold*1.22
-);
-
-function seedIfSafe(i){
-if(edges[i]<=seedBarrier){
-push(i);
-}
-}
-
-for(let x=0;x<w;x++){
-seedIfSafe(x);
-seedIfSafe((h-1)*w+x);
-}
-
-for(let y=1;y<h-1;y++){
-seedIfSafe(y*w);
-seedIfSafe(y*w+w-1);
-}
-
-let bgR=stats.medianColor[0];
-let bgG=stats.medianColor[1];
-let bgB=stats.medianColor[2];
-let bgCount=0;
-
-/*
-For the first few layers, learn the actual outside colors. This makes
-the engine more stable when the four sides are different colors.
-*/
-const learnLimit=Math.max(
-40,
-Math.floor(w*h*0.018)
-);
-
-function localDistance(a,b){
-return rgbDistance(
-a[0],a[1],a[2],
-b[0],b[1],b[2]
-);
-}
-
-function shouldAccept(current,next){
-const a=rgbAt(current);
-const b=rgbAt(next);
-
-const local=localDistance(a,b);
-const edgeA=edges[current];
-const edgeB=edges[next];
-const edge=Math.max(edgeA,edgeB);
-
-if(local>localThreshold*1.9){
-return false;
-}
-
-/*
-A strong edge is normally the artwork boundary. Aggressive mode can
-cross a somewhat stronger edge, but never blindly crosses very large
-jumps.
-*/
-if(edge>edgeBarrier){
-return false;
-}
-
-const drift=rgbDistance(
-b[0],b[1],b[2],
-bgR,bgG,bgB
-);
-
-/*
-Learning is deliberately soft. It should help gradients, not force
-everything to look like one global background color.
-*/
-if(learning&&bgCount>12&&drift>colorDriftLimit){
-return false;
-}
-
-return true;
-}
-
-while(head<tail){
-const current=queue[head++];
-state[current]=1;
-
-const cy=Math.floor(current/w);
-const cx=current-cy*w;
-
-const neighbors=[
-cx>0?current-1:-1,
-cx<w-1?current+1:-1,
-cy>0?current-w:-1,
-cy<h-1?current+w:-1
-];
-
-/* Diagonals improve continuity around rounded corners. */
-const diagonals=[
-(cx>0&&cy>0)?current-w-1:-1,
-(cx<w-1&&cy>0)?current-w+1:-1,
-(cx>0&&cy<h-1)?current+w-1:-1,
-(cx<w-1&&cy<h-1)?current+w+1:-1
-];
-
-for(const next of neighbors){
-if(next<0||state[next]!==0)continue;
-
-if(shouldAccept(current,next)){
-push(next);
-
-if(learning&&bgCount<learnLimit){
-const p=next*4;
-bgR=(bgR*bgCount+data[p])/(bgCount+1);
-bgG=(bgG*bgCount+data[p+1])/(bgCount+1);
-bgB=(bgB*bgCount+data[p+2])/(bgCount+1);
-bgCount++;
-}
-}
-}
-
-/*
-Only use diagonal connections when at least one orthogonal route is
-already visually plausible. This prevents diagonal leakage through
-sharp artwork corners.
-*/
-for(const next of diagonals){
-if(next<0||state[next]!==0)continue;
-
-const nx=next%w;
-const ny=Math.floor(next/w);
-
-const bridge1=Math.abs(nx-cx)+Math.abs(ny-cy)===2;
-if(!bridge1)continue;
-
-if(shouldAccept(current,next)){
-const around=[
-nx>0?next-1:-1,
-nx<w-1?next+1:-1,
-ny>0?next-w:-1,
-ny<h-1?next+w:-1
-];
-
-let known=0;
-
-for(const q of around){
-if(q>=0&&state[q]===1)known++;
-}
-
-if(known>=1){
-push(next);
-}
-}
-}
-}
-
-/*
-Convert queued pixels into background as well. In normal operation most
-queued pixels are eventually visited; this also makes the mask robust
-if a browser yields during a very large analysis.
-*/
-for(let i=0;i<state.length;i++){
-if(state[i]===2)state[i]=1;
-}
-
-return{
-mask:state,
-localThreshold:localThreshold,
-edgeBarrier:edgeBarrier,
-stats:stats
-};
-}
-
-/*
-Remove tiny isolated "content islands" inside the outer background mask.
-This is intentionally conservative: it only fills a pixel when the
-majority of its immediate neighborhood is already background.
-*/
-function cleanBackgroundMask(mask,w,h,aggressive){
-const passes=aggressive?2:1;
-
-for(let pass=0;pass<passes;pass++){
-const copy=new Uint8Array(mask);
-
-for(let y=1;y<h-1;y++){
-for(let x=1;x<w-1;x++){
-const i=y*w+x;
-
-if(mask[i]!==0)continue;
-
-let bg=0;
-
-for(let yy=-1;yy<=1;yy++){
-for(let xx=-1;xx<=1;xx++){
-if(xx===0&&yy===0)continue;
-
-if(mask[(y+yy)*w+(x+xx)]===1){
-bg++;
-}
-}
-}
-
-if(bg>=7){
-copy[i]=1;
-}
-}
-}
-
-mask.set(copy);
-}
-}
-
-/*
-Find the actual crop box from the background mask.
-
-A side is only allowed to move inward when the detector sees a strong
-majority of connected background there. This is the important safety
-layer that stops one noisy edge from destroying the crop.
-*/
-function findBoundsFromMask(mask,w,h,originalWidth,originalHeight,pad,mode){
-const aggressive=mode==='aggressive';
-
-const sideCoverage=aggressive?0.42:0.58;
-const persistence=aggressive?0.74:0.84;
-
-function rowRatio(y){
-let bg=0;
-let total=0;
-const step=Math.max(1,Math.floor(w/420));
-
-for(let x=0;x<w;x+=step){
-total++;
-if(mask[y*w+x]===1)bg++;
-}
-
-return bg/Math.max(1,total);
-}
-
-function colRatio(x){
-let bg=0;
-let total=0;
-const step=Math.max(1,Math.floor(h/420));
-
-for(let y=0;y<h;y+=step){
-total++;
-if(mask[y*w+x]===1)bg++;
-}
-
-return bg/Math.max(1,total);
-}
-
-function persistentRows(from,dir,limit){
-let last=from;
-let consecutive=0;
-
-for(let y=from;(dir>0?y<h:y>=0);y+=dir){
-const ratio=rowRatio(y);
-
-if(ratio>=sideCoverage){
-consecutive++;
-last=y;
-
-if(consecutive>=Math.max(2,Math.floor(h*.004))){
-return y;
-}
-}else{
-consecutive=0;
-}
-}
-
-return last;
-}
-
-function persistentCols(from,dir,limit){
-let last=from;
-let consecutive=0;
-
-for(let x=from;(dir>0?x<w:x>=0);x+=dir){
-const ratio=colRatio(x);
-
-if(ratio>=sideCoverage){
-consecutive++;
-last=x;
-
-if(consecutive>=Math.max(2,Math.floor(w*.004))){
-return x;
-}
-}else{
-consecutive=0;
-}
-}
-
-return last;
-}
-
-/*
-Instead of scanning thousands of full-resolution rows, the analysis
-image is small. This is cheap enough to inspect every row/column.
-*/
-let leftA=0;
-let rightA=w-1;
-let topA=0;
-let bottomA=h-1;
-
-let maxCropLeft=0;
-let maxCropRight=0;
-let maxCropTop=0;
-let maxCropBottom=0;
-
-/*
-Measure how much connected background exists on the outer strip.
-If a side is mostly actual artwork, don't touch it.
-*/
-const outerBandX=Math.max(1,Math.floor(w*.012));
-const outerBandY=Math.max(1,Math.floor(h*.012));
-
-function bandColRatio(from,to){
-let bg=0,total=0;
-
-for(let x=from;x<=to;x++){
-const step=Math.max(1,Math.floor(h/260));
-for(let y=0;y<h;y+=step){
-total++;
-if(mask[y*w+x]===1)bg++;
-}
-}
-
-return bg/Math.max(1,total);
-}
-
-function bandRowRatio(from,to){
-let bg=0,total=0;
-
-for(let y=from;y<=to;y++){
-const step=Math.max(1,Math.floor(w/260));
-for(let x=0;x<w;x+=step){
-total++;
-if(mask[y*w+x]===1)bg++;
-}
-}
-
-return bg/Math.max(1,total);
-}
-
-const leftCoverage=bandColRatio(0,outerBandX);
-const rightCoverage=bandColRatio(
-Math.max(0,w-outerBandX-1),
-w-1
-);
-const topCoverage=bandRowRatio(0,outerBandY);
-const bottomCoverage=bandRowRatio(
-Math.max(0,h-outerBandY-1),
-h-1
-);
-
-const minDepthX=Math.max(
-2,
-Math.floor(w*(aggressive?.0025:.004))
-);
-const minDepthY=Math.max(
-2,
-Math.floor(h*(aggressive?.0025:.004))
-);
-
-if(leftCoverage>=sideCoverage){
-const candidate=persistentCols(0,1);
-if(candidate>=minDepthX){
-leftA=candidate;
-maxCropLeft=leftA;
-}else{
-leftA=0;
-}
-}else{
-leftA=0;
-}
-
-if(rightCoverage>=sideCoverage){
-const candidate=persistentCols(w-1,-1);
-if((w-1)-candidate>=minDepthX){
-rightA=candidate;
-maxCropRight=(w-1)-rightA;
-}else{
-rightA=w-1;
-}
-}else{
-rightA=w-1;
-}
-
-if(topCoverage>=sideCoverage){
-const candidate=persistentRows(0,1);
-if(candidate>=minDepthY){
-topA=candidate;
-maxCropTop=topA;
-}else{
-topA=0;
-}
-}else{
-topA=0;
-}
-
-if(bottomCoverage>=sideCoverage){
-const candidate=persistentRows(h-1,-1);
-if((h-1)-candidate>=minDepthY){
-bottomA=candidate;
-maxCropBottom=(h-1)-bottomA;
-}else{
-bottomA=h-1;
-}
-}
-
-/*
-Convert analysis coordinates to original coordinates. We use floor on
-the outer side and ceil on the inner side so the crop never accidentally
-loses a high-resolution content pixel because of rounding.
-*/
-let left=Math.floor(leftA*originalWidth/w);
-let top=Math.floor(topA*originalHeight/h);
-
-let right=Math.ceil(
-((rightA+1)*originalWidth/w)-1
-);
-
-let bottom=Math.ceil(
-((bottomA+1)*originalHeight/h)-1
-);
-
-left=clampNumber(left,0,originalWidth-1);
-top=clampNumber(top,0,originalHeight-1);
-right=clampNumber(right,0,originalWidth-1);
-bottom=clampNumber(bottom,0,originalHeight-1);
-
-/*
-Safety margin is expressed in original pixels. The control remains
-small, but it is applied at full resolution.
-*/
-left=Math.max(0,left-pad);
-top=Math.max(0,top-pad);
-right=Math.min(originalWidth-1,right+pad);
-bottom=Math.min(originalHeight-1,bottom+pad);
-
-/*
-Reject absurd results. A border cropper should never turn a normal
-image into a tiny sliver because of a noisy mask.
-*/
-const cropW=right-left+1;
-const cropH=bottom-top+1;
-const sourceArea=originalWidth*originalHeight;
-const cropArea=cropW*cropH;
-
-if(
-cropW<Math.max(2,originalWidth*.02)||
-cropH<Math.max(2,originalHeight*.02)||
-cropArea<sourceArea*.08
-){
-return{
-left:0,
-top:0,
-right:originalWidth-1,
-bottom:originalHeight-1,
-confidence:'low'
-};
-}
 
-const removedLeft=left;
-const removedRight=originalWidth-1-right;
-const removedTop=top;
-const removedBottom=originalHeight-1-bottom;
-
-const removedPixels=
-removedLeft+removedRight+removedTop+removedBottom;
-
-return{
-left:left,
-top:top,
-right:right,
-bottom:bottom,
-removed:{
-left:removedLeft,
-right:removedRight,
-top:removedTop,
-bottom:removedBottom,
-total:removedPixels
-},
-confidence:
-removedPixels>0?'good':'none'
-};
+function outerProfile(d,w,h){
+  const band=Math.max(3,Math.floor(Math.min(w,h)*.055));
+  const samples=[];
+  const local=[];
+  const sideMeans={top:[],right:[],bottom:[],left:[]};
+
+  function pix(x,y){
+    const p=(y*w+x)*4;
+    return [d[p],d[p+1],d[p+2],d[p+3]];
+  }
+  function collect(side){
+    const arr=sideMeans[side];
+    const count=side==='top'||side==='bottom'?w:h;
+    const stride=Math.max(1,Math.floor(count/180));
+    for(let q=0;q<count;q+=stride){
+      let x,y;
+      if(side==='top'){x=q;y=Math.min(h-1,Math.floor(band*.5))}
+      if(side==='bottom'){x=q;y=Math.max(0,h-1-Math.floor(band*.5))}
+      if(side==='left'){x=Math.min(w-1,Math.floor(band*.5));y=q}
+      if(side==='right'){x=Math.max(0,w-1-Math.floor(band*.5));y=q}
+      const p=pix(x,y);arr.push(p);
+      samples.push(p);
+    }
+  }
+  collect('top');collect('right');collect('bottom');collect('left');
+
+  for(let y=0;y<h;y+=Math.max(1,Math.floor(h/90))){
+    for(let x=0;x<w;x+=Math.max(1,Math.floor(w/90))){
+      if(x<band||x>=w-band||y<band||y>=h-band){
+        const p=(y*w+x)*4;
+        samples.push([d[p],d[p+1],d[p+2],d[p+3]]);
+      }
+    }
+  }
+
+  const rs=samples.map(p=>p[0]),gs=samples.map(p=>p[1]),bs=samples.map(p=>p[2]);
+  const lumv=samples.map(p=>lum(p[0],p[1],p[2]));
+  return {
+    median:[median(rs),median(gs),median(bs)],
+    spread:[percentile(rs,.9)-percentile(rs,.1),percentile(gs,.9)-percentile(gs,.1),percentile(bs,.9)-percentile(bs,.1)],
+    lumaSpread:percentile(lumv,.9)-percentile(lumv,.1),
+    sides:sideMeans
+  };
+}
+
+function buildEdgeMap(d,w,h){
+  const edge=new Uint8Array(w*h);
+  const texture=new Uint8Array(w*h);
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const i=(y*w+x)*4;
+      const r=d[i],g=d[i+1],b=d[i+2];
+      let sum=0,n=0,maxv=0;
+      if(x>0){
+        const q=i-4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
+        sum+=v;n++;if(v>maxv)maxv=v;
+      }
+      if(x<w-1){
+        const q=i+4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
+        sum+=v;n++;if(v>maxv)maxv=v;
+      }
+      if(y>0){
+        const q=i-w*4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
+        sum+=v;n++;if(v>maxv)maxv=v;
+      }
+      if(y<h-1){
+        const q=i+w*4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
+        sum+=v;n++;if(v>maxv)maxv=v;
+      }
+      edge[y*w+x]=Math.round(clamp((sum/Math.max(1,n))*.9+maxv*.35,0,255));
+      texture[y*w+x]=Math.round(clamp(sum/Math.max(1,n),0,255));
+    }
+  }
+  return {edge,texture};
+}
+
+function localColor(d,i,j){
+  return rgbDist(d[i],d[i+1],d[i+2],d[j],d[j+1],d[j+2]);
+}
+
+function growOuterBackground(info,features,tol,mode,learning){
+  const {w,h,d}=info;
+  const {edge,texture}=features;
+  const aggressive=mode==='aggressive';
+  const profile=outerProfile(d,w,h);
+
+  const borderNoise=Math.max(
+    2,
+    percentile(Array.from(texture).filter(v=>v>0),.72)
+  );
+  const edgeBase=Math.max(7,percentile(Array.from(edge),.78));
+
+  /*
+    Tolerance is deliberately mapped to a usable range instead of
+    becoming a raw RGB distance. This keeps the slider predictable.
+  */
+  const colorLimit=(aggressive?18:12)+tol*.72+(profile.lumaSpread*.025);
+  const edgeLimit=(aggressive?42:30)+tol*.48+edgeBase*.35;
+  const noisyLimit=borderNoise*.95+tol*.55;
+
+  const state=new Uint8Array(w*h);
+  const q=new Int32Array(w*h);
+  const seedCost=new Float32Array(w*h);
+  let head=0,tail=0;
+
+  function push(i,cost){
+    if(state[i]!==0)return;
+    state[i]=2;q[tail]=i;seedCost[i]=cost;tail++;
+  }
+
+  /*
+    Seed EVERY outer pixel. The previous failed version rejected many
+    outer pixels before the flood even began. Textured/coloured borders
+    need to be seeded too; the edge barrier is applied during growth.
+  */
+  for(let x=0;x<w;x++){push(x,0);if(h>1)push((h-1)*w+x,0)}
+  for(let y=1;y<h-1;y++){push(y*w,0);if(w>1)push(y*w+w-1,0)}
+
+  let learnedR=profile.median[0],learnedG=profile.median[1],learnedB=profile.median[2];
+  let learnedN=0;
+  const learnCap=Math.max(120,Math.floor(w*h*.035));
+
+  function accept(cur,next){
+    const ci=cur*4,ni=next*4;
+    const cd=localColor(d,ci,ni);
+    const e=Math.max(edge[cur],edge[next]);
+    const t=Math.max(texture[cur],texture[next]);
+
+    /*
+      Local continuity handles gradients: the detector compares a new
+      pixel with the connected pixel, not against one global colour.
+    */
+    if(cd>colorLimit*1.75 && t>noisyLimit)return false;
+
+    /*
+      A very strong edge is likely the artwork boundary. Aggressive
+      mode may cross medium edges when the colour transition itself is
+      smooth, but not a major discontinuity.
+    */
+    if(e>edgeLimit && cd>colorLimit*.72)return false;
+
+    if(learning&&learnedN>24){
+      const drift=rgbDist(d[ni],d[ni+1],d[ni+2],learnedR,learnedG,learnedB);
+      const driftLimit=colorLimit*(aggressive?4.8:3.6);
+      if(drift>driftLimit && e>edgeLimit*.7)return false;
+    }
+    return true;
+  }
+
+  while(head<tail){
+    const cur=q[head++];state[cur]=1;
+    const y=Math.floor(cur/w),x=cur-y*w;
+    const ns=[];
+    if(x>0)ns.push(cur-1);
+    if(x<w-1)ns.push(cur+1);
+    if(y>0)ns.push(cur-w);
+    if(y<h-1)ns.push(cur+w);
+
+    for(const next of ns){
+      if(state[next]!==0||!accept(cur,next))continue;
+      push(next,0);
+      if(learning&&learnedN<learnCap){
+        const p=next*4;
+        learnedR=(learnedR*learnedN+d[p])/(learnedN+1);
+        learnedG=(learnedG*learnedN+d[p+1])/(learnedN+1);
+        learnedB=(learnedB*learnedN+d[p+2])/(learnedN+1);
+        learnedN++;
+      }
+    }
+  }
+
+  /*
+    Convert "queued" to background only if it was actually reached.
+    State 1 is the connected outside region.
+  */
+  return {
+    mask:state,
+    colorLimit,
+    edgeLimit,
+    profile,
+    backgroundCount:state.reduce((n,v)=>n+(v===1?1:0),0)
+  };
+}
+
+function sideScore(mask,w,h,side,offset){
+  let bg=0,total=0;
+  const span=side==='top'||side==='bottom'?w:h;
+  const step=Math.max(1,Math.floor(span/500));
+  if(side==='top'||side==='bottom'){
+    const y=side==='top'?offset:h-1-offset;
+    for(let x=0;x<w;x+=step){total++;if(mask[y*w+x]===1)bg++}
+  }else{
+    const x=side==='left'?offset:w-1-offset;
+    for(let y=0;y<h;y+=step){total++;if(mask[y*w+x]===1)bg++}
+  }
+  return bg/Math.max(1,total);
+}
+
+function persistentBoundary(mask,w,h,side,mode){
+  const aggressive=mode==='aggressive';
+  const span=side==='top'||side==='bottom'?h:w;
+  const maxDepth=Math.floor(span*.48);
+  const threshold=aggressive?.54:.70;
+
+  /*
+    Search for the first persistent fall in connected-background
+    coverage. A single letter/noise mark cannot trigger the boundary.
+  */
+  let previous=sideScore(mask,w,h,side,0);
+  let bestDepth=0;
+  let bestDrop=0;
+
+  for(let d=1;d<=maxDepth;d++){
+    const s=sideScore(mask,w,h,side,d);
+    const drop=previous-s;
+    if(drop>bestDrop){bestDrop=drop;bestDepth=d}
+    previous=s;
+  }
+
+  let run=0;
+  for(let d=0;d<=maxDepth;d++){
+    const s=sideScore(mask,w,h,side,d);
+    if(s<threshold){
+      run++;
+      if(run>=Math.max(2,Math.floor(span*.006))){
+        return Math.max(0,d-run+1);
+      }
+    }else run=0;
+  }
+
+  /*
+    If the percentage threshold never fires, use the strongest stable
+    drop only when it is meaningful. Otherwise keep the side untouched.
+  */
+  if(bestDrop>0.18)return bestDepth;
+  return 0;
+}
+
+function refineBounds(info,grown,pad,mode){
+  const {w,h,ow,oh}=info;
+  const mask=grown.mask;
+
+  const leftA=persistentBoundary(mask,w,h,'left',mode);
+  const rightA=persistentBoundary(mask,w,h,'right',mode);
+  const topA=persistentBoundary(mask,w,h,'top',mode);
+  const bottomA=persistentBoundary(mask,w,h,'bottom',mode);
+
+  /*
+    Convert analysis coordinates to original coordinates conservatively.
+    We intentionally expand by one analysis pixel before applying the
+    user safety margin, preventing accidental loss of high-res details.
+  */
+  let left=Math.floor(Math.max(0,leftA-1)*ow/w);
+  let right=Math.ceil(Math.min(w-1,w-1-rightA+1)*ow/w)-1;
+  let top=Math.floor(Math.max(0,topA-1)*oh/h);
+  let bottom=Math.ceil(Math.min(h-1,h-1-bottomA+1)*oh/h)-1;
+
+  left=clamp(left,0,ow-1);right=clamp(right,0,ow-1);
+  top=clamp(top,0,oh-1);bottom=clamp(bottom,0,oh-1);
+
+  left=Math.max(0,left-pad);top=Math.max(0,top-pad);
+  right=Math.min(ow-1,right+pad);bottom=Math.min(oh-1,bottom+pad);
+
+  const cw=right-left+1,ch=bottom-top+1;
+  const area=cw*ch/(ow*oh);
+
+  /*
+    Never return a ridiculous crop. A 1-2% sliver is almost certainly a
+    segmentation failure. This is the final crash/safety guard.
+  */
+  if(cw<Math.max(8,ow*.035)||ch<Math.max(8,oh*.035)||area<.035){
+    return {left:0,top:0,right:ow-1,bottom:oh-1,confidence:'low',removed:0};
+  }
+
+  const removed=(left)+(ow-1-right)+(top)+(oh-1-bottom);
+  const maxSideRemoved=Math.max(left,ow-1-right,top,oh-1-bottom);
+  const confidence=removed===0?'none':maxSideRemoved>Math.max(ow,oh)*.42?'medium':'high';
+
+  return {
+    left,top,right,bottom,confidence,
+    removed,
+    sides:{left,right:ow-1-right,top,bottom:oh-1-bottom}
+  };
 }
 
-/*
-Main analysis entry point.
-*/
 function analyzeCrop(img,tol,pad,mode){
-const info=buildAnalysisCanvas(img);
+  const info=buildAnalysis(img);
+  if(info.w<2||info.h<2){
+    return {left:0,top:0,right:info.ow-1,bottom:info.oh-1,confidence:'low',removed:0};
+  }
 
-const ctx=info.canvas.getContext('2d',{
-willReadFrequently:true
-});
+  const features=buildEdgeMap(info.d,info.w,info.h);
+  const grown=growOuterBackground(info,features,tol,mode,selfImprove.checked);
+  const bounds=refineBounds(info,grown,pad,mode);
 
-const imageData=ctx.getImageData(
-0,
-0,
-info.width,
-info.height
-);
-
-const data=imageData.data;
-
-if(info.width<2||info.height<2){
-return{
-left:0,
-top:0,
-right:info.originalWidth-1,
-bottom:info.originalHeight-1,
-confidence:'low'
-};
+  bounds.analysis={
+    width:info.w,height:info.h,
+    backgroundRatio:grown.backgroundCount/(info.w*info.h),
+    colorLimit:grown.colorLimit,
+    edgeLimit:grown.edgeLimit
+  };
+  return bounds;
 }
 
-const edges=buildEdgeMap(
-data,
-info.width,
-info.height
-);
-
-const grown=adaptiveBackgroundMask(
-data,
-edges,
-info.width,
-info.height,
-tol,
-mode,
-selfImprove.checked
-);
-
-cleanBackgroundMask(
-grown.mask,
-info.width,
-info.height,
-mode==='aggressive'
-);
-
-const bounds=findBoundsFromMask(
-grown.mask,
-info.width,
-info.height,
-info.originalWidth,
-info.originalHeight,
-pad,
-mode
-);
-
-return bounds;
-}
-
-/*
-Full-quality output path.
-
-The detector is low-resolution only for analysis. The actual crop is
-drawn directly from the original image dimensions, so there is NO
-downscaling of the exported image.
-*/
 function cropImage(img,tol,pad,mode){
-const w=img.naturalWidth||img.width;
-const h=img.naturalHeight||img.height;
+  const w=img.naturalWidth||img.width;
+  const h=img.naturalHeight||img.height;
+  const bounds=analyzeCrop(img,tol,pad,mode);
 
-const bounds=analyzeCrop(
-img,
-tol,
-pad,
-mode
-);
+  const out=document.createElement('canvas');
+  out.width=Math.max(1,bounds.right-bounds.left+1);
+  out.height=Math.max(1,bounds.bottom-bounds.top+1);
 
-const out=document.createElement('canvas');
-
-out.width=Math.max(
-1,
-bounds.right-bounds.left+1
-);
-
-out.height=Math.max(
-1,
-bounds.bottom-bounds.top+1
-);
-
-const octx=out.getContext('2d',{
-willReadFrequently:false
-});
-
-octx.imageSmoothingEnabled=true;
-octx.imageSmoothingQuality='high';
-
-octx.drawImage(
-img,
-bounds.left,
-bounds.top,
-out.width,
-out.height,
-0,
-0,
-out.width,
-out.height
-);
-
-return{
-canvas:out,
-bounds:bounds,
-width:out.width,
-height:out.height
-};
-}
-
-/*
-Preview path.
-
-Do NOT convert a giant original-resolution canvas to a data URL on every
-slider movement. That is what can freeze mobile browsers.
-
-Instead, detect at analysis resolution and render a capped preview.
-*/
-async function makePreview(file){
-const img=await getImage(file);
-
-const result=cropImage(
-img,
-Number(tolEl.value),
-Number(padEl.value),
-cropMode
-);
-
-const maxPreview=1100;
-const scale=Math.min(
-1,
-maxPreview/Math.max(result.width,result.height)
-);
-
-const pw=Math.max(1,Math.round(result.width*scale));
-const ph=Math.max(1,Math.round(result.height*scale));
-
-const canvas=document.createElement('canvas');
-canvas.width=pw;
-canvas.height=ph;
-
-const ctx=canvas.getContext('2d');
-ctx.imageSmoothingEnabled=true;
-ctx.imageSmoothingQuality='high';
-
-ctx.drawImage(
-result.canvas,
-0,0,result.width,result.height,
-0,0,pw,ph
-);
-
-return canvas.toDataURL(
-'image/jpeg',
-0.88
-);
+  const ctx=out.getContext('2d');
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(
+    img,
+    bounds.left,bounds.top,out.width,out.height,
+    0,0,out.width,out.height
+  );
+  out._bounds=bounds;
+  return out;
 }
 
 async function showPreview(file){
-if(previewUrl){
-URL.revokeObjectURL(previewUrl);
-previewUrl=null;
+  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
+  previewUrl=URL.createObjectURL(file);
+  origPreview.src=previewUrl;
+  origPreview.style.display='block';
+  origEmpty.style.display='none';
+
+  const img=await getImage(file);
+  const w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+  originalMeta.textContent=w+' × '+h;
+  setPreviewMeta('ANALYZING');
+  await refreshPreview();
 }
 
-previewUrl=URL.createObjectURL(file);
-origPreview.src=previewUrl;
+async function refreshPreview(){
+  if(!selected.length)return;
+  const token=++previewToken;
+  setPreviewMeta('SCANNING OUTER REGION');
+  cropEmpty.style.display='none';
+  cropPreview.style.display='none';
 
-await previewCrop();
-}
+  await yieldUI();
 
-let previewRequest=0;
+  try{
+    const img=await getImage(selected[0]);
+    const result=cropImage(img,+tolEl.value,+padEl.value,cropMode);
+    if(token!==previewToken)return;
 
-async function previewCrop(){
-if(!selected.length)return;
+    const max=1200;
+    const scale=Math.min(1,max/Math.max(result.width,result.height));
+    const pw=Math.max(1,Math.round(result.width*scale));
+    const ph=Math.max(1,Math.round(result.height*scale));
+    const pc=document.createElement('canvas');pc.width=pw;pc.height=ph;
+    const ctx=pc.getContext('2d');
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(result,0,0,result.width,result.height,0,0,pw,ph);
 
-const request=++previewRequest;
+    const url=URL.createObjectURL(await new Promise(r=>pc.toBlob(r,'image/jpeg',.9)));
+    cropPreview.onload=()=>URL.revokeObjectURL(url);
+    cropPreview.src=url;
+    cropPreview.style.display='block';
 
-cropPreview.style.opacity='.35';
-
-try{
-const url=await makePreview(selected[0]);
-
-if(request!==previewRequest)return;
-
-cropPreview.src=url;
-}catch(e){
-console.error('Preview failed:',e);
-}finally{
-if(request===previewRequest){
-cropPreview.style.opacity='1';
-}
-}
+    cropMeta.textContent=result.width+' × '+result.height;
+    setPreviewMeta(
+      result._bounds&&result._bounds.confidence
+      ? 'BOUNDARY '+result._bounds.confidence.toUpperCase()
+      : 'READY'
+    );
+  }catch(e){
+    console.error(e);
+    if(token===previewToken){
+      setPreviewMeta('SCAN ERROR');
+      cropMeta.textContent='—';
+    }
+  }
 }
 
 function setLocked(locked){
-settingsBox.classList.toggle('locked',locked);
-
-filesEl.disabled=locked;
-tolEl.disabled=locked;
-padEl.disabled=locked;
-resetBtn.disabled=locked;
-modeNormal.disabled=locked;
-modeAggressive.disabled=locked;
-selfImprove.disabled=locked;
-
-if(locked){
-drop.style.pointerEvents='none';
-}else{
-drop.style.pointerEvents='';
-}
+  settingsBox.classList.toggle('locked',locked);
+  filesEl.disabled=locked;
+  tolEl.disabled=locked;
+  padEl.disabled=locked;
+  resetBtn.disabled=locked;
+  modeNormal.disabled=locked;
+  modeAggressive.disabled=locked;
+  selfImprove.disabled=locked;
+  busy=locked;
+  drop.style.pointerEvents=locked?'none':'';
 }
 
 function setMode(mode){
-cropMode=mode;
-
-modeNormal.classList.toggle('active',mode==='normal');
-modeAggressive.classList.toggle('active',mode==='aggressive');
-
-previewCrop();
+  cropMode=mode;
+  modeNormal.classList.toggle('active',mode==='normal');
+  modeAggressive.classList.toggle('active',mode==='aggressive');
+  refreshPreview();
 }
 
-modeNormal.addEventListener('click',function(){
-if(!modeNormal.disabled)setMode('normal');
+modeNormal.addEventListener('click',()=>{if(!modeNormal.disabled)setMode('normal')});
+modeAggressive.addEventListener('click',()=>{if(!modeAggressive.disabled)setMode('aggressive')});
+
+tolEl.addEventListener('input',()=>{
+  tolVal.textContent=tolEl.value;
+  updateSlider(tolEl);
+  refreshPreview();
+});
+padEl.addEventListener('input',()=>{
+  padVal.textContent=padEl.value+' px';
+  updateSlider(padEl);
+  refreshPreview();
+});
+selfImprove.addEventListener('change',()=>{
+  selfState.textContent=selfImprove.checked?'ON':'OFF';
+  refreshPreview();
 });
 
-modeAggressive.addEventListener('click',function(){
-if(!modeAggressive.disabled)setMode('aggressive');
+resetBtn.addEventListener('click',()=>{
+  tolEl.value='34';padEl.value='2';selfImprove.checked=true;cropMode='normal';
+  tolVal.textContent='34';padVal.textContent='2 px';selfState.textContent='ON';
+  updateSlider(tolEl);updateSlider(padEl);
+  modeNormal.classList.add('active');modeAggressive.classList.remove('active');
+  refreshPreview();
 });
 
-tolEl.addEventListener('input',function(){
-tolVal.textContent=tolEl.value;
-updateSlider(tolEl);
-previewCrop();
-});
-
-padEl.addEventListener('input',function(){
-padVal.textContent=padEl.value;
-updateSlider(padEl);
-previewCrop();
-});
-
-selfImprove.addEventListener('change',function(){
-selfState.textContent=selfImprove.checked?'ON':'OFF';
-previewCrop();
-});
-
-resetBtn.addEventListener('click',function(){
-tolEl.value='18';
-padEl.value='2';
-tolVal.textContent='18';
-padVal.textContent='2';
-selfImprove.checked=true;
-selfState.textContent='ON';
-setMode('normal');
-updateSlider(tolEl);
-updateSlider(padEl);
-previewCrop();
-});
-
-function downloadBlob(blob,name){
-const url=URL.createObjectURL(blob);
-const a=document.createElement('a');
-
-a.href=url;
-a.download=name;
-a.style.display='none';
-
-document.body.appendChild(a);
-a.click();
-a.remove();
-
-setTimeout(function(){
-URL.revokeObjectURL(url);
-},5000);
-}
+setCount();
 
 function renderPage(){
 results.innerHTML='';
@@ -1787,18 +1213,16 @@ status.textContent=selected[i].name;
 
 const img=await getImage(selected[i]);
 
-const result=cropImage(
+const out=cropImage(
 img,
 tol,
 pad,
 mode
 );
 
-const out=result.canvas;
-
 const blob=await new Promise(function(resolve,reject){
-out.toBlob(function(resultBlob){
-if(resultBlob)resolve(resultBlob);
+out.toBlob(function(result){
+if(result)resolve(result);
 else reject(new Error('Could not create PNG'));
 },'image/png');
 });
@@ -1861,6 +1285,7 @@ setLocked(false);
 updateSlider(tolEl);
 updateSlider(padEl);
 selfState.textContent=selfImprove.checked?'ON':'OFF';
+
 
 </script>
 </body>
