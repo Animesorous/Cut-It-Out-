@@ -7,7 +7,8 @@
 
 <title>Cut It Out! — AI Background Remover</title>
 
-<style>:root{
+<style>
+:root{
 --bg:#050810;
 --bg2:#09101d;
 --glass:rgba(14,20,34,.62);
@@ -244,7 +245,1160 @@ cursor:pointer;
 overflow:hidden;
 transition:
 transform .2s ease,
-border-color .2s ease,<script>
+border-color .2s ease,
+background .2s ease,
+box-shadow .2s ease;
+background:
+radial-gradient(
+circle at 50% 50%,
+rgba(77,231,255,.055),
+transparent 55%
+),
+rgba(4,10,19,.35);
+}
+
+.drop::before{
+content:"";
+position:absolute;
+inset:0;
+background:
+linear-gradient(
+120deg,
+transparent 20%,
+rgba(77,231,255,.08) 50%,
+transparent 80%
+);
+transform:translateX(-100%);
+transition:transform .6s ease;
+}
+
+.drop:hover::before,
+.drop.drag::before{
+transform:translateX(100%);
+}
+
+.drop:hover,
+.drop.drag{
+transform:translateY(-2px);
+border-color:rgba(77,231,255,.65);
+background:
+radial-gradient(
+circle at 50% 50%,
+rgba(77,231,255,.11),
+transparent 60%
+),
+rgba(5,14,26,.55);
+box-shadow:
+0 0 45px rgba(77,231,255,.08),
+inset 0 0 35px rgba(77,231,255,.025);
+}
+
+.drop-icon{
+position:relative;
+width:62px;
+height:62px;
+display:grid;
+place-items:center;
+margin-bottom:13px;
+border:1px solid rgba(77,231,255,.32);
+border-radius:18px;
+background:
+linear-gradient(
+145deg,
+rgba(77,231,255,.12),
+rgba(92,124,255,.08)
+);
+color:var(--cyan);
+font-size:29px;
+box-shadow:
+0 0 30px rgba(77,231,255,.09),
+inset 0 0 20px rgba(77,231,255,.04);
+}
+
+.drop-title{
+position:relative;
+font-size:20px;
+font-weight:850;
+letter-spacing:-.4px;
+}
+
+.drop-sub{
+position:relative;
+margin-top:6px;
+color:var(--muted);
+font-size:13px;
+}
+
+.count{
+position:relative;
+display:inline-flex;
+align-items:center;
+gap:8px;
+margin-top:17px;
+padding:8px 13px;
+border:1px solid rgba(255,255,255,.09);
+border-radius:999px;
+background:rgba(5,10,18,.58);
+color:#9aa9bf;
+font-size:12px;
+}
+
+.count strong{
+color:var(--green);
+}
+
+input[type=file]{
+display:none;
+}
+
+.workspace{
+display:grid;
+grid-template-columns:370px 1fr;
+gap:16px;
+margin-top:16px;
+}
+
+.panel{
+min-width:0;
+padding:18px;
+border:1px solid var(--line);
+border-radius:20px;
+background:
+linear-gradient(
+145deg,
+rgba(15,24,40,.67),
+rgba(7,12,22,.55)
+);
+}
+
+.panel-title{
+display:flex;
+align-items:center;
+gap:9px;
+margin-bottom:18px;
+font-size:13px;
+font-weight:900;
+letter-spacing:.7px;
+text-transform:uppercase;
+color:#dbeaff;
+}
+
+.panel-title::before{
+content:"";
+width:8px;
+height:8px;
+border-radius:50%;
+background:var(--cyan);
+box-shadow:0 0 13px var(--cyan);
+}
+
+.setting{
+margin-bottom:22px;
+}
+
+.setting:last-child{
+margin-bottom:0;
+}
+
+.setting-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+margin-bottom:9px;
+font-size:13px;
+font-weight:800;
+}
+
+.value{
+min-width:48px;
+padding:6px 9px;
+border:1px solid var(--line);
+border-radius:9px;
+background:rgba(4,9,17,.65);
+color:#e6f3ff;
+font-size:12px;
+text-align:center;
+}
+
+.help{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+width:17px;
+height:17px;
+margin-left:4px;
+border:1px solid rgba(255,255,255,.15);
+border-radius:50%;
+color:#7f8ea5;
+font-size:10px;
+cursor:help;
+}
+
+.mode-group{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+}
+
+.mode-btn{
+min-height:85px;
+padding:12px;
+border:1px solid var(--line);
+border-radius:13px;
+background:rgba(6,12,22,.55);
+color:#c9d6e8;
+text-align:left;
+cursor:pointer;
+transition:.18s ease;
+}
+
+.mode-btn:hover{
+border-color:var(--line2);
+transform:translateY(-1px);
+}
+
+.mode-btn.active{
+border-color:rgba(77,231,255,.6);
+background:
+linear-gradient(
+145deg,
+rgba(77,231,255,.13),
+rgba(92,124,255,.08)
+);
+box-shadow:
+0 0 22px rgba(77,231,255,.08),
+inset 0 0 20px rgba(77,231,255,.035);
+color:#fff;
+}
+
+.mode-btn small{
+display:block;
+margin-top:6px;
+color:#77869c;
+font-size:10px;
+line-height:1.4;
+font-weight:500;
+}
+
+.mode-btn.active small{
+color:#9eb6ce;
+}
+
+.range-wrap{
+padding:4px 0;
+}
+
+input[type=range]{
+width:100%;
+height:7px;
+margin:0;
+appearance:none;
+-webkit-appearance:none;
+border-radius:999px;
+outline:none;
+cursor:pointer;
+background:
+linear-gradient(
+90deg,
+var(--cyan) 0%,
+var(--blue) var(--fill,18%),
+rgba(255,255,255,.10) var(--fill,18%),
+rgba(255,255,255,.10) 100%
+);
+box-shadow:
+0 0 15px rgba(77,231,255,.06);
+}
+
+input[type=range]::-webkit-slider-runnable-track{
+height:7px;
+border-radius:999px;
+background:transparent;
+}
+
+input[type=range]::-webkit-slider-thumb{
+appearance:none;
+-webkit-appearance:none;
+width:20px;
+height:20px;
+margin-top:-6.5px;
+border-radius:50%;
+background:#dffaff;
+border:3px solid #0a1624;
+box-shadow:
+0 0 0 1px var(--cyan),
+0 0 14px rgba(77,231,255,.55);
+cursor:pointer;
+}
+
+input[type=range]::-moz-range-track{
+height:7px;
+border-radius:999px;
+background:rgba(255,255,255,.1);
+}
+
+input[type=range]::-moz-range-progress{
+height:7px;
+border-radius:999px;
+background:linear-gradient(90deg,var(--cyan),var(--blue));
+}
+
+input[type=range]::-moz-range-thumb{
+width:20px;
+height:20px;
+border-radius:50%;
+background:#dffaff;
+border:3px solid #0a1624;
+box-shadow:
+0 0 0 1px var(--cyan),
+0 0 14px rgba(77,231,255,.55);
+cursor:pointer;
+}
+
+.desc{
+margin-top:7px;
+color:#718198;
+font-size:11px;
+line-height:1.45;
+}
+
+.switch-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding:12px;
+border:1px solid var(--line);
+border-radius:13px;
+background:rgba(4,10,19,.48);
+}
+
+.switch-text{
+font-size:12px;
+font-weight:800;
+}
+
+.switch-text small{
+display:block;
+margin-top:4px;
+color:#718198;
+font-size:10px;
+font-weight:500;
+line-height:1.35;
+}
+
+.switch{
+position:relative;
+width:48px;
+height:26px;
+flex:0 0 auto;
+}
+
+.switch input{
+display:none;
+}
+
+.switch-slider{
+position:absolute;
+inset:0;
+border-radius:999px;
+background:#252d3a;
+border:1px solid rgba(255,255,255,.1);
+cursor:pointer;
+transition:.2s;
+}
+
+.switch-slider::before{
+content:"";
+position:absolute;
+width:18px;
+height:18px;
+left:3px;
+top:3px;
+border-radius:50%;
+background:#8b98a8;
+transition:.2s;
+}
+
+.switch input:checked + .switch-slider{
+background:
+linear-gradient(90deg,#087d98,#3656c8);
+box-shadow:0 0 16px rgba(77,231,255,.2);
+}
+
+.switch input:checked + .switch-slider::before{
+transform:translateX(21px);
+background:#e9fcff;
+box-shadow:0 0 12px var(--cyan);
+}
+
+.secondary{
+width:100%;
+margin-top:17px;
+padding:11px 15px;
+border:1px solid var(--line);
+border-radius:12px;
+background:rgba(8,15,27,.62);
+color:#cbd8e9;
+font-weight:800;
+cursor:pointer;
+transition:.18s;
+}
+
+.secondary:hover{
+border-color:var(--line2);
+background:rgba(12,23,39,.8);
+}
+
+.previewbox{
+min-width:0;
+}
+
+.preview-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+margin-bottom:13px;
+}
+
+.preview-title{
+font-size:13px;
+font-weight:900;
+letter-spacing:.7px;
+text-transform:uppercase;
+}
+
+.live{
+display:inline-flex;
+align-items:center;
+gap:6px;
+font-size:10px;
+color:#7e91a9;
+}
+
+.live::before{
+content:"";
+width:6px;
+height:6px;
+border-radius:50%;
+background:var(--green);
+box-shadow:0 0 10px var(--green);
+}
+
+.previews{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.pane{
+min-width:0;
+}
+
+.pane label{
+display:flex;
+justify-content:space-between;
+margin:0 3px 7px;
+color:#8190a5;
+font-size:10px;
+font-weight:800;
+text-transform:uppercase;
+letter-spacing:.8px;
+}
+
+.frame{
+position:relative;
+height:320px;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+border:1px solid rgba(255,255,255,.09);
+border-radius:15px;
+background:
+linear-gradient(45deg,#111a27 25%,transparent 25%) 0 0/22px 22px,
+linear-gradient(-45deg,#111a27 25%,transparent 25%) 0 11px/22px 22px,
+linear-gradient(45deg,transparent 75%,#111a27 75%) 11px -11px/22px 22px,
+linear-gradient(-45deg,transparent 75%,#111a27 75%) -11px 0/22px 22px,
+#0a101b;
+box-shadow:inset 0 0 35px rgba(0,0,0,.22);
+}
+
+.frame::after{
+content:"";
+position:absolute;
+inset:0;
+pointer-events:none;
+border:1px solid rgba(77,231,255,.05);
+border-radius:15px;
+}
+
+.frame img{
+position:relative;
+z-index:1;
+max-width:100%;
+max-height:100%;
+width:auto;
+height:auto;
+object-fit:contain;
+display:block;
+}
+
+.empty-preview{
+padding:20px;
+color:#536177;
+font-size:11px;
+line-height:1.5;
+text-align:center;
+}
+
+.actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:16px;
+}
+
+.action-btn{
+min-height:48px;
+padding:12px 18px;
+border-radius:13px;
+font-size:13px;
+font-weight:900;
+cursor:pointer;
+transition:.18s ease;
+}
+
+.primary{
+border:1px solid rgba(77,231,255,.55);
+background:
+linear-gradient(
+110deg,
+#43dff7,
+#597fff
+);
+color:#03101a;
+box-shadow:
+0 0 25px rgba(77,231,255,.15);
+}
+
+.primary:hover{
+transform:translateY(-2px);
+box-shadow:
+0 0 35px rgba(77,231,255,.25);
+}
+
+.secondary-action{
+border:1px solid var(--line);
+background:rgba(7,14,25,.65);
+color:#d9e6f5;
+}
+
+.secondary-action:hover{
+transform:translateY(-2px);
+border-color:var(--line2);
+}
+
+button:disabled{
+opacity:.4;
+cursor:not-allowed!important;
+transform:none!important;
+box-shadow:none!important;
+}
+
+.note{
+margin-top:13px;
+text-align:center;
+color:#596a82;
+font-size:10px;
+line-height:1.5;
+}
+
+.progress-card{
+display:none;
+margin-top:16px;
+padding:18px;
+}
+
+.progress-top{
+display:flex;
+justify-content:space-between;
+gap:12px;
+margin-bottom:9px;
+font-size:12px;
+font-weight:800;
+}
+
+.percent{
+color:var(--cyan);
+}
+
+.track{
+height:8px;
+overflow:hidden;
+border-radius:999px;
+background:rgba(255,255,255,.08);
+}
+
+.bar{
+height:100%;
+width:0;
+border-radius:999px;
+background:
+linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));
+box-shadow:
+0 0 15px rgba(77,231,255,.4);
+transition:width .15s ease;
+}
+
+.status{
+margin-top:8px;
+color:#718198;
+font-size:10px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.results{
+display:grid;
+grid-template-columns:
+repeat(auto-fill,minmax(190px,1fr));
+gap:12px;
+margin-top:16px;
+}
+
+.result{
+position:relative;
+overflow:hidden;
+border:1px solid var(--line);
+border-radius:17px;
+background:rgba(9,15,26,.7);
+box-shadow:
+0 15px 35px rgba(0,0,0,.25);
+}
+
+.result img{
+display:block;
+width:100%;
+height:170px;
+object-fit:contain;
+background:
+linear-gradient(45deg,#111a27 25%,transparent 25%) 0 0/18px 18px,
+linear-gradient(-45deg,#111a27 25%,transparent 25%) 0 9px/18px 18px,
+linear-gradient(45deg,transparent 75%,#111a27 75%) 9px -9px/18px 18px,
+linear-gradient(-45deg,transparent 75%,#111a27 75%) -9px 0/18px 18px,
+#0a101b;
+}
+
+.result-body{
+padding:10px;
+}
+
+.result-name{
+color:#c7d4e6;
+font-size:10px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.result-size{
+margin-top:4px;
+color:#65758c;
+font-size:10px;
+}
+
+.done{
+position:absolute;
+top:8px;
+left:8px;
+padding:4px 7px;
+border:1px solid rgba(56,233,139,.25);
+border-radius:7px;
+background:rgba(3,70,39,.82);
+color:#73ffb1;
+font-size:8px;
+font-weight:900;
+letter-spacing:.7px;
+}
+
+.download-one{
+position:absolute;
+right:8px;
+top:8px;
+width:30px;
+height:30px;
+padding:0;
+border:1px solid rgba(255,255,255,.14);
+border-radius:8px;
+background:rgba(5,10,18,.78);
+color:#dff7ff;
+cursor:pointer;
+}
+
+.download-one:hover{
+border-color:var(--line2);
+background:rgba(12,24,40,.9);
+}
+
+.pagination{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:7px;
+flex-wrap:wrap;
+margin-top:18px;
+}
+
+.page-btn{
+min-width:37px;
+padding:8px 11px;
+border:1px solid var(--line);
+border-radius:9px;
+background:rgba(8,15,26,.65);
+color:#b8c6d8;
+cursor:pointer;
+}
+
+.page-btn:hover{
+border-color:var(--line2);
+}
+
+.page-btn.active{
+border-color:var(--cyan);
+background:rgba(77,231,255,.12);
+color:#e8fcff;
+}
+
+.page-info{
+margin:0 7px;
+color:#63748b;
+font-size:10px;
+}
+
+.locked{
+opacity:.55;
+pointer-events:none;
+}
+
+@media(max-width:850px){
+
+.workspace{
+grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:600px){
+
+main{
+width:min(100% - 16px,1220px);
+padding-top:22px;
+}
+
+h1{
+letter-spacing:-2.5px;
+}
+
+.workspace{
+gap:12px;
+}
+
+.previews{
+grid-template-columns:1fr;
+}
+
+.frame{
+height:260px;
+}
+
+.actions{
+grid-template-columns:1fr;
+}
+
+.mode-group{
+grid-template-columns:1fr;
+}
+
+.panel{
+padding:15px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<main>
+
+<header class="hero">
+
+<div class="eyebrow">
+<span class="eyebrow-dot"></span>
+LOCAL AI PROCESSING
+</div>
+
+<h1>Cut It <span>Out!</span> ✂️</h1>
+
+<p class="subtitle">
+Remove backgrounds with AI directly in your browser.
+No server upload. Full-resolution PNG output.
+</p>
+
+<div class="badges">
+<div class="badge">🔒 <b>Private</b></div>
+<div class="badge">⚡ <b>AI Powered</b></div>
+<div class="badge">🖥️ <b>On Device</b></div>
+<div class="badge">💎 <b>PNG Output</b></div>
+</div>
+
+</header>
+
+<section class="glass main-card">
+
+<div class="drop" id="drop">
+
+<div class="drop-icon">✦</div>
+
+<div class="drop-title">
+Tap to select images
+</div>
+
+<div class="drop-sub">
+or drag & drop images here
+</div>
+
+<div class="count" id="count">
+<span>○</span>
+<strong>0</strong>
+images selected
+</div>
+
+<input
+id="files"
+type="file"
+accept="image/*"
+multiple
+>
+
+</div>
+
+<div class="workspace">
+
+<div class="panel" id="settings">
+
+<div class="panel-title">
+AI Controls
+</div>
+
+<div class="setting">
+
+<div class="setting-head">
+<span>
+Removal Mode
+<span
+class="help"
+title="Choose how strongly the edge cleanup behaves."
+>?</span>
+</span>
+</div>
+
+<div class="mode-group">
+
+<button
+type="button"
+class="mode-btn active"
+id="modeNormal"
+>
+Normal
+<small>
+Balanced processing that keeps more fine subject detail.
+</small>
+</button>
+
+<button
+type="button"
+class="mode-btn"
+id="modeAggressive"
+>
+Aggressive
+<small>
+Stronger cleanup for difficult or busy backgrounds.
+</small>
+</button>
+
+</div>
+
+</div>
+
+<div class="setting">
+
+<div class="setting-head">
+
+<span>
+Tolerance
+<span
+class="help"
+title="Controls how strongly low-alpha pixels are removed."
+>?</span>
+</span>
+
+<span
+class="value"
+id="tolVal"
+>18</span>
+
+</div>
+
+<div class="range-wrap">
+
+<input
+id="tol"
+type="range"
+min="1"
+max="100"
+value="18"
+>
+
+</div>
+
+<div class="desc">
+Higher values remove more uncertain pixels.
+Lower values preserve more subtle edges.
+</div>
+
+</div>
+
+<div class="setting">
+
+<div class="setting-head">
+
+<span>
+Safety Margin
+<span
+class="help"
+title="Protects a small area around detected subject edges."
+>?</span>
+</span>
+
+<span
+class="value"
+id="padVal"
+>2 px</span>
+
+</div>
+
+<div class="range-wrap">
+
+<input
+id="pad"
+type="range"
+min="0"
+max="20"
+value="2"
+>
+
+</div>
+
+<div class="desc">
+Adds a tiny protective alpha layer around subject edges.
+</div>
+
+</div>
+
+<div class="setting">
+
+<div class="setting-head">
+<span>Self Improvement</span>
+</div>
+
+<div class="switch-row">
+
+<div class="switch-text">
+
+Edge Refinement
+
+<small>
+Smooths uncertain edges after AI segmentation.
+</small>
+
+</div>
+
+<label class="switch">
+
+<input
+type="checkbox"
+id="selfImprove"
+checked
+>
+
+<span class="switch-slider"></span>
+
+</label>
+
+</div>
+
+</div>
+
+<button
+type="button"
+class="secondary"
+id="reset"
+>
+↻ Reset Settings
+</button>
+
+</div>
+
+<div class="panel previewbox">
+
+<div class="preview-header">
+
+<div class="preview-title">
+Preview
+</div>
+
+<div class="live">
+LOCAL PREVIEW
+</div>
+
+</div>
+
+<div class="previews">
+
+<div class="pane">
+
+<label>
+<span>Original</span>
+</label>
+
+<div
+class="frame"
+id="originalFrame"
+>
+
+<div class="empty-preview">
+Choose an image to preview it here.
+</div>
+
+<img
+id="origPreview"
+style="display:none"
+alt="Original preview"
+>
+
+</div>
+
+</div>
+
+<div class="pane">
+
+<label>
+<span>Transparent Result</span>
+</label>
+
+<div
+class="frame"
+id="resultFrame"
+>
+
+<div class="empty-preview">
+Your transparent result will appear here.
+</div>
+
+<img
+id="cropPreview"
+style="display:none"
+alt="Background removed preview"
+>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<button
+type="button"
+class="action-btn primary"
+id="clean"
+>
+✦ Remove Background
+</button>
+
+<button
+type="button"
+class="action-btn secondary-action"
+id="downloadAll"
+disabled
+>
+⇩ Download All (.ZIP)
+</button>
+
+</div>
+
+<div class="note">
+Your images stay on this device during processing.
+The AI model is downloaded to your browser for local inference.
+</div>
+
+</section>
+
+<section
+class="glass progress-card"
+id="progressCard"
+>
+
+<div class="progress-top">
+
+<span id="progressText">
+Preparing AI…
+</span>
+
+<span
+class="percent"
+id="percent"
+>
+0%
+</span>
+
+</div>
+
+<div class="track">
+<div
+class="bar"
+id="bar"
+></div>
+</div>
+
+<div
+class="status"
+id="status"
+></div>
+
+</section>
+
+<div
+class="results"
+id="results"
+></div>
+
+<div
+class="pagination"
+id="pagination"
+></div>
+
+   </main><script>
 "use strict";
 
 const $ = id => document.getElementById(id);
@@ -702,7 +1856,7 @@ updateSlider(padEl);
 
 setMode("normal");
 
-</script><script>
+   </script><script>
 
 /* =========================================================
    AI BACKGROUND REMOVER
@@ -1140,7 +2294,7 @@ function resizeMask(
 
 }
 
-</script><script>
+   </script><script>
 
 /* =========================================================
    MASK PROCESSING
@@ -1665,7 +2819,7 @@ async function createTransparentPNG(file){
 
 }
 
-</script><script>
+   </script><script>
 
 /* =========================================================
    LIVE PREVIEW
@@ -2200,7 +3354,7 @@ function renderPagination(){
 
 }
 
-</script><script>
+   </script><script>
 
 /* =========================================================
    MAIN PROCESSING
