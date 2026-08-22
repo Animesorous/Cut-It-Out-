@@ -106,6 +106,8 @@ input[type=file]{display:none}
 .section-title:before{content:"";display:inline-block;width:3px;height:14px;border-radius:4px;background:var(--cyan);margin-right:8px;vertical-align:-2px}
 .signal{font-size:10px;color:#6f819d;display:flex;gap:6px;align-items:center}
 .signal i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.signal.scanning i{background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .setting{margin-bottom:21px}.setting:last-child{margin-bottom:0}
 .setting-head{display:flex;justify-content:space-between;align-items:center;font-weight:850;margin-bottom:9px}
 .value{
@@ -125,15 +127,16 @@ input[type=file]{display:none}
   box-shadow:0 0 0 1px rgba(77,232,255,.12) inset;
 }
 .mode-btn small{display:block;color:#72839b;font-size:10px;font-weight:600;margin-top:6px;line-height:1.35}
-.range-wrap{padding:4px 0}
+.range-wrap{padding:8px 0}
 input[type=range]{
-  --fill:50%;appearance:none;width:100%;height:7px;margin:0;
+  --fill:50%;appearance:none;width:100%;height:8px;margin:0;
   background:linear-gradient(90deg,var(--cyan) 0,var(--blue) var(--fill),rgba(255,255,255,.09) var(--fill),rgba(255,255,255,.09) 100%);
   border-radius:99px;outline:none;cursor:pointer;
 }
 input[type=range]::-webkit-slider-thumb{
-  appearance:none;width:20px;height:20px;margin-top:-6.5px;border-radius:50%;
-  background:#dffbff;border:4px solid #10243a;cursor:pointer;
+  appearance:none;width:18px;height:18px;margin-top:-5px;border-radius:50%;
+  background:#dffbff;border:3px solid #10243a;cursor:pointer;
+  box-shadow:0 0 10px rgba(0,0,0,.5);
 }
 .preview-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .preview-title strong{font-size:13px;letter-spacing:.12em;text-transform:uppercase}
@@ -144,8 +147,14 @@ input[type=range]::-webkit-slider-thumb{
   height:390px;border:1px solid #ffffff10;border-radius:16px;
   background:#08101d;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
 }
-.frame img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.frame img{max-width:100%;max-height:100%;object-fit:contain;display:block;position:relative;z-index:2}
 .empty{color:#566781;font-size:12px;text-align:center;padding:20px}
+.scan-line{
+  position:absolute;top:0;left:0;width:100%;height:2px;background:var(--cyan);
+  box-shadow:0 0 20px 5px rgba(77,232,255,.4);z-index:10;opacity:0;pointer-events:none;
+}
+.is-scanning .scan-line{animation:scan 1.2s infinite ease-in-out;opacity:1}
+@keyframes scan{0%,100%{top:0}50%{top:100%}}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 button.action{
   border:1px solid transparent;border-radius:14px;padding:14px 18px;font-weight:950;font-size:13px;cursor:pointer;
@@ -212,7 +221,7 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
     <div class="settings" id="settings">
       <div class="section-head">
         <div class="section-title">Detection Core</div>
-        <div class="signal"><i></i> ONLINE</div>
+        <div class="signal" id="statusSignal"><i></i> ONLINE</div>
       </div>
 
       <div class="setting">
@@ -260,11 +269,18 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
       <div class="previews">
         <div class="pane">
           <label><span>Original</span><span id="originalMeta">—</span></label>
-          <div class="frame"><div class="empty" id="origEmpty">Choose an image to begin.</div><img id="origPreview" alt="" style="display:none"></div>
+          <div class="frame" id="origFrame">
+            <div class="scan-line"></div>
+            <div class="empty" id="origEmpty">Choose an image to begin.</div>
+            <img id="origPreview" alt="" style="display:none">
+          </div>
         </div>
         <div class="pane">
           <label><span>Detected Content</span><span id="cropMeta">—</span></label>
-          <div class="frame"><div class="empty" id="cropEmpty">The detected crop will appear here.</div><img id="cropPreview" alt="" style="display:none"></div>
+          <div class="frame">
+            <div class="empty" id="cropEmpty">The detected crop will appear here.</div>
+            <img id="cropPreview" alt="" style="display:none">
+          </div>
         </div>
       </div>
     </div>
@@ -298,6 +314,7 @@ const origEmpty=$('origEmpty'), cropEmpty=$('cropEmpty'), originalMeta=$('origin
 const cropMeta=$('cropMeta'), previewMeta=$('previewMeta'), results=$('results');
 const pagination=$('pagination'), progressCard=$('progressCard'), bar=$('bar');
 const percent=$('percent'), progressText=$('progressText'), status=$('status');
+const origFrame=$('origFrame'), statusSignal=$('statusSignal');
 
 let selected=[], outputs=[], previewUrl=null, currentPage=1, cropMode='normal', previewToken=0;
 let busy=false, previewTimer=null, previewRunning=false;
@@ -350,15 +367,6 @@ function getImage(file){
   });
 }
 
-/*
-  ==================================================================
-  UPGRADED DETERMINISTIC EDGE & BORDER DETECTION ENGINE
-  ==================================================================
-  Utilizes 4-directional Sobel gradients + Otsu's variance-based 
-  bimodal thresholding and adaptive flood-filling to robustly strip 
-  noisy or gradient borders without touching interior comic/artwork content.
-*/
-
 function buildAnalysisCanvas(img, maxSide=1000){
   const ow=img.naturalWidth||img.width, oh=img.naturalHeight||img.height;
   const scale=Math.min(1, maxSide/Math.max(ow,oh));
@@ -388,7 +396,6 @@ function computeOtsuThreshold(histogram, totalPixels){
 function detectContentBounds(img, sensitivity, pad, mode){
   const {w, h, data, ow, oh} = buildAnalysisCanvas(img, 1000);
   
-  // 1. Convert to Grayscale & Calculate Gradients
   const gray = new Uint8ClampedArray(w * h);
   for(let i=0; i<w*h; i++){
     const p = i * 4;
@@ -409,71 +416,46 @@ function detectContentBounds(img, sensitivity, pad, mode){
     }
   }
 
-  // 2. Compute Otsu Adaptive Edge Cutoff
+  // FIXED: Aggressive mode requires a higher multiplier to cut deeper past weak borders
   const otsu = computeOtsuThreshold(hist, (w-2)*(h-2));
-  const mult = mode === 'aggressive' ? 0.45 : 0.70;
+  const mult = mode === 'aggressive' ? 1.4 : 0.65;
   const sensMod = (100 - sensitivity) / 50; 
   const edgeCutoff = Math.max(8, otsu * mult * sensMod);
 
-  // 3. Multi-directional edge scanning
   let minX = w, maxX = 0, minY = h, maxY = 0;
 
-  // Scan Left & Right
   for(let y=0; y<h; y++){
     for(let x=0; x<w; x++){
-      if(grads[y*w + x] >= edgeCutoff){
-        if(x < minX) minX = x;
-        if(x > maxX) maxX = x;
-        break;
-      }
+      if(grads[y*w + x] >= edgeCutoff){ if(x < minX) minX = x; if(x > maxX) maxX = x; break; }
     }
     for(let x=w-1; x>=0; x--){
-      if(grads[y*w + x] >= edgeCutoff){
-        if(x > maxX) maxX = x;
-        if(x < minX) minX = x;
-        break;
-      }
+      if(grads[y*w + x] >= edgeCutoff){ if(x > maxX) maxX = x; if(x < minX) minX = x; break; }
     }
   }
 
-  // Scan Top & Bottom
   for(let x=0; x<w; x++){
     for(let y=0; y<h; y++){
-      if(grads[y*w + x] >= edgeCutoff){
-        if(y < minY) minY = y;
-        if(y > maxY) maxY = y;
-        break;
-      }
+      if(grads[y*w + x] >= edgeCutoff){ if(y < minY) minY = y; if(y > maxY) maxY = y; break; }
     }
     for(let y=h-1; y>=0; y--){
-      if(grads[y*w + x] >= edgeCutoff){
-        if(y > maxY) maxY = y;
-        if(y < minY) minY = y;
-        break;
-      }
+      if(grads[y*w + x] >= edgeCutoff){ if(y > maxY) maxY = y; if(y < minY) minY = y; break; }
     }
   }
 
-  // Fallback protection if image has almost zero detectable edges
   if(maxX <= minX || maxY <= minY){
-    minX = 0; maxX = w - 1;
-    minY = 0; maxY = h - 1;
+    minX = 0; maxX = w - 1; minY = 0; maxY = h - 1;
   }
 
-  // 4. Scale up bounds to native original image resolution
   const scaleX = ow / w;
   const scaleY = oh / h;
-
   let left = Math.floor(minX * scaleX) - pad;
   let top = Math.floor(minY * scaleY) - pad;
   let right = Math.ceil(maxX * scaleX) + pad;
   let bottom = Math.ceil(maxY * scaleY) + pad;
 
   return {
-    left: Math.max(0, left),
-    top: Math.max(0, top),
-    right: Math.min(ow - 1, right),
-    bottom: Math.min(oh - 1, bottom)
+    left: Math.max(0, left), top: Math.max(0, top),
+    right: Math.min(ow - 1, right), bottom: Math.min(oh - 1, bottom)
   };
 }
 
@@ -510,7 +492,10 @@ async function refreshPreview(){
   const token=++previewToken;
   if(previewRunning)return;
   previewRunning=true;
-  setPreviewMeta('FAST SCANNING');
+  setPreviewMeta('SCANNING');
+  origFrame.classList.add('is-scanning');
+  statusSignal.classList.add('scanning');
+  
   try{
     await yieldUI();
     const img=await getImage(selected[0]);
@@ -532,7 +517,13 @@ async function refreshPreview(){
   }catch(e){
     console.error(e);
     if(token===previewToken){setPreviewMeta('SCAN ERROR');cropMeta.textContent='—'}
-  }finally{previewRunning=false}
+  }finally{
+    previewRunning=false;
+    if(token===previewToken){
+      origFrame.classList.remove('is-scanning');
+      statusSignal.classList.remove('scanning');
+    }
+  }
 }
 
 function setLocked(locked){
