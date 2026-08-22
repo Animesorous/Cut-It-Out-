@@ -3,258 +3,1114 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Free Image Tools Online | Cut It Out!</title>
+
+<title>Cut It Out! — Free Image Tools</title>
+
 <style>
+
 :root{
---bg:#0b0d12;
---panel:#13161d;
---panel2:#171a22;
---line:#ffffff14;
---text:#f5f5f7;
---muted:#9297a3;
+--bg:#070910;
+--bg2:#0c1020;
+
+--glass:rgba(18,23,38,.58);
+--glass2:rgba(24,30,48,.68);
+
+--line:rgba(255,255,255,.12);
+--line-bright:rgba(255,255,255,.22);
+
+--text:#f5f7ff;
+--muted:#9299ad;
+
+--cyan:#55e7ff;
+--blue:#557cff;
+--purple:#9b6cff;
 --gold:#f1c33b;
---gold2:#dcae27;
---green:#28d66f;
+--green:#38e58a;
+
+--shadow:rgba(0,0,0,.45);
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
+
+*{
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
 body{
 margin:0;
-background:
-radial-gradient(circle at 50% -15%,#252936 0,#0b0d12 48%);
-color:var(--text);
-font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 min-height:100vh;
+
+font-family:
+system-ui,
+-apple-system,
+BlinkMacSystemFont,
+"Segoe UI",
+sans-serif;
+
+color:var(--text);
+
+background:
+radial-gradient(
+circle at 12% 15%,
+rgba(85,231,255,.15),
+transparent 28%
+),
+radial-gradient(
+circle at 88% 20%,
+rgba(155,108,255,.17),
+transparent 30%
+),
+radial-gradient(
+circle at 50% 90%,
+rgba(85,124,255,.12),
+transparent 32%
+),
+linear-gradient(
+145deg,
+#070910 0%,
+#0b0f1c 45%,
+#090b15 100%
+);
+
+overflow-x:hidden;
 }
-main{
-width:min(1050px,calc(100% - 30px));
-margin:auto;
-padding:55px 0 35px;
-}
-.hero{text-align:center;padding:25px 0 42px}
-.logo{
-font-size:clamp(42px,8vw,70px);
-font-weight:900;
-letter-spacing:-3px;
-line-height:1;
-margin:0;
-}
-.logo span{color:var(--gold)}
-.tagline{
-font-size:clamp(16px,2.5vw,20px);
-color:#c3c6ce;
-margin:18px auto 0;
-max-width:650px;
-line-height:1.5;
-}
-.badges{
-display:flex;
-justify-content:center;
-gap:9px;
-flex-wrap:wrap;
-margin-top:22px;
-}
-.badge{
-background:#171a21;
-border:1px solid var(--line);
-border-radius:9px;
-padding:7px 12px;
-font-size:13px;
-color:#d7dae1;
-}
-.badge b{color:var(--gold)}
-.tools{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:18px;
-}
-.tool{
-position:relative;
-background:linear-gradient(145deg,#151820,#11141a);
-border:1px solid var(--line);
-border-radius:20px;
-padding:27px;
-min-height:310px;
-display:flex;
-flex-direction:column;
-box-shadow:0 15px 45px #0005;
-transition:transform .18s,border-color .18s,box-shadow .18s;
-overflow:hidden;
-}
-.tool:before{
+
+
+/* =========================
+   BACKGROUND EFFECTS
+========================= */
+
+body::before{
 content:"";
-position:absolute;
-width:180px;
-height:180px;
-right:-70px;
-top:-70px;
-background:#f1c33b0c;
-border-radius:50%;
+position:fixed;
+inset:0;
+
+pointer-events:none;
+
+background:
+linear-gradient(
+rgba(255,255,255,.018) 1px,
+transparent 1px
+),
+linear-gradient(
+90deg,
+rgba(255,255,255,.018) 1px,
+transparent 1px
+);
+
+background-size:45px 45px;
+
+mask-image:linear-gradient(
+to bottom,
+black,
+transparent 80%
+);
+
+opacity:.35;
+}
+
+body::after{
+content:"";
+
+position:fixed;
+
+width:500px;
+height:500px;
+
+left:50%;
+top:0;
+
+transform:translateX(-50%);
+
+background:
+radial-gradient(
+circle,
+rgba(85,231,255,.08),
+transparent 65%
+);
+
+filter:blur(20px);
+
 pointer-events:none;
 }
-.tool:hover{
-transform:translateY(-5px);
-border-color:#f1c33b55;
-box-shadow:0 20px 55px #0007;
+
+
+/* =========================
+   MAIN
+========================= */
+
+main{
+width:min(1080px,calc(100% - 30px));
+
+margin:auto;
+
+padding:
+55px 0
+45px;
+
+position:relative;
+
+z-index:1;
 }
-.icon{
-width:62px;
-height:62px;
-display:flex;
+
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+text-align:center;
+
+padding:
+35px 0
+48px;
+
+animation:
+heroIn .8s ease both;
+}
+
+@keyframes heroIn{
+
+from{
+opacity:0;
+transform:translateY(-18px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+.system-label{
+display:inline-flex;
+
 align-items:center;
-justify-content:center;
-border-radius:15px;
-background:#201d13;
-border:1px solid #f1c33b25;
-font-size:32px;
-margin-bottom:20px;
-}
-.tool h2{
-font-size:25px;
-margin:0 0 9px;
-letter-spacing:-.5px;
-}
-.tool p{
-font-size:14px;
-line-height:1.55;
-color:var(--muted);
-margin:0;
-max-width:430px;
-}
-.tool-btn{
-margin-top:auto;
-padding-top:23px;
-}
-.tool-btn button{
-width:100%;
-border:0;
-border-radius:11px;
-padding:13px 18px;
-font-size:14px;
-font-weight:850;
-cursor:pointer;
-background:var(--gold);
-color:#16120a;
-transition:.15s;
-}
-.tool-btn button:hover{
-background:#ffd451;
-transform:translateY(-1px);
-}
-.tool-btn button:active{transform:translateY(0)}
-.features{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px;
-margin-top:18px;
-}
-.feature{
-text-align:center;
-background:#12151b;
-border:1px solid var(--line);
-border-radius:13px;
-padding:15px 10px;
-}
-.feature-icon{font-size:20px}
-.feature-title{
-font-size:12px;
-font-weight:800;
-margin-top:5px;
-}
-.feature-text{
+gap:8px;
+
+padding:7px 12px;
+
+border-radius:999px;
+
+background:
+rgba(85,231,255,.07);
+
+border:
+1px solid rgba(85,231,255,.2);
+
+color:#a9f3ff;
+
 font-size:11px;
-color:#777d88;
-margin-top:2px;
+
+font-weight:800;
+
+letter-spacing:1.5px;
+
+text-transform:uppercase;
+
+margin-bottom:20px;
+
+box-shadow:
+0 0 25px rgba(85,231,255,.06);
 }
-footer{
-text-align:center;
-color:#686e79;
-font-size:12px;
-margin-top:30px;
+
+.system-dot{
+width:7px;
+height:7px;
+
+border-radius:50%;
+
+background:var(--cyan);
+
+box-shadow:
+0 0 10px var(--cyan);
+
+animation:pulse 1.8s infinite;
+}
+
+@keyframes pulse{
+
+0%,100%{
+opacity:1;
+box-shadow:0 0 8px var(--cyan);
+}
+
+50%{
+opacity:.5;
+box-shadow:0 0 18px var(--cyan);
+}
+
+}
+
+.logo{
+font-size:
+clamp(46px,8vw,76px);
+
+font-weight:950;
+
+letter-spacing:-4px;
+
+line-height:.95;
+
+margin:0;
+
+background:
+linear-gradient(
+110deg,
+#ffffff 0%,
+#dfe8ff 42%,
+#7eeeff 70%,
+#ffffff 100%
+);
+
+-webkit-background-clip:text;
+background-clip:text;
+
+color:transparent;
+
+text-shadow:
+0 0 35px rgba(85,231,255,.08);
+}
+
+.logo span{
+background:
+linear-gradient(
+110deg,
+var(--cyan),
+#7b8cff,
+var(--purple)
+);
+
+-webkit-background-clip:text;
+background-clip:text;
+
+color:transparent;
+}
+
+.tagline{
+font-size:
+clamp(15px,2.5vw,19px);
+
+color:#aeb5c8;
+
+margin:
+20px auto 0;
+
+max-width:650px;
+
 line-height:1.6;
 }
+
+
+/* =========================
+   STATUS LINE
+========================= */
+
+.status-line{
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:10px;
+
+margin-top:22px;
+
+font-size:12px;
+
+color:#7f879c;
+}
+
+.status-line span{
+color:var(--cyan);
+}
+
+
+/* =========================
+   TOOL GRID
+========================= */
+
+.tools{
+display:grid;
+
+grid-template-columns:
+repeat(2,1fr);
+
+gap:20px;
+
+perspective:1000px;
+}
+
+
+/* =========================
+   GLASS TOOL CARD
+========================= */
+
+.tool{
+
+position:relative;
+
+background:
+linear-gradient(
+145deg,
+rgba(255,255,255,.065),
+rgba(255,255,255,.018)
+),
+rgba(12,16,29,.58);
+
+border:
+1px solid var(--line);
+
+border-radius:24px;
+
+padding:28px;
+
+min-height:330px;
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+backdrop-filter:blur(22px);
+-webkit-backdrop-filter:blur(22px);
+
+box-shadow:
+0 20px 60px var(--shadow),
+inset 0 1px 0 rgba(255,255,255,.07);
+
+opacity:0;
+
+transform:
+translateY(35px)
+scale(.96);
+
+animation:
+cardPop .65s cubic-bezier(.2,.8,.2,1) forwards;
+
+transition:
+transform .3s ease,
+border-color .3s ease,
+box-shadow .3s ease;
+
+}
+
+.tool:nth-child(1){
+animation-delay:.12s;
+}
+
+.tool:nth-child(2){
+animation-delay:.24s;
+}
+
+@keyframes cardPop{
+
+0%{
+opacity:0;
+transform:
+translateY(35px)
+scale(.94);
+}
+
+70%{
+opacity:1;
+transform:
+translateY(-3px)
+scale(1.01);
+}
+
+100%{
+opacity:1;
+transform:
+translateY(0)
+scale(1);
+}
+
+}
+
+
+/* CARD LIGHT */
+
+.tool::before{
+
+content:"";
+
+position:absolute;
+
+width:240px;
+height:240px;
+
+right:-110px;
+top:-110px;
+
+background:
+radial-gradient(
+circle,
+rgba(85,231,255,.17),
+transparent 68%
+);
+
+pointer-events:none;
+
+transition:
+transform .5s ease,
+opacity .5s ease;
+
+}
+
+.tool:nth-child(2)::before{
+
+background:
+radial-gradient(
+circle,
+rgba(155,108,255,.18),
+transparent 68%
+);
+
+}
+
+.tool::after{
+
+content:"";
+
+position:absolute;
+
+left:0;
+right:0;
+top:0;
+
+height:1px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+rgba(255,255,255,.3),
+transparent
+);
+
+opacity:.5;
+}
+
+
+/* CARD HOVER */
+
+.tool:hover{
+
+transform:
+translateY(-8px)
+scale(1.015);
+
+border-color:
+rgba(85,231,255,.32);
+
+box-shadow:
+0 28px 75px rgba(0,0,0,.55),
+0 0 35px rgba(85,231,255,.06),
+inset 0 1px 0 rgba(255,255,255,.1);
+
+}
+
+.tool:nth-child(2):hover{
+
+border-color:
+rgba(155,108,255,.35);
+
+box-shadow:
+0 28px 75px rgba(0,0,0,.55),
+0 0 35px rgba(155,108,255,.07),
+inset 0 1px 0 rgba(255,255,255,.1);
+
+}
+
+.tool:hover::before{
+transform:scale(1.35);
+}
+
+
+/* =========================
+   TOOL HEADER
+========================= */
+
+.tool-top{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:flex-start;
+
+gap:15px;
+
+}
+
+.tool-index{
+
+font-family:
+monospace;
+
+font-size:10px;
+
+letter-spacing:1.5px;
+
+color:#687187;
+
+padding-top:6px;
+}
+
+.icon{
+
+width:66px;
+height:66px;
+
+display:flex;
+
+align-items:center;
+justify-content:center;
+
+border-radius:18px;
+
+background:
+linear-gradient(
+145deg,
+rgba(85,231,255,.12),
+rgba(85,231,255,.025)
+);
+
+border:
+1px solid rgba(85,231,255,.22);
+
+font-size:31px;
+
+box-shadow:
+0 0 25px rgba(85,231,255,.06),
+inset 0 1px 0 rgba(255,255,255,.08);
+
+transition:
+transform .3s ease,
+box-shadow .3s ease;
+
+}
+
+.tool:nth-child(2) .icon{
+
+background:
+linear-gradient(
+145deg,
+rgba(155,108,255,.13),
+rgba(155,108,255,.025)
+);
+
+border-color:
+rgba(155,108,255,.25);
+
+}
+
+.tool:hover .icon{
+
+transform:
+rotate(-4deg)
+scale(1.08);
+
+box-shadow:
+0 0 30px rgba(85,231,255,.13),
+inset 0 1px 0 rgba(255,255,255,.1);
+
+}
+
+.tool:nth-child(2):hover .icon{
+
+box-shadow:
+0 0 30px rgba(155,108,255,.14),
+inset 0 1px 0 rgba(255,255,255,.1);
+
+}
+
+
+/* =========================
+   TEXT
+========================= */
+
+.tool h2{
+
+font-size:26px;
+
+margin:
+24px 0 9px;
+
+letter-spacing:-.7px;
+
+}
+
+.tool p{
+
+font-size:14px;
+
+line-height:1.6;
+
+color:var(--muted);
+
+margin:0;
+
+max-width:440px;
+
+}
+
+
+/* =========================
+   TOOL BUTTON
+========================= */
+
+.tool-btn{
+
+margin-top:auto;
+
+padding-top:25px;
+
+}
+
+.tool-btn button{
+
+width:100%;
+
+border:
+1px solid rgba(255,255,255,.12);
+
+border-radius:13px;
+
+padding:14px 18px;
+
+font-size:13px;
+
+font-weight:850;
+
+cursor:pointer;
+
+background:
+linear-gradient(
+135deg,
+rgba(85,231,255,.9),
+rgba(85,124,255,.9)
+);
+
+color:#061018;
+
+box-shadow:
+0 8px 25px rgba(85,231,255,.1);
+
+transition:
+transform .2s ease,
+box-shadow .2s ease,
+filter .2s ease;
+
+}
+
+.tool:nth-child(2) .tool-btn button{
+
+background:
+linear-gradient(
+135deg,
+#9b6cff,
+#557cff
+);
+
+color:white;
+
+box-shadow:
+0 8px 25px rgba(155,108,255,.12);
+
+}
+
+.tool-btn button:hover{
+
+transform:
+translateY(-3px);
+
+filter:brightness(1.1);
+
+box-shadow:
+0 12px 32px rgba(85,231,255,.2);
+
+}
+
+.tool:nth-child(2) .tool-btn button:hover{
+
+box-shadow:
+0 12px 32px rgba(155,108,255,.2);
+
+}
+
+.tool-btn button:active{
+
+transform:
+translateY(0)
+scale(.99);
+
+}
+
+
+/* =========================
+   BOTTOM INFO
+========================= */
+
+.info-panel{
+
+margin-top:20px;
+
+padding:17px 20px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:28px;
+
+flex-wrap:wrap;
+
+background:
+rgba(15,20,34,.48);
+
+border:
+1px solid var(--line);
+
+border-radius:18px;
+
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+
+box-shadow:
+0 15px 45px rgba(0,0,0,.25),
+inset 0 1px 0 rgba(255,255,255,.05);
+
+opacity:0;
+
+animation:
+cardPop .65s .38s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.info-item{
+
+display:flex;
+
+align-items:center;
+
+gap:9px;
+
+font-size:12px;
+
+color:#969eb2;
+
+}
+
+.info-item strong{
+
+color:#dce2f0;
+
+font-weight:750;
+
+}
+
+.info-icon{
+
+font-size:16px;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+
+text-align:center;
+
+color:#626a7d;
+
+font-size:11px;
+
+margin-top:28px;
+
+line-height:1.7;
+
+opacity:0;
+
+animation:
+fadeIn .7s .55s ease forwards;
+}
+
+@keyframes fadeIn{
+
+from{opacity:0}
+
+to{opacity:1}
+
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
 @media(max-width:700px){
-main{padding:30px 0 25px}
-.hero{padding:18px 0 30px}
-.logo{letter-spacing:-2px}
-.tools{grid-template-columns:1fr}
-.tool{min-height:285px}
+
+main{
+width:min(100% - 20px,1080px);
+padding:
+30px 0
+30px;
 }
+
+.hero{
+padding:
+25px 0
+35px;
+}
+
+.logo{
+letter-spacing:-3px;
+}
+
+.tools{
+grid-template-columns:1fr;
+}
+
+.tool{
+min-height:310px;
+}
+
+.info-panel{
+gap:15px;
+}
+
+}
+
 @media(max-width:430px){
-main{width:calc(100% - 18px)}
-.tool{padding:22px}
-.features{grid-template-columns:1fr}
-.feature{display:flex;align-items:center;text-align:left;gap:10px}
-.feature-text{margin-top:1px}
+
+main{
+width:calc(100% - 14px);
 }
+
+.logo{
+font-size:45px;
+letter-spacing:-2.5px;
+}
+
+.tagline{
+font-size:14px;
+}
+
+.tool{
+padding:22px;
+border-radius:20px;
+}
+
+.tool h2{
+font-size:23px;
+}
+
+.info-panel{
+align-items:flex-start;
+flex-direction:column;
+gap:11px;
+}
+
+}
+
 </style>
-</head>
-<body>
+</head><body>
+
 <main>
+
 <section class="hero">
-<h1 class="logo">Cut It <span>Out!</span> ✂️</h1>
-<p class="tagline">Free image tools that make editing simple, fast, and completely browser-based.</p>
-<div class="badges">
-<div class="badge">🔒 <b>Private</b></div>
-<div class="badge">☁️ <b>No Uploads</b></div>
-<div class="badge">💸 <b>100% Free</b></div>
+
+<div class="system-label">
+<span class="system-dot"></span>
+IMAGE PROCESSING SYSTEM ONLINE
 </div>
+
+<h1 class="logo">
+Cut It <span>Out!</span> ✂️
+</h1>
+
+<p class="tagline">
+A lightweight image-processing workspace for clean,
+fast editing directly in your browser.
+</p>
+
+<div class="status-line">
+<span>◆</span>
+No account required
+<span>•</span>
+Runs locally
+<span>•</span>
+Built for speed
+</div>
+
 </section>
+
 
 <section class="tools">
-<article class="tool">
-<div class="icon">✂️</div>
-<h2>Image Border Cropper</h2>
-<p>Automatically detect and remove unwanted borders around your images. Choose between Normal and Aggressive modes and fine-tune the result.</p>
-<div class="tool-btn">
-<button type="button" onclick="openTool('cropper.html')">Open Border Cropper →</button>
-</div>
-</article>
+
 
 <article class="tool">
-<div class="icon">🪄</div>
-<h2>Background Remover</h2>
-<p>Remove unwanted backgrounds from your images and keep the main subject. A simple tool for creating clean, transparent images.</p>
-<div class="tool-btn">
-<button type="button" onclick="openTool('bg-remover.html')">Open Background Remover →</button>
+
+<div class="tool-top">
+
+<div class="icon">
+✂️
 </div>
+
+<div class="tool-index">
+MODULE 01
+</div>
+
+</div>
+
+
+<h2>
+Image Border Cropper
+</h2>
+
+<p>
+Automatically detect unwanted borders around your images
+and crop them away. Fine-tune the detection with Normal
+or Aggressive processing modes.
+</p>
+
+
+<div class="tool-btn">
+
+<button
+type="button"
+onclick="openTool('cropper.html')">
+
+Launch Border Cropper
+&nbsp; →
+
+</button>
+
+</div>
+
 </article>
+
+
+
+<article class="tool">
+
+<div class="tool-top">
+
+<div class="icon">
+🪄
+</div>
+
+<div class="tool-index">
+MODULE 02
+</div>
+
+</div>
+
+
+<h2>
+Background Remover
+</h2>
+
+<p>
+Separate the main subject from its background and create
+clean transparent PNG images directly inside your browser.
+</p>
+
+
+<div class="tool-btn">
+
+<button
+type="button"
+onclick="openTool('bg-remover.html')">
+
+Launch Background Remover
+&nbsp; →
+
+</button>
+
+</div>
+
+</article>
+
+
 </section>
 
-<section class="features">
-<div class="feature">
-<div class="feature-icon">🔒</div>
-<div>
-<div class="feature-title">Private</div>
-<div class="feature-text">Process images locally</div>
+
+
+<section class="info-panel">
+
+<div class="info-item">
+
+<span class="info-icon">🔒</span>
+
+<span>
+<strong>Private</strong>
+&nbsp; Local processing
+</span>
+
 </div>
+
+
+<div class="info-item">
+
+<span class="info-icon">⚡</span>
+
+<span>
+<strong>Fast</strong>
+&nbsp; No account needed
+</span>
+
 </div>
-<div class="feature">
-<div class="feature-icon">⚡</div>
-<div>
-<div class="feature-title">Fast</div>
-<div class="feature-text">No account required</div>
+
+
+<div class="info-item">
+
+<span class="info-icon">◈</span>
+
+<span>
+<strong>Browser-based</strong>
+&nbsp; No server upload
+</span>
+
 </div>
-</div>
-<div class="feature">
-<div class="feature-icon">💸</div>
-<div>
-<div class="feature-title">Free</div>
-<div class="feature-text">No paid tools</div>
-</div>
-</div>
+
 </section>
+
+
 
 <footer>
-Cut It Out! — Simple image tools for everyone.<br>
+
+Cut It Out! — Simple tools for smarter image editing.<br>
+
 Your images stay on your device.
+
 </footer>
+
+
 </main>
 
+
+
 <script>
+
 function openTool(page){
+
 window.location.href=page;
+
 }
+
 </script>
+
+
 </body>
 </html>
