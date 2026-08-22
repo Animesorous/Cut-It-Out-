@@ -3,1418 +3,865 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#070b14">
-
 <title>Cut It Out! — AI Background Remover</title>
 
 <style>
 :root{
---bg:#050810;
---bg2:#09101d;
---glass:rgba(14,20,34,.62);
---glass2:rgba(18,27,45,.72);
---line:rgba(120,170,255,.18);
---line2:rgba(120,190,255,.32);
---text:#f4f8ff;
---muted:#8f9db3;
---cyan:#4de7ff;
---blue:#5c7cff;
---violet:#9d6cff;
---green:#38e98b;
---danger:#ff637c;
---shadow:0 25px 80px rgba(0,0,0,.48);
+  --bg:#050810;
+  --panel:rgba(12,18,32,.64);
+  --panel2:rgba(16,24,42,.72);
+  --line:rgba(120,210,255,.15);
+  --text:#f3f7ff;
+  --muted:#8491a8;
+  --cyan:#43dcff;
+  --blue:#628cff;
+  --purple:#9a6cff;
+  --green:#39e58c;
+  --danger:#ff667c;
 }
 
 *{
-box-sizing:border-box;
+  box-sizing:border-box;
 }
 
 html{
-scroll-behavior:smooth;
+  scroll-behavior:smooth;
 }
 
 body{
-margin:0;
-min-height:100vh;
-color:var(--text);
-font-family:
-Inter,
-ui-sans-serif,
-system-ui,
--apple-system,
-BlinkMacSystemFont,
-"Segoe UI",
-sans-serif;
-background:
-radial-gradient(
-circle at 15% 5%,
-rgba(50,110,255,.24),
-transparent 30%
-),
-radial-gradient(
-circle at 85% 12%,
-rgba(0,229,255,.19),
-transparent 28%
-),
-radial-gradient(
-circle at 50% 75%,
-rgba(130,70,255,.16),
-transparent 34%
-),
-linear-gradient(
-145deg,
-#050810 0%,
-#091120 48%,
-#050812 100%
-);
-overflow-x:hidden;
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(55,110,255,.28),transparent 35%),
+    radial-gradient(circle at 0% 45%,rgba(0,220,255,.10),transparent 30%),
+    radial-gradient(circle at 100% 70%,rgba(145,70,255,.12),transparent 32%),
+    linear-gradient(145deg,#050810,#080d19 48%,#050711);
+  overflow-x:hidden;
 }
 
-body::before{
-content:"";
-position:fixed;
-inset:0;
-pointer-events:none;
-background:
-linear-gradient(
-rgba(255,255,255,.018) 1px,
-transparent 1px
-),
-linear-gradient(
-90deg,
-rgba(255,255,255,.018) 1px,
-transparent 1px
-);
-background-size:42px 42px;
-mask-image:linear-gradient(
-to bottom,
-rgba(0,0,0,.7),
-transparent 80%
-);
-}
-
-body::after{
-content:"";
-position:fixed;
-width:600px;
-height:600px;
-left:50%;
-top:-350px;
-transform:translateX(-50%);
-background:
-radial-gradient(
-circle,
-rgba(75,220,255,.14),
-transparent 65%
-);
-filter:blur(20px);
-pointer-events:none;
-}
-
-button,
-input{
-font:inherit;
-}
-
-button{
--webkit-tap-highlight-color:transparent;
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.25;
+  background-image:
+    linear-gradient(rgba(100,180,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(100,180,255,.025) 1px,transparent 1px);
+  background-size:35px 35px;
 }
 
 main{
-position:relative;
-z-index:1;
-width:min(1220px,calc(100% - 28px));
-margin:auto;
-padding:42px 0 70px;
+  width:min(1220px,calc(100% - 28px));
+  margin:auto;
+  padding:30px 0 55px;
+  position:relative;
+  z-index:1;
 }
 
 .hero{
-text-align:center;
-margin-bottom:28px;
+  text-align:center;
+  padding:18px 0 25px;
 }
 
-.eyebrow{
-display:inline-flex;
-align-items:center;
-gap:8px;
-padding:7px 12px;
-border:1px solid var(--line2);
-border-radius:999px;
-background:rgba(10,18,32,.6);
-box-shadow:
-0 0 25px rgba(77,231,255,.07),
-inset 0 1px rgba(255,255,255,.06);
-color:#b8dfff;
-font-size:11px;
-font-weight:800;
-letter-spacing:1.5px;
-text-transform:uppercase;
+.logo{
+  margin:0;
+  font-size:clamp(38px,7vw,62px);
+  font-weight:950;
+  letter-spacing:-2.8px;
 }
 
-.eyebrow-dot{
-width:7px;
-height:7px;
-border-radius:50%;
-background:var(--green);
-box-shadow:0 0 12px var(--green);
-}
-
-h1{
-margin:17px 0 10px;
-font-size:clamp(42px,7vw,76px);
-line-height:.92;
-font-weight:950;
-letter-spacing:-4px;
-}
-
-h1 span{
-background:
-linear-gradient(
-110deg,
-var(--cyan),
-#83c8ff 35%,
-var(--violet)
-);
--webkit-background-clip:text;
-background-clip:text;
-color:transparent;
-text-shadow:
-0 0 40px rgba(77,231,255,.12);
+.logo span{
+  color:var(--cyan);
+  text-shadow:0 0 28px rgba(67,220,255,.35);
 }
 
 .subtitle{
-max-width:650px;
-margin:0 auto;
-color:#aab7ca;
-font-size:15px;
-line-height:1.65;
+  color:#aebbd0;
+  margin:12px auto 0;
+  max-width:650px;
+  line-height:1.5;
+  font-size:15px;
 }
 
-.badges{
-display:flex;
-justify-content:center;
-gap:8px;
-flex-wrap:wrap;
-margin-top:17px;
+.status-line{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  margin-top:16px;
+  color:#718099;
+  font-size:12px;
 }
 
-.badge{
-padding:7px 11px;
-border:1px solid var(--line);
-border-radius:999px;
-background:rgba(12,19,32,.62);
-color:#aebbd0;
-font-size:11px;
-backdrop-filter:blur(16px);
--webkit-backdrop-filter:blur(16px);
-}
-
-.badge b{
-color:#dcecff;
+.status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px var(--green);
 }
 
 .glass{
-background:
-linear-gradient(
-145deg,
-rgba(20,30,50,.72),
-rgba(8,14,25,.62)
-);
-border:1px solid var(--line);
-border-radius:24px;
-box-shadow:var(--shadow);
-backdrop-filter:blur(24px);
--webkit-backdrop-filter:blur(24px);
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,.055),
+      rgba(255,255,255,.015));
+  border:1px solid var(--line);
+  box-shadow:
+    0 20px 70px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.045);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border-radius:22px;
 }
 
-.main-card{
-padding:18px;
+.upload{
+  padding:16px;
+  margin-top:5px;
 }
 
 .drop{
-position:relative;
-min-height:235px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-border:1px dashed rgba(90,180,255,.28);
-border-radius:19px;
-cursor:pointer;
-overflow:hidden;
-transition:
-transform .2s ease,
-border-color .2s ease,
-background .2s ease,
-box-shadow .2s ease;
-background:
-radial-gradient(
-circle at 50% 50%,
-rgba(77,231,255,.055),
-transparent 55%
-),
-rgba(4,10,19,.35);
-}
-
-.drop::before{
-content:"";
-position:absolute;
-inset:0;
-background:
-linear-gradient(
-120deg,
-transparent 20%,
-rgba(77,231,255,.08) 50%,
-transparent 80%
-);
-transform:translateX(-100%);
-transition:transform .6s ease;
-}
-
-.drop:hover::before,
-.drop.drag::before{
-transform:translateX(100%);
+  min-height:190px;
+  border:1px dashed rgba(67,220,255,.25);
+  border-radius:17px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  background:rgba(4,10,20,.35);
+  transition:.2s;
 }
 
 .drop:hover,
 .drop.drag{
-transform:translateY(-2px);
-border-color:rgba(77,231,255,.65);
-background:
-radial-gradient(
-circle at 50% 50%,
-rgba(77,231,255,.11),
-transparent 60%
-),
-rgba(5,14,26,.55);
-box-shadow:
-0 0 45px rgba(77,231,255,.08),
-inset 0 0 35px rgba(77,231,255,.025);
+  border-color:var(--cyan);
+  background:rgba(67,220,255,.055);
+  box-shadow:0 0 35px rgba(67,220,255,.08);
+  transform:translateY(-2px);
 }
 
 .drop-icon{
-position:relative;
-width:62px;
-height:62px;
-display:grid;
-place-items:center;
-margin-bottom:13px;
-border:1px solid rgba(77,231,255,.32);
-border-radius:18px;
-background:
-linear-gradient(
-145deg,
-rgba(77,231,255,.12),
-rgba(92,124,255,.08)
-);
-color:var(--cyan);
-font-size:29px;
-box-shadow:
-0 0 30px rgba(77,231,255,.09),
-inset 0 0 20px rgba(77,231,255,.04);
+  font-size:35px;
+  margin-bottom:8px;
+  filter:drop-shadow(0 0 12px rgba(67,220,255,.5));
 }
 
 .drop-title{
-position:relative;
-font-size:20px;
-font-weight:850;
-letter-spacing:-.4px;
+  font-size:19px;
+  font-weight:850;
 }
 
 .drop-sub{
-position:relative;
-margin-top:6px;
-color:var(--muted);
-font-size:13px;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:5px;
 }
 
 .count{
-position:relative;
-display:inline-flex;
-align-items:center;
-gap:8px;
-margin-top:17px;
-padding:8px 13px;
-border:1px solid rgba(255,255,255,.09);
-border-radius:999px;
-background:rgba(5,10,18,.58);
-color:#9aa9bf;
-font-size:12px;
+  margin-top:13px;
+  padding:7px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  color:#9eabc0;
+  font-size:12px;
+  background:rgba(255,255,255,.025);
 }
 
 .count strong{
-color:var(--green);
+  color:var(--green);
 }
 
 input[type=file]{
-display:none;
+  display:none;
 }
 
 .workspace{
-display:grid;
-grid-template-columns:370px 1fr;
-gap:16px;
-margin-top:16px;
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:15px;
+  margin-top:15px;
 }
 
 .panel{
-min-width:0;
-padding:18px;
-border:1px solid var(--line);
-border-radius:20px;
-background:
-linear-gradient(
-145deg,
-rgba(15,24,40,.67),
-rgba(7,12,22,.55)
-);
+  padding:18px;
 }
 
 .panel-title{
-display:flex;
-align-items:center;
-gap:9px;
-margin-bottom:18px;
-font-size:13px;
-font-weight:900;
-letter-spacing:.7px;
-text-transform:uppercase;
-color:#dbeaff;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.7px;
+  margin-bottom:18px;
 }
 
-.panel-title::before{
-content:"";
-width:8px;
-height:8px;
-border-radius:50%;
-background:var(--cyan);
-box-shadow:0 0 13px var(--cyan);
+.panel-title:before{
+  content:"";
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 12px var(--cyan);
 }
 
 .setting{
-margin-bottom:22px;
-}
-
-.setting:last-child{
-margin-bottom:0;
+  margin-bottom:20px;
 }
 
 .setting-head{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-margin-bottom:9px;
-font-size:13px;
-font-weight:800;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:9px;
+  font-size:13px;
+  font-weight:800;
 }
 
 .value{
-min-width:48px;
-padding:6px 9px;
-border:1px solid var(--line);
-border-radius:9px;
-background:rgba(4,9,17,.65);
-color:#e6f3ff;
-font-size:12px;
-text-align:center;
-}
-
-.help{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-width:17px;
-height:17px;
-margin-left:4px;
-border:1px solid rgba(255,255,255,.15);
-border-radius:50%;
-color:#7f8ea5;
-font-size:10px;
-cursor:help;
+  min-width:50px;
+  padding:5px 8px;
+  text-align:center;
+  border-radius:8px;
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--line);
+  color:#dbe8ff;
 }
 
 .mode-group{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
 }
 
 .mode-btn{
-min-height:85px;
-padding:12px;
-border:1px solid var(--line);
-border-radius:13px;
-background:rgba(6,12,22,.55);
-color:#c9d6e8;
-text-align:left;
-cursor:pointer;
-transition:.18s ease;
+  min-height:82px;
+  padding:11px;
+  text-align:left;
+  border-radius:13px;
+  border:1px solid var(--line);
+  background:rgba(5,11,22,.5);
+  color:#cbd6e8;
+  cursor:pointer;
+  transition:.18s;
 }
 
 .mode-btn:hover{
-border-color:var(--line2);
-transform:translateY(-1px);
+  border-color:rgba(67,220,255,.35);
 }
 
 .mode-btn.active{
-border-color:rgba(77,231,255,.6);
-background:
-linear-gradient(
-145deg,
-rgba(77,231,255,.13),
-rgba(92,124,255,.08)
-);
-box-shadow:
-0 0 22px rgba(77,231,255,.08),
-inset 0 0 20px rgba(77,231,255,.035);
-color:#fff;
+  border-color:rgba(67,220,255,.65);
+  background:linear-gradient(135deg,rgba(67,220,255,.12),rgba(98,140,255,.08));
+  box-shadow:0 0 25px rgba(67,220,255,.07);
+}
+
+.mode-btn b{
+  display:block;
+  font-size:14px;
 }
 
 .mode-btn small{
-display:block;
-margin-top:6px;
-color:#77869c;
-font-size:10px;
-line-height:1.4;
-font-weight:500;
-}
-
-.mode-btn.active small{
-color:#9eb6ce;
-}
-
-.range-wrap{
-padding:4px 0;
-}
-
-input[type=range]{
-width:100%;
-height:7px;
-margin:0;
-appearance:none;
--webkit-appearance:none;
-border-radius:999px;
-outline:none;
-cursor:pointer;
-background:
-linear-gradient(
-90deg,
-var(--cyan) 0%,
-var(--blue) var(--fill,18%),
-rgba(255,255,255,.10) var(--fill,18%),
-rgba(255,255,255,.10) 100%
-);
-box-shadow:
-0 0 15px rgba(77,231,255,.06);
-}
-
-input[type=range]::-webkit-slider-runnable-track{
-height:7px;
-border-radius:999px;
-background:transparent;
-}
-
-input[type=range]::-webkit-slider-thumb{
-appearance:none;
--webkit-appearance:none;
-width:20px;
-height:20px;
-margin-top:-6.5px;
-border-radius:50%;
-background:#dffaff;
-border:3px solid #0a1624;
-box-shadow:
-0 0 0 1px var(--cyan),
-0 0 14px rgba(77,231,255,.55);
-cursor:pointer;
-}
-
-input[type=range]::-moz-range-track{
-height:7px;
-border-radius:999px;
-background:rgba(255,255,255,.1);
-}
-
-input[type=range]::-moz-range-progress{
-height:7px;
-border-radius:999px;
-background:linear-gradient(90deg,var(--cyan),var(--blue));
-}
-
-input[type=range]::-moz-range-thumb{
-width:20px;
-height:20px;
-border-radius:50%;
-background:#dffaff;
-border:3px solid #0a1624;
-box-shadow:
-0 0 0 1px var(--cyan),
-0 0 14px rgba(77,231,255,.55);
-cursor:pointer;
+  display:block;
+  margin-top:5px;
+  color:#718099;
+  font-size:10px;
+  line-height:1.4;
 }
 
 .desc{
-margin-top:7px;
-color:#718198;
-font-size:11px;
-line-height:1.45;
+  color:#68758b;
+  font-size:11px;
+  line-height:1.45;
+  margin-top:8px;
+}
+
+.help{
+  display:inline-flex;
+  width:17px;
+  height:17px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #ffffff20;
+  border-radius:50%;
+  color:#728098;
+  font-size:10px;
+  margin-left:3px;
+}
+
+input[type=range]{
+  width:100%;
+  height:7px;
+  appearance:none;
+  -webkit-appearance:none;
+  border-radius:99px;
+  outline:none;
+  background:linear-gradient(
+    90deg,
+    var(--cyan) 0%,
+    var(--blue) var(--fill,20%),
+    rgba(255,255,255,.09) var(--fill,20%),
+    rgba(255,255,255,.09) 100%
+  );
+}
+
+input[type=range]::-webkit-slider-thumb{
+  appearance:none;
+  -webkit-appearance:none;
+  width:19px;
+  height:19px;
+  border-radius:50%;
+  background:#dffaff;
+  border:3px solid #17263b;
+  box-shadow:0 0 0 1px var(--cyan),0 0 15px rgba(67,220,255,.45);
+}
+
+input[type=range]::-moz-range-thumb{
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  background:#dffaff;
+  border:3px solid #17263b;
+  box-shadow:0 0 0 1px var(--cyan);
 }
 
 .switch-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:12px;
-padding:12px;
-border:1px solid var(--line);
-border-radius:13px;
-background:rgba(4,10,19,.48);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  border-radius:13px;
+  border:1px solid var(--line);
+  background:rgba(5,11,22,.45);
 }
 
 .switch-text{
-font-size:12px;
-font-weight:800;
+  font-size:12px;
+  font-weight:800;
 }
 
 .switch-text small{
-display:block;
-margin-top:4px;
-color:#718198;
-font-size:10px;
-font-weight:500;
-line-height:1.35;
+  display:block;
+  color:#68758b;
+  font-size:10px;
+  font-weight:500;
+  margin-top:3px;
 }
 
 .switch{
-position:relative;
-width:48px;
-height:26px;
-flex:0 0 auto;
+  position:relative;
+  width:45px;
+  height:24px;
+  flex:none;
 }
 
 .switch input{
-display:none;
+  display:none;
 }
 
 .switch-slider{
-position:absolute;
-inset:0;
-border-radius:999px;
-background:#252d3a;
-border:1px solid rgba(255,255,255,.1);
-cursor:pointer;
-transition:.2s;
+  position:absolute;
+  inset:0;
+  border-radius:99px;
+  background:#202b3c;
+  cursor:pointer;
 }
 
-.switch-slider::before{
-content:"";
-position:absolute;
-width:18px;
-height:18px;
-left:3px;
-top:3px;
-border-radius:50%;
-background:#8b98a8;
-transition:.2s;
+.switch-slider:before{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  top:3px;
+  left:3px;
+  border-radius:50%;
+  background:#718099;
+  transition:.2s;
 }
 
-.switch input:checked + .switch-slider{
-background:
-linear-gradient(90deg,#087d98,#3656c8);
-box-shadow:0 0 16px rgba(77,231,255,.2);
+.switch input:checked+.switch-slider{
+  background:#087f9d;
 }
 
-.switch input:checked + .switch-slider::before{
-transform:translateX(21px);
-background:#e9fcff;
-box-shadow:0 0 12px var(--cyan);
+.switch input:checked+.switch-slider:before{
+  transform:translateX(21px);
+  background:#eaffff;
+  box-shadow:0 0 10px var(--cyan);
 }
 
-.secondary{
-width:100%;
-margin-top:17px;
-padding:11px 15px;
-border:1px solid var(--line);
-border-radius:12px;
-background:rgba(8,15,27,.62);
-color:#cbd8e9;
-font-weight:800;
-cursor:pointer;
-transition:.18s;
+.reset{
+  width:100%;
+  margin-top:3px;
+  padding:11px;
+  border-radius:11px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.025);
+  color:#aebbd0;
+  font-weight:800;
+  cursor:pointer;
 }
 
-.secondary:hover{
-border-color:var(--line2);
-background:rgba(12,23,39,.8);
+.reset:hover{
+  border-color:rgba(67,220,255,.4);
+  color:white;
 }
 
-.previewbox{
-min-width:0;
+.preview{
+  padding:18px;
+  min-width:0;
 }
 
-.preview-header{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:12px;
-margin-bottom:13px;
+.preview-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:13px;
 }
 
-.preview-title{
-font-size:13px;
-font-weight:900;
-letter-spacing:.7px;
-text-transform:uppercase;
+.preview-label{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.7px;
 }
 
-.live{
-display:inline-flex;
-align-items:center;
-gap:6px;
-font-size:10px;
-color:#7e91a9;
-}
-
-.live::before{
-content:"";
-width:6px;
-height:6px;
-border-radius:50%;
-background:var(--green);
-box-shadow:0 0 10px var(--green);
+.local{
+  color:#637188;
+  font-size:10px;
 }
 
 .previews{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
 
-.pane{
-min-width:0;
-}
-
-.pane label{
-display:flex;
-justify-content:space-between;
-margin:0 3px 7px;
-color:#8190a5;
-font-size:10px;
-font-weight:800;
-text-transform:uppercase;
-letter-spacing:.8px;
+.pane-label{
+  color:#6f7c91;
+  font-size:10px;
+  font-weight:800;
+  margin-bottom:7px;
+  text-transform:uppercase;
+  letter-spacing:1px;
 }
 
 .frame{
-position:relative;
-height:320px;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-border:1px solid rgba(255,255,255,.09);
-border-radius:15px;
-background:
-linear-gradient(45deg,#111a27 25%,transparent 25%) 0 0/22px 22px,
-linear-gradient(-45deg,#111a27 25%,transparent 25%) 0 11px/22px 22px,
-linear-gradient(45deg,transparent 75%,#111a27 75%) 11px -11px/22px 22px,
-linear-gradient(-45deg,transparent 75%,#111a27 75%) -11px 0/22px 22px,
-#0a101b;
-box-shadow:inset 0 0 35px rgba(0,0,0,.22);
-}
-
-.frame::after{
-content:"";
-position:absolute;
-inset:0;
-pointer-events:none;
-border:1px solid rgba(77,231,255,.05);
-border-radius:15px;
+  height:330px;
+  border-radius:15px;
+  border:1px solid rgba(120,210,255,.11);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  background:
+    linear-gradient(45deg,#101a29 25%,transparent 25%) 0 0/20px 20px,
+    linear-gradient(-45deg,#101a29 25%,transparent 25%) 0 10px/20px 20px,
+    linear-gradient(45deg,transparent 75%,#101a29 75%) 10px -10px/20px 20px,
+    linear-gradient(-45deg,transparent 75%,#101a29 75%) -10px 0/20px 20px,
+    #09101b;
 }
 
 .frame img{
-position:relative;
-z-index:1;
-max-width:100%;
-max-height:100%;
-width:auto;
-height:auto;
-object-fit:contain;
-display:block;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  display:block;
 }
 
-.empty-preview{
-padding:20px;
-color:#536177;
-font-size:11px;
-line-height:1.5;
-text-align:center;
+.empty{
+  color:#435069;
+  font-size:11px;
+  text-align:center;
+  padding:20px;
 }
 
 .actions{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:16px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:15px;
 }
 
-.action-btn{
-min-height:48px;
-padding:12px 18px;
-border-radius:13px;
-font-size:13px;
-font-weight:900;
-cursor:pointer;
-transition:.18s ease;
+button{
+  font-family:inherit;
+}
+
+.action{
+  padding:13px 16px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.18s;
 }
 
 .primary{
-border:1px solid rgba(77,231,255,.55);
-background:
-linear-gradient(
-110deg,
-#43dff7,
-#597fff
-);
-color:#03101a;
-box-shadow:
-0 0 25px rgba(77,231,255,.15);
+  border:0;
+  color:#031019;
+  background:linear-gradient(100deg,var(--cyan),var(--blue));
+  box-shadow:0 8px 30px rgba(67,150,255,.18);
 }
 
 .primary:hover{
-transform:translateY(-2px);
-box-shadow:
-0 0 35px rgba(77,231,255,.25);
+  transform:translateY(-2px);
+  box-shadow:0 12px 35px rgba(67,150,255,.28);
 }
 
-.secondary-action{
-border:1px solid var(--line);
-background:rgba(7,14,25,.65);
-color:#d9e6f5;
+.secondary{
+  border:1px solid var(--line);
+  color:#aebbd0;
+  background:rgba(255,255,255,.025);
 }
 
-.secondary-action:hover{
-transform:translateY(-2px);
-border-color:var(--line2);
+.secondary:hover{
+  border-color:rgba(67,220,255,.35);
+  color:white;
 }
 
 button:disabled{
-opacity:.4;
-cursor:not-allowed!important;
-transform:none!important;
-box-shadow:none!important;
+  opacity:.35;
+  cursor:not-allowed;
+  transform:none!important;
 }
 
-.note{
-margin-top:13px;
-text-align:center;
-color:#596a82;
-font-size:10px;
-line-height:1.5;
-}
-
-.progress-card{
-display:none;
-margin-top:16px;
-padding:18px;
+.progress{
+  display:none;
+  margin-top:15px;
+  padding:16px;
 }
 
 .progress-top{
-display:flex;
-justify-content:space-between;
-gap:12px;
-margin-bottom:9px;
-font-size:12px;
-font-weight:800;
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:#aebbd0;
+  margin-bottom:8px;
 }
 
 .percent{
-color:var(--cyan);
+  color:var(--cyan);
+  font-weight:900;
 }
 
 .track{
-height:8px;
-overflow:hidden;
-border-radius:999px;
-background:rgba(255,255,255,.08);
+  height:8px;
+  border-radius:99px;
+  overflow:hidden;
+  background:rgba(255,255,255,.08);
 }
 
 .bar{
-height:100%;
-width:0;
-border-radius:999px;
-background:
-linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));
-box-shadow:
-0 0 15px rgba(77,231,255,.4);
-transition:width .15s ease;
+  width:0;
+  height:100%;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--cyan),var(--blue),var(--purple));
+  transition:width .15s;
 }
 
 .status{
-margin-top:8px;
-color:#718198;
-font-size:10px;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
+  color:#65738a;
+  font-size:11px;
+  margin-top:8px;
 }
 
 .results{
-display:grid;
-grid-template-columns:
-repeat(auto-fill,minmax(190px,1fr));
-gap:12px;
-margin-top:16px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:12px;
+  margin-top:15px;
 }
 
 .result{
-position:relative;
-overflow:hidden;
-border:1px solid var(--line);
-border-radius:17px;
-background:rgba(9,15,26,.7);
-box-shadow:
-0 15px 35px rgba(0,0,0,.25);
+  position:relative;
+  overflow:hidden;
+  border-radius:15px;
+  border:1px solid var(--line);
+  background:rgba(10,17,29,.65);
+  animation:pop .35s ease both;
+}
+
+@keyframes pop{
+  from{
+    opacity:0;
+    transform:translateY(14px) scale(.96);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
 }
 
 .result img{
-display:block;
-width:100%;
-height:170px;
-object-fit:contain;
-background:
-linear-gradient(45deg,#111a27 25%,transparent 25%) 0 0/18px 18px,
-linear-gradient(-45deg,#111a27 25%,transparent 25%) 0 9px/18px 18px,
-linear-gradient(45deg,transparent 75%,#111a27 75%) 9px -9px/18px 18px,
-linear-gradient(-45deg,transparent 75%,#111a27 75%) -9px 0/18px 18px,
-#0a101b;
+  width:100%;
+  height:160px;
+  object-fit:contain;
+  display:block;
+  background:#070d17;
 }
 
 .result-body{
-padding:10px;
+  padding:9px;
 }
 
 .result-name{
-color:#c7d4e6;
-font-size:10px;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
+  font-size:11px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .result-size{
-margin-top:4px;
-color:#65758c;
-font-size:10px;
-}
-
-.done{
-position:absolute;
-top:8px;
-left:8px;
-padding:4px 7px;
-border:1px solid rgba(56,233,139,.25);
-border-radius:7px;
-background:rgba(3,70,39,.82);
-color:#73ffb1;
-font-size:8px;
-font-weight:900;
-letter-spacing:.7px;
+  color:#617087;
+  font-size:10px;
+  margin-top:3px;
 }
 
 .download-one{
-position:absolute;
-right:8px;
-top:8px;
-width:30px;
-height:30px;
-padding:0;
-border:1px solid rgba(255,255,255,.14);
-border-radius:8px;
-background:rgba(5,10,18,.78);
-color:#dff7ff;
-cursor:pointer;
+  position:absolute;
+  top:7px;
+  right:7px;
+  width:30px;
+  height:30px;
+  border-radius:9px;
+  border:1px solid #ffffff20;
+  background:rgba(5,10,18,.8);
+  color:white;
+  cursor:pointer;
 }
 
-.download-one:hover{
-border-color:var(--line2);
-background:rgba(12,24,40,.9);
+.done{
+  position:absolute;
+  top:7px;
+  left:7px;
+  padding:4px 6px;
+  border-radius:6px;
+  background:#087c4a;
+  color:white;
+  font-size:9px;
+  font-weight:900;
 }
 
-.pagination{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:7px;
-flex-wrap:wrap;
-margin-top:18px;
-}
-
-.page-btn{
-min-width:37px;
-padding:8px 11px;
-border:1px solid var(--line);
-border-radius:9px;
-background:rgba(8,15,26,.65);
-color:#b8c6d8;
-cursor:pointer;
-}
-
-.page-btn:hover{
-border-color:var(--line2);
-}
-
-.page-btn.active{
-border-color:var(--cyan);
-background:rgba(77,231,255,.12);
-color:#e8fcff;
-}
-
-.page-info{
-margin:0 7px;
-color:#63748b;
-font-size:10px;
-}
-
-.locked{
-opacity:.55;
-pointer-events:none;
+.note{
+  text-align:center;
+  color:#536076;
+  font-size:10px;
+  margin-top:14px;
 }
 
 @media(max-width:850px){
+  .workspace{
+    grid-template-columns:1fr;
+  }
 
-.workspace{
-grid-template-columns:1fr;
+  .frame{
+    height:290px;
+  }
 }
 
+@media(max-width:560px){
+  main{
+    width:calc(100% - 16px);
+    padding-top:18px;
+  }
+
+  .previews,
+  .actions{
+    grid-template-columns:1fr;
+  }
+
+  .mode-group{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .frame{
+    height:250px;
+  }
 }
-
-@media(max-width:600px){
-
-main{
-width:min(100% - 16px,1220px);
-padding-top:22px;
-}
-
-h1{
-letter-spacing:-2.5px;
-}
-
-.workspace{
-gap:12px;
-}
-
-.previews{
-grid-template-columns:1fr;
-}
-
-.frame{
-height:260px;
-}
-
-.actions{
-grid-template-columns:1fr;
-}
-
-.mode-group{
-grid-template-columns:1fr;
-}
-
-.panel{
-padding:15px;
-}
-
-}
-
 </style>
 </head>
 
 <body>
-
 <main>
 
-<header class="hero">
-
-<div class="eyebrow">
-<span class="eyebrow-dot"></span>
-LOCAL AI PROCESSING
-</div>
-
-<h1>Cut It <span>Out!</span> ✂️</h1>
-
-<p class="subtitle">
-Remove backgrounds with AI directly in your browser.
-No server upload. Full-resolution PNG output.
-</p>
-
-<div class="badges">
-<div class="badge">🔒 <b>Private</b></div>
-<div class="badge">⚡ <b>AI Powered</b></div>
-<div class="badge">🖥️ <b>On Device</b></div>
-<div class="badge">💎 <b>PNG Output</b></div>
-</div>
-
-</header>
-
-<section class="glass main-card">
-
-<div class="drop" id="drop">
-
-<div class="drop-icon">✦</div>
-
-<div class="drop-title">
-Tap to select images
-</div>
-
-<div class="drop-sub">
-or drag & drop images here
-</div>
-
-<div class="count" id="count">
-<span>○</span>
-<strong>0</strong>
-images selected
-</div>
+<section class="hero">
+  <h1 class="logo">Cut It <span>Out!</span> ✂️</h1>
+  <p class="subtitle">
+    AI background removal running directly in your browser.
+  </p>
+
+  <div class="status-line">
+    <span class="status-dot"></span>
+    LOCAL PROCESSING • NO IMAGE UPLOAD
+  </div>
+</section>
+
+<section class="glass upload">
+  <div class="drop" id="drop">
+    <div class="drop-icon">◈</div>
+    <div class="drop-title">Select images</div>
+    <div class="drop-sub">Tap here or drag & drop images</div>
+    <div class="count" id="count">0 images selected</div>
+    <input id="files" type="file" accept="image/*" multiple>
+  </div>
+</section>
+
+<section class="workspace">
+
+<section class="glass panel">
+  <div class="panel-title">AI CONTROLS</div>
+
+  <div class="setting">
+    <div class="setting-head">
+      <span>Removal Mode <span class="help">?</span></span>
+    </div>
+
+    <div class="mode-group">
+      <button class="mode-btn active" id="modeNormal" type="button">
+        <b>Normal</b>
+        <small>Balanced edges and natural subject detail.</small>
+      </button>
+
+      <button class="mode-btn" id="modeAggressive" type="button">
+        <b>Aggressive</b>
+        <small>Stronger cleanup around uncertain background pixels.</small>
+      </button>
+    </div>
+  </div>
+
+  <div class="setting">
+    <div class="setting-head">
+      <span>Tolerance</span>
+      <span class="value" id="tolVal">18</span>
+    </div>
+
+    <input id="tol" type="range" min="1" max="100" value="18">
+
+    <div class="desc">
+      Higher values remove more uncertain pixels.
+    </div>
+  </div>
+
+  <div class="setting">
+    <div class="setting-head">
+      <span>Safety Margin</span>
+      <span class="value" id="padVal">2 px</span>
+    </div>
+
+    <input id="pad" type="range" min="0" max="20" value="2">
+
+    <div class="desc">
+      Keeps a tiny protective alpha layer around subject edges.
+    </div>
+  </div>
+
+  <div class="setting">
+    <div class="setting-head">
+      <span>Self Improvement</span>
+    </div>
+
+    <div class="switch-row">
+      <div class="switch-text">
+        Edge Refinement
+        <small>Softens uncertain AI edges.</small>
+      </div>
+
+      <label class="switch">
+        <input type="checkbox" id="selfImprove" checked>
+        <span class="switch-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <button class="reset" id="reset" type="button">
+    ↻ Reset Settings
+  </button>
+</section>
+
+<section class="glass preview">
+  <div class="preview-head">
+    <div class="preview-label">PREVIEW</div>
+    <div class="local">● LOCAL PREVIEW</div>
+  </div>
+
+  <div class="previews">
 
-<input
-id="files"
-type="file"
-accept="image/*"
-multiple
->
-
-</div>
-
-<div class="workspace">
-
-<div class="panel" id="settings">
-
-<div class="panel-title">
-AI Controls
-</div>
+    <div>
+      <div class="pane-label">Original</div>
 
-<div class="setting">
-
-<div class="setting-head">
-<span>
-Removal Mode
-<span
-class="help"
-title="Choose how strongly the edge cleanup behaves."
->?</span>
-</span>
-</div>
-
-<div class="mode-group">
-
-<button
-type="button"
-class="mode-btn active"
-id="modeNormal"
->
-Normal
-<small>
-Balanced processing that keeps more fine subject detail.
-</small>
-</button>
+      <div class="frame" id="originalFrame">
+        <div class="empty" id="originalEmpty">
+          Select an image to preview it.
+        </div>
 
-<button
-type="button"
-class="mode-btn"
-id="modeAggressive"
->
-Aggressive
-<small>
-Stronger cleanup for difficult or busy backgrounds.
-</small>
-</button>
+        <img id="origPreview" alt="Original preview" hidden>
+      </div>
+    </div>
 
-</div>
+    <div>
+      <div class="pane-label">Transparent Result</div>
 
-</div>
+      <div class="frame" id="resultFrame">
+        <div class="empty" id="resultEmpty">
+          Your transparent result will appear here.
+        </div>
 
-<div class="setting">
+        <img id="cropPreview" alt="Transparent result" hidden>
+      </div>
+    </div>
 
-<div class="setting-head">
+  </div>
+</section>
 
-<span>
-Tolerance
-<span
-class="help"
-title="Controls how strongly low-alpha pixels are removed."
->?</span>
-</span>
+</section>
 
-<span
-class="value"
-id="tolVal"
->18</span>
+<section class="actions">
+  <button class="action primary" id="clean" type="button">
+    ✦ Remove Background
+  </button>
 
-</div>
+  <button class="action secondary" id="downloadAll" type="button" disabled>
+    ⇩ Download All (.ZIP)
+  </button>
+</section>
 
-<div class="range-wrap">
+<section class="glass progress" id="progressCard">
+  <div class="progress-top">
+    <span id="progressText">Preparing…</span>
+    <span class="percent" id="percent">0%</span>
+  </div>
 
-<input
-id="tol"
-type="range"
-min="1"
-max="100"
-value="18"
->
+  <div class="track">
+    <div class="bar" id="bar"></div>
+  </div>
 
-</div>
+  <div class="status" id="status"></div>
+</section>
 
-<div class="desc">
-Higher values remove more uncertain pixels.
-Lower values preserve more subtle edges.
-</div>
-
-</div>
-
-<div class="setting">
-
-<div class="setting-head">
-
-<span>
-Safety Margin
-<span
-class="help"
-title="Protects a small area around detected subject edges."
->?</span>
-</span>
-
-<span
-class="value"
-id="padVal"
->2 px</span>
-
-</div>
-
-<div class="range-wrap">
-
-<input
-id="pad"
-type="range"
-min="0"
-max="20"
-value="2"
->
-
-</div>
-
-<div class="desc">
-Adds a tiny protective alpha layer around subject edges.
-</div>
-
-</div>
-
-<div class="setting">
-
-<div class="setting-head">
-<span>Self Improvement</span>
-</div>
-
-<div class="switch-row">
-
-<div class="switch-text">
-
-Edge Refinement
-
-<small>
-Smooths uncertain edges after AI segmentation.
-</small>
-
-</div>
-
-<label class="switch">
-
-<input
-type="checkbox"
-id="selfImprove"
-checked
->
-
-<span class="switch-slider"></span>
-
-</label>
-
-</div>
-
-</div>
-
-<button
-type="button"
-class="secondary"
-id="reset"
->
-↻ Reset Settings
-</button>
-
-</div>
-
-<div class="panel previewbox">
-
-<div class="preview-header">
-
-<div class="preview-title">
-Preview
-</div>
-
-<div class="live">
-LOCAL PREVIEW
-</div>
-
-</div>
-
-<div class="previews">
-
-<div class="pane">
-
-<label>
-<span>Original</span>
-</label>
-
-<div
-class="frame"
-id="originalFrame"
->
-
-<div class="empty-preview">
-Choose an image to preview it here.
-</div>
-
-<img
-id="origPreview"
-style="display:none"
-alt="Original preview"
->
-
-</div>
-
-</div>
-
-<div class="pane">
-
-<label>
-<span>Transparent Result</span>
-</label>
-
-<div
-class="frame"
-id="resultFrame"
->
-
-<div class="empty-preview">
-Your transparent result will appear here.
-</div>
-
-<img
-id="cropPreview"
-style="display:none"
-alt="Background removed preview"
->
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="actions">
-
-<button
-type="button"
-class="action-btn primary"
-id="clean"
->
-✦ Remove Background
-</button>
-
-<button
-type="button"
-class="action-btn secondary-action"
-id="downloadAll"
-disabled
->
-⇩ Download All (.ZIP)
-</button>
-
-</div>
+<div class="results" id="results"></div>
 
 <div class="note">
-Your images stay on this device during processing.
-The AI model is downloaded to your browser for local inference.
+  Your images stay on this device. The AI model runs locally in your browser.
 </div>
 
-</section>
+</main>
 
-<section
-class="glass progress-card"
-id="progressCard"
->
-
-<div class="progress-top">
-
-<span id="progressText">
-Preparing AI…
-</span>
-
-<span
-class="percent"
-id="percent"
->
-0%
-</span>
-
-</div>
-
-<div class="track">
-<div
-class="bar"
-id="bar"
-></div>
-</div>
-
-<div
-class="status"
-id="status"
-></div>
-
-</section>
-
-<div
-class="results"
-id="results"
-></div>
-
-<div
-class="pagination"
-id="pagination"
-></div>
-
-   </main><script>
-"use strict";
-
-const $ = id => document.getElementById(id);
+<script type="module">iv>const $ = id => document.getElementById(id);
 
 const filesEl = $("files");
 const drop = $("drop");
 const count = $("count");
-
-const settings = $("settings");
 
 const modeNormal = $("modeNormal");
 const modeAggressive = $("modeAggressive");
 
 const tolEl = $("tol");
 const padEl = $("pad");
-
 const tolVal = $("tolVal");
 const padVal = $("padVal");
 
@@ -1424,8 +871,8 @@ const resetBtn = $("reset");
 const origPreview = $("origPreview");
 const cropPreview = $("cropPreview");
 
-const originalFrame = $("originalFrame");
-const resultFrame = $("resultFrame");
+const originalEmpty = $("originalEmpty");
+const resultEmpty = $("resultEmpty");
 
 const cleanBtn = $("clean");
 const downloadAll = $("downloadAll");
@@ -1437,2505 +884,1441 @@ const bar = $("bar");
 const status = $("status");
 
 const results = $("results");
-const pagination = $("pagination");
 
 let selected = [];
 let outputs = [];
-
 let currentPage = 1;
+
 let cropMode = "normal";
-
 let previewURL = null;
+let resultURL = null;
 let previewToken = 0;
-
-let resultPreviewURL = null;
 
 const PAGE_SIZE = 20;
 
-
-/* -----------------------------
-   SLIDER VISUALS
------------------------------ */
-
 function updateSlider(el){
+  const min = Number(el.min);
+  const max = Number(el.max);
+  const value = Number(el.value);
 
-    const min = Number(el.min);
-    const max = Number(el.max);
-    const value = Number(el.value);
+  const pct = ((value-min)/(max-min))*100;
 
-    const pct =
-        ((value - min) / (max - min)) * 100;
-
-    el.style.setProperty(
-        "--fill",
-        pct + "%"
-    );
+  el.style.setProperty("--fill",pct+"%");
 }
-
-updateSlider(tolEl);
-updateSlider(padEl);
-
-
-/* -----------------------------
-   FILE COUNT
------------------------------ */
 
 function updateCount(){
-
-    count.innerHTML = `
-        <span style="color:#38e98b">✓</span>
-        <strong>${selected.length}</strong>
-        ${selected.length === 1 ? "image" : "images"} selected
-    `;
+  count.innerHTML =
+    `<strong>${selected.length}</strong> images selected`;
 }
 
+function setFiles(list){
+  const incoming = Array.from(list || []);
 
-/* -----------------------------
-   IMAGE IMPORT
------------------------------ */
+  selected = incoming.filter(file =>
+    file &&
+    file.type &&
+    file.type.startsWith("image/")
+  );
 
-function setFiles(files){
+  updateCount();
 
-    const valid = files.filter(
-        file =>
-            file &&
-            file.type &&
-            file.type.startsWith("image/")
-    );
+  if(!selected.length){
+    origPreview.hidden = true;
+    cropPreview.hidden = true;
 
-    selected = valid;
+    originalEmpty.hidden = false;
+    resultEmpty.hidden = false;
 
-    updateCount();
+    return;
+  }
 
-    previewToken++;
-
-    if(resultPreviewURL){
-        URL.revokeObjectURL(resultPreviewURL);
-        resultPreviewURL = null;
-    }
-
-    cropPreview.src = "";
-    cropPreview.style.display = "none";
-
-    const resultEmpty =
-        resultFrame.querySelector(".empty-preview");
-
-    if(resultEmpty){
-        resultEmpty.style.display = "block";
-    }
-
-    if(!selected.length){
-
-        origPreview.src = "";
-        origPreview.style.display = "none";
-
-        const originalEmpty =
-            originalFrame.querySelector(".empty-preview");
-
-        if(originalEmpty){
-            originalEmpty.style.display = "block";
-        }
-
-        return;
-    }
-
-    showPreview(selected[0]);
+  showPreview(selected[0]);
 }
 
+function showPreview(file){
+  if(previewURL){
+    URL.revokeObjectURL(previewURL);
+  }
 
-/* Clicking anywhere in drop zone */
+  previewURL = URL.createObjectURL(file);
 
-drop.addEventListener("click", event => {
+  origPreview.src = previewURL;
+  origPreview.hidden = false;
+  originalEmpty.hidden = true;
 
-    if(event.target === filesEl){
-        return;
-    }
+  if(resultURL){
+    URL.revokeObjectURL(resultURL);
+    resultURL = null;
+  }
 
-    filesEl.click();
+  cropPreview.hidden = true;
+  resultEmpty.hidden = false;
 
-});
-
-
-/* File picker */
-
-filesEl.addEventListener("change", () => {
-
-    setFiles(
-        Array.from(filesEl.files || [])
-    );
-
-});
-
-
-/* Drag over */
-
-drop.addEventListener("dragover", event => {
-
-    event.preventDefault();
-
-    event.dataTransfer.dropEffect = "copy";
-
-    drop.classList.add("drag");
-
-});
-
-
-/* Drag leave */
-
-drop.addEventListener("dragleave", event => {
-
-    if(!drop.contains(event.relatedTarget)){
-        drop.classList.remove("drag");
-    }
-
-});
-
-
-/* Drop */
-
-drop.addEventListener("drop", event => {
-
-    event.preventDefault();
-
-    drop.classList.remove("drag");
-
-    setFiles(
-        Array.from(
-            event.dataTransfer.files || []
-        )
-    );
-
-});
-
-
-/* -----------------------------
-   PREVIEW
------------------------------ */
-
-async function showPreview(file){
-
-    if(previewURL){
-        URL.revokeObjectURL(previewURL);
-        previewURL = null;
-    }
-
-    previewURL =
-        URL.createObjectURL(file);
-
-    origPreview.src = previewURL;
-
-    origPreview.style.display = "block";
-
-    const empty =
-        originalFrame.querySelector(".empty-preview");
-
-    if(empty){
-        empty.style.display = "none";
-    }
-
-    await updatePreview();
-
+  updatePreview();
 }
 
+drop.addEventListener("click",()=>{
+  filesEl.click();
+});
 
-/* -----------------------------
-   IMAGE LOADER
------------------------------ */
+filesEl.addEventListener("change",()=>{
+  setFiles(filesEl.files);
+});
+
+drop.addEventListener("dragover",event=>{
+  event.preventDefault();
+  drop.classList.add("drag");
+});
+
+drop.addEventListener("dragleave",()=>{
+  drop.classList.remove("drag");
+});
+
+drop.addEventListener("drop",event=>{
+  event.preventDefault();
+
+  drop.classList.remove("drag");
+
+  setFiles(event.dataTransfer.files);
+});
 
 function loadImage(file){
+  return new Promise((resolve,reject)=>{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
 
-    return new Promise((resolve, reject) => {
+    img.onload = ()=>{
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
 
-        const url =
-            URL.createObjectURL(file);
+    img.onerror = ()=>{
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not load image."));
+    };
 
-        const img =
-            new Image();
-
-        img.onload = () => {
-
-            URL.revokeObjectURL(url);
-
-            resolve(img);
-
-        };
-
-        img.onerror = () => {
-
-            URL.revokeObjectURL(url);
-
-            reject(
-                new Error(
-                    "Could not load image."
-                )
-            );
-
-        };
-
-        img.src = url;
-
-    });
-
+    img.src = url;
+  });
 }
-
-
-/* -----------------------------
-   MODE
------------------------------ */
 
 function setMode(mode){
+  cropMode = mode;
 
-    cropMode = mode;
+  modeNormal.classList.toggle(
+    "active",
+    mode === "normal"
+  );
 
-    modeNormal.classList.toggle(
-        "active",
-        mode === "normal"
-    );
+  modeAggressive.classList.toggle(
+    "active",
+    mode === "aggressive"
+  );
 
-    modeAggressive.classList.toggle(
-        "active",
-        mode === "aggressive"
-    );
-
-    if(selected.length){
-        updatePreview();
-    }
-
+  updatePreview();
 }
 
+modeNormal.addEventListener("click",()=>{
+  setMode("normal");
+});
 
-modeNormal.addEventListener(
-    "click",
-    () => {
+modeAggressive.addEventListener("click",()=>{
+  setMode("aggressive");
+});
 
-        if(!modeNormal.disabled){
-            setMode("normal");
-        }
+tolEl.addEventListener("input",()=>{
+  tolVal.textContent = tolEl.value;
+  updateSlider(tolEl);
 
-    }
-);
+  schedulePreview();
+});
 
+padEl.addEventListener("input",()=>{
+  padVal.textContent = padEl.value + " px";
+  updateSlider(padEl);
 
-modeAggressive.addEventListener(
-    "click",
-    () => {
+  schedulePreview();
+});
 
-        if(!modeAggressive.disabled){
-            setMode("aggressive");
-        }
+selfImprove.addEventListener("change",()=>{
+  schedulePreview();
+});
 
-    }
-);
+resetBtn.addEventListener("click",()=>{
+  tolEl.value = 18;
+  padEl.value = 2;
+  selfImprove.checked = true;
 
+  tolVal.textContent = "18";
+  padVal.textContent = "2 px";
 
-/* -----------------------------
-   TOLERANCE
------------------------------ */
+  updateSlider(tolEl);
+  updateSlider(padEl);
 
-tolEl.addEventListener(
-    "input",
-    () => {
-
-        tolVal.textContent =
-            tolEl.value;
-
-        updateSlider(tolEl);
-
-        if(selected.length){
-            updatePreview();
-        }
-
-    }
-);
-
-
-/* -----------------------------
-   SAFETY MARGIN
------------------------------ */
-
-padEl.addEventListener(
-    "input",
-    () => {
-
-        padVal.textContent =
-            padEl.value + " px";
-
-        updateSlider(padEl);
-
-        if(selected.length){
-            updatePreview();
-        }
-
-    }
-);
-
-
-/* -----------------------------
-   RESET
------------------------------ */
-
-resetBtn.addEventListener(
-    "click",
-    () => {
-
-        tolEl.value = "18";
-        padEl.value = "2";
-
-        selfImprove.checked = true;
-
-        tolVal.textContent = "18";
-        padVal.textContent = "2 px";
-
-        updateSlider(tolEl);
-        updateSlider(padEl);
-
-        setMode("normal");
-
-    }
-);
-
-
-/* -----------------------------
-   LOCK CONTROLS
------------------------------ */
-
-function setLocked(value){
-
-    settings.classList.toggle(
-        "locked",
-        value
-    );
-
-    tolEl.disabled = value;
-    padEl.disabled = value;
-
-    resetBtn.disabled = value;
-
-    modeNormal.disabled = value;
-    modeAggressive.disabled = value;
-
-    selfImprove.disabled = value;
-
-}
-
-
-/* -----------------------------
-   PROGRESS
------------------------------ */
-
-function setProgress(value, text){
-
-    const v =
-        Math.max(
-            0,
-            Math.min(100, value)
-        );
-
-    bar.style.width =
-        v + "%";
-
-    percent.textContent =
-        Math.round(v) + "%";
-
-    if(text){
-        progressText.textContent =
-            text;
-    }
-
-}
-
-
-/* -----------------------------
-   INITIAL STATE
------------------------------ */
-
-updateCount();
+  setMode("normal");
+});
 
 updateSlider(tolEl);
 updateSlider(padEl);
 
-setMode("normal");
+function setProgress(value,text){
+  const v = Math.max(0,Math.min(100,value));
 
-   </script><script>
+  bar.style.width = v + "%";
+  percent.textContent = Math.round(v) + "%";
 
-/* =========================================================
-   AI BACKGROUND REMOVER
-   BRIA RMBG-1.4
-========================================================= */
-
-let remover = null;
-let modelLoading = null;
-
-
-/* -----------------------------
-   LOAD MODEL
------------------------------ */
-
-async function getRemover(){
-
-    if(remover){
-        return remover;
-    }
-
-    if(modelLoading){
-        return modelLoading;
-    }
-
-    modelLoading = (async () => {
-
-        status.textContent =
-            "Loading BRIA AI model…";
-
-        progressText.textContent =
-            "Downloading AI model…";
-
-        try{
-
-            const mod = await import(
-                "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1"
-            );
-
-            const pipeline =
-                mod.pipeline;
-
-            /*
-             * BRIA RMBG-1.4 officially uses
-             * the image-segmentation pipeline
-             * in Transformers.js.
-             */
-
-            remover = await pipeline(
-                "image-segmentation",
-                "briaai/RMBG-1.4"
-            );
-
-            status.textContent =
-                "AI model ready.";
-
-            return remover;
-
-        }catch(error){
-
-            console.error(
-                "AI MODEL ERROR:",
-                error
-            );
-
-            throw new Error(
-                "The AI model could not load. Make sure the page is running on HTTPS or localhost, then try again."
-            );
-
-        }finally{
-
-            modelLoading = null;
-
-        }
-
-    })();
-
-    return modelLoading;
-
+  if(text){
+    progressText.textContent = text;
+  }
 }
 
+let previewTimer = null;
 
-/* -----------------------------
-   RAW IMAGE -> CANVAS
------------------------------ */
+function schedulePreview(){
+  clearTimeout(previewTimer);
 
-function rawImageToCanvas(raw){
+  previewTimer = setTimeout(()=>{
+    updatePreview();
+  },180);
+}
 
-    if(
-        !raw ||
-        !raw.data ||
-        !raw.width ||
-        !raw.height
-    ){
+function clearResultPreview(){
+  if(resultURL){
+    URL.revokeObjectURL(resultURL);
+    resultURL = null;
+  }
 
-        throw new Error(
-            "Invalid AI mask returned."
-        );
+  cropPreview.hidden = true;
+  resultEmpty.hidden = false;
+}
 
-    }
+async function updatePreview(){
+  if(!selected.length) return;
 
-    const width =
-        Number(raw.width);
+  const token = ++previewToken;
 
-    const height =
-        Number(raw.height);
+  clearResultPreview();
 
-    const channels =
-        Number(raw.channels || 1);
+  try{
+    status.textContent = "Preparing preview…";
 
-    const data =
-        new Uint8ClampedArray(raw.data);
-
-    const canvas =
-        document.createElement("canvas");
-
-    canvas.width = width;
-    canvas.height = height;
-
-    const ctx =
-        canvas.getContext(
-            "2d",
-            {
-                willReadFrequently:true
-            }
-        );
-
-    const rgba =
-        new Uint8ClampedArray(
-            width * height * 4
-        );
-
-
-    /*
-     * Single-channel mask.
-     */
-
-    if(channels === 1){
-
-        for(
-            let p = 0,
-                i = 0;
-
-            p < width * height;
-
-            p++,
-            i += 4
-        ){
-
-            const value =
-                data[p];
-
-            rgba[i] = 255;
-            rgba[i + 1] = 255;
-            rgba[i + 2] = 255;
-            rgba[i + 3] = value;
-
-        }
-
-    }
-
-    /*
-     * RGBA mask.
-     */
-
-    else if(channels === 4){
-
-        for(
-            let p = 0,
-                i = 0;
-
-            p < width * height;
-
-            p++,
-            i += 4
-        ){
-
-            const r =
-                data[i];
-
-            const g =
-                data[i + 1];
-
-            const b =
-                data[i + 2];
-
-            const a =
-                data[i + 3];
-
-            const value =
-                Math.round(
-                    (r + g + b) / 3
-                );
-
-            rgba[i] = 255;
-            rgba[i + 1] = 255;
-            rgba[i + 2] = 255;
-
-            /*
-             * Some models use alpha,
-             * some use RGB grayscale.
-             */
-
-            rgba[i + 3] =
-                Math.max(
-                    value,
-                    a
-                );
-
-        }
-
-    }
-
-    /*
-     * RGB mask.
-     */
-
-    else if(channels === 3){
-
-        for(
-            let p = 0,
-                i = 0;
-
-            p < width * height;
-
-            p++,
-            i += 4
-        ){
-
-            const value =
-                Math.round(
-                    (
-                        data[p * 3] +
-                        data[p * 3 + 1] +
-                        data[p * 3 + 2]
-                    ) / 3
-                );
-
-            rgba[i] = 255;
-            rgba[i + 1] = 255;
-            rgba[i + 2] = 255;
-            rgba[i + 3] = value;
-
-        }
-
-    }
-
-    else{
-
-        throw new Error(
-            "Unsupported AI mask format."
-        );
-
-    }
-
-    ctx.putImageData(
-        new ImageData(
-            rgba,
-            width,
-            height
-        ),
-        0,
-        0
+    const result = await createTransparentPNG(
+      selected[0],
+      true
     );
 
-    return canvas;
+    if(token !== previewToken) return;
 
+    resultURL = URL.createObjectURL(result.blob);
+
+    cropPreview.src = resultURL;
+    cropPreview.hidden = false;
+    resultEmpty.hidden = true;
+
+    status.textContent = "Preview ready.";
+
+  }catch(error){
+    console.error(error);
+
+    if(token === previewToken){
+      status.textContent =
+        error.message || "Preview failed.";
+    }
+  }
+   }let segmenter = null;
+let modelPromise = null;
+
+async function getSegmenter(){
+
+  if(segmenter){
+    return segmenter;
+  }
+
+  if(modelPromise){
+    return modelPromise;
+  }
+
+  modelPromise = (async()=>{
+
+    status.textContent =
+      "Loading AI model for first use…";
+
+    const mod = await import(
+      "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1"
+    );
+
+    const pipeline = mod.pipeline;
+
+    /*
+      RMBG-1.4 is used as an image-segmentation
+      pipeline. This is the documented Transformers.js
+      route for this model.
+    */
+
+    segmenter = await pipeline(
+      "image-segmentation",
+      "briaai/RMBG-1.4",
+      {
+        device:"wasm"
+      }
+    );
+
+    return segmenter;
+
+  })();
+
+  try{
+    return await modelPromise;
+  }catch(error){
+
+    modelPromise = null;
+    segmenter = null;
+
+    throw new Error(
+      "The AI model could not load. Make sure the page is running through GitHub Pages or another web server."
+    );
+  }
 }
 
+function getMaskFromOutput(output){
 
-/* -----------------------------
-   GET AI MASK
------------------------------ */
+  if(!output){
+    throw new Error("The AI returned no result.");
+  }
 
-async function removeBackground(file){
+  /*
+    Different Transformers.js builds can expose the
+    mask slightly differently, so we check the common
+    structures instead of assuming one format.
+  */
 
-    const pipe =
-        await getRemover();
+  if(Array.isArray(output)){
 
-    const url =
-        URL.createObjectURL(file);
+    const first = output[0];
 
-    try{
+    if(first){
 
-        status.textContent =
-            "Running AI segmentation…";
+      if(first.mask){
+        return first.mask;
+      }
 
-        const output =
-            await pipe(url);
+      if(first.image){
+        return first.image;
+      }
 
-        console.log(
-            "BRIA OUTPUT:",
-            output
-        );
+      if(
+        first.data &&
+        first.width &&
+        first.height
+      ){
+        return first;
+      }
+    }
+  }
 
+  if(output.mask){
+    return output.mask;
+  }
 
-        if(!output){
-            throw new Error(
-                "The AI model returned nothing."
-            );
-        }
+  if(
+    output.data &&
+    output.width &&
+    output.height
+  ){
+    return output;
+  }
 
+  throw new Error(
+    "The AI returned an unsupported mask format."
+  );
+}
 
-        /*
-         * Normal image-segmentation output:
-         *
-         * [
-         *   {
-         *      label,
-         *      score,
-         *      mask: RawImage
-         *   }
-         * ]
-         */
+function maskToCanvas(mask,width,height){
 
-        if(
-            Array.isArray(output) &&
-            output.length
-        ){
+  const canvas = document.createElement("canvas");
 
-            /*
-             * Find an item containing a mask.
-             */
+  canvas.width = width;
+  canvas.height = height;
 
-            const item =
-                output.find(
-                    entry =>
-                        entry &&
-                        entry.mask &&
-                        entry.mask.data
-                );
+  const ctx = canvas.getContext(
+    "2d",
+    {willReadFrequently:true}
+  );
 
-            if(item){
+  /*
+    RawImage-style output.
+  */
 
-                return rawImageToCanvas(
-                    item.mask
-                );
+  if(
+    mask.data &&
+    mask.width &&
+    mask.height
+  ){
 
-            }
+    const mw = mask.width;
+    const mh = mask.height;
+    const channels = mask.channels || 1;
 
+    const source = new Uint8ClampedArray(
+      mask.data
+    );
 
-            /*
-             * Some models may return
-             * RawImage directly.
-             */
+    const temp = document.createElement("canvas");
 
-            const direct =
-                output.find(
-                    entry =>
-                        entry &&
-                        entry.data &&
-                        entry.width &&
-                        entry.height
-                );
+    temp.width = mw;
+    temp.height = mh;
 
-            if(direct){
+    const tctx = temp.getContext(
+      "2d",
+      {willReadFrequently:true}
+    );
 
-                return rawImageToCanvas(
-                    direct
-                );
+    const rgba =
+      new Uint8ClampedArray(mw*mh*4);
 
-            }
+    for(
+      let i=0,p=0;
+      p<mw*mh;
+      p++,i+=channels
+    ){
 
-        }
+      let value = source[i];
 
+      if(channels >= 4){
+        value = source[i+3];
+      }
 
-        /*
-         * Direct RawImage fallback.
-         */
-
-        if(
-            output.data &&
-            output.width &&
-            output.height
-        ){
-
-            return rawImageToCanvas(
-                output
-            );
-
-        }
-
-
-        throw new Error(
-            "The AI model returned an unsupported mask format."
-        );
-
-    }finally{
-
-        URL.revokeObjectURL(url);
-
+      rgba[p*4] = value;
+      rgba[p*4+1] = value;
+      rgba[p*4+2] = value;
+      rgba[p*4+3] = 255;
     }
 
-}
-
-
-/* -----------------------------
-   RESIZE MASK
------------------------------ */
-
-function resizeMask(
-    mask,
-    width,
-    height
-){
-
-    const canvas =
-        document.createElement("canvas");
-
-    canvas.width =
-        width;
-
-    canvas.height =
-        height;
-
-    const ctx =
-        canvas.getContext(
-            "2d",
-            {
-                willReadFrequently:true
-            }
-        );
+    tctx.putImageData(
+      new ImageData(rgba,mw,mh),
+      0,
+      0
+    );
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
 
     ctx.drawImage(
-        mask,
-        0,
-        0,
-        width,
-        height
+      temp,
+      0,
+      0,
+      width,
+      height
     );
 
     return canvas;
+  }
 
+  throw new Error(
+    "Could not convert AI mask."
+  );
 }
 
-   </script><script>
+async function getMask(file,width,height){
 
-/* =========================================================
-   MASK PROCESSING
-========================================================= */
+  const pipe = await getSegmenter();
 
+  const url = URL.createObjectURL(file);
 
-/* -----------------------------
-   EDGE REFINEMENT
------------------------------ */
+  try{
 
-function refineAlpha(
-    alpha,
-    width,
-    height,
-    aggressive
+    const output = await pipe(url,{
+      subtask:"foreground-extraction"
+    });
+
+    const mask = getMaskFromOutput(output);
+
+    return maskToCanvas(
+      mask,
+      width,
+      height
+    );
+
+  }finally{
+
+    URL.revokeObjectURL(url);
+
+  }
+     }function refineAlpha(
+  alpha,
+  width,
+  height,
+  aggressive
 ){
 
-    const result =
-        new Uint8ClampedArray(alpha);
+  const result =
+    new Uint8ClampedArray(alpha);
 
-    const threshold =
-        aggressive ? 24 : 12;
+  /*
+    Aggressive mode gets a substantially higher
+    removal threshold and removes weak edge pixels.
+  */
 
+  const threshold =
+    aggressive ? 42 : 12;
 
-    for(
-        let y = 1;
-        y < height - 1;
-        y++
-    ){
+  for(let y=1;y<height-1;y++){
 
-        for(
-            let x = 1;
-            x < width - 1;
-            x++
-        ){
+    for(let x=1;x<width-1;x++){
 
-            const i =
-                y * width + x;
+      const i = y*width+x;
+      const a = alpha[i];
 
-            const current =
-                alpha[i];
+      if(a === 0){
+        continue;
+      }
 
+      const left   = alpha[i-1];
+      const right  = alpha[i+1];
+      const top    = alpha[i-width];
+      const bottom = alpha[i+width];
 
-            if(current === 0){
-                continue;
-            }
+      const neighbours =
+        (left>100 ? 1:0) +
+        (right>100 ? 1:0) +
+        (top>100 ? 1:0) +
+        (bottom>100 ? 1:0);
 
-
-            let neighbors = 0;
-
-
-            if(alpha[i - 1] > 100){
-                neighbors++;
-            }
-
-            if(alpha[i + 1] > 100){
-                neighbors++;
-            }
-
-            if(alpha[i - width] > 100){
-                neighbors++;
-            }
-
-            if(alpha[i + width] > 100){
-                neighbors++;
-            }
-
-
-            /*
-             * Remove isolated weak pixels.
-             */
-
-            if(
-                neighbors === 0 &&
-                current < 150
-            ){
-
-                result[i] = 0;
-
-            }
-
-            /*
-             * Strengthen uncertain pixels
-             * surrounded by foreground.
-             */
-
-            else if(
-                neighbors >= 3 &&
-                current > 35 &&
-                current < 220
-            ){
-
-                result[i] =
-                    Math.min(
-                        255,
-                        current + threshold
-                    );
-
-            }
-
-        }
-
-    }
-
-    return result;
-
-}
-
-
-/* -----------------------------
-   SAFETY MARGIN
------------------------------ */
-
-function applySafety(
-    alpha,
-    width,
-    height,
-    pad
-){
-
-    if(pad <= 0){
-        return alpha;
-    }
-
-    const result =
-        new Uint8ClampedArray(alpha);
-
-
-    for(
-        let y = 0;
-        y < height;
-        y++
-    ){
-
-        for(
-            let x = 0;
-            x < width;
-            x++
-        ){
-
-            const i =
-                y * width + x;
-
-
-            if(alpha[i] > 0){
-                continue;
-            }
-
-
-            let nearby = false;
-
-
-            for(
-                let yy =
-                    Math.max(0,y-pad);
-
-                yy <=
-                    Math.min(height-1,y+pad)
-                    && !nearby;
-
-                yy++
-            ){
-
-                for(
-                    let xx =
-                        Math.max(0,x-pad);
-
-                    xx <=
-                        Math.min(width-1,x+pad);
-
-                    xx++
-                ){
-
-                    if(
-                        alpha[
-                            yy * width + xx
-                        ] > 180
-                    ){
-
-                        nearby = true;
-
-                        break;
-
-                    }
-
-                }
-
-            }
-
-
-            if(nearby){
-
-                /*
-                 * Small semi-transparent
-                 * protective edge.
-                 */
-
-                result[i] = 12;
-
-            }
-
-        }
-
-    }
-
-    return result;
-
-}
-
-
-/* -----------------------------
-   CREATE TRANSPARENT PNG
------------------------------ */
-
-async function createTransparentPNG(file){
-
-    const img =
-        await loadImage(file);
-
-    const width =
-        img.naturalWidth;
-
-    const height =
-        img.naturalHeight;
-
-
-    /*
-     * Get AI segmentation mask.
-     */
-
-    const mask =
-        await removeBackground(file);
-
-
-    /*
-     * Resize AI mask back to the
-     * ORIGINAL image resolution.
-     */
-
-    const fitted =
-        resizeMask(
-            mask,
-            width,
-            height
-        );
-
-
-    const maskCtx =
-        fitted.getContext(
-            "2d",
-            {
-                willReadFrequently:true
-            }
-        );
-
-
-    const maskData =
-        maskCtx.getImageData(
-            0,
-            0,
-            width,
-            height
-        );
-
-
-    /*
-     * IMPORTANT:
-     *
-     * The mask is stored in the
-     * alpha channel by rawImageToCanvas().
-     */
-
-    const alpha =
-        new Uint8ClampedArray(
-            width * height
-        );
-
-
-    for(
-        let i = 0,
-            p = 0;
-
-        i < maskData.data.length;
-
-        i += 4,
-        p++
-    ){
-
-        alpha[p] =
-            maskData.data[i + 3];
-
-    }
-
-
-    /*
-     * User settings.
-     */
-
-    const aggressive =
-        cropMode === "aggressive";
-
-    const tolerance =
-        Number(tolEl.value);
-
-
-    /*
-     * Higher tolerance =
-     * stronger removal.
-     */
-
-    const cutoff =
-        aggressive
-            ? Math.max(
-                8,
-                60 - tolerance * 0.5
-            )
-            : Math.max(
-                4,
-                35 - tolerance * 0.25
-            );
-
-
-    for(
-        let i = 0;
-        i < alpha.length;
-        i++
-    ){
-
-        let a =
-            alpha[i];
-
-
-        if(a <= cutoff){
-
-            a = 0;
-
-        }
-
+      if(aggressive){
 
         /*
-         * Slightly strengthen
-         * very strong foreground.
-         */
+          Weak isolated pixels are removed.
+        */
 
         if(
-            aggressive &&
-            a > 190
+          a < 145 &&
+          neighbours <= 1
         ){
-
-            a =
-                Math.min(
-                    255,
-                    a + 8
-                );
-
+          result[i] = 0;
+          continue;
         }
 
-
-        alpha[i] = a;
-
-    }
-
-
-    /*
-     * Optional self improvement.
-     */
-
-    if(selfImprove.checked){
-
-        for(
-            let pass = 0;
-            pass < 1;
-            pass++
+        if(
+          a < threshold
         ){
-
-            const refined =
-                refineAlpha(
-                    alpha,
-                    width,
-                    height,
-                    aggressive
-                );
-
-            alpha.set(refined);
-
+          result[i] = 0;
+          continue;
         }
 
+      }else{
+
+        if(
+          a < threshold &&
+          neighbours === 0
+        ){
+          result[i] = 0;
+          continue;
+        }
+      }
+
+      /*
+        Slightly strengthen confident subject pixels.
+      */
+
+      if(
+        neighbours >= 3 &&
+        a > 35 &&
+        a < 230
+      ){
+
+        result[i] =
+          Math.min(
+            255,
+            a + (aggressive ? 18 : 7)
+          );
+      }
     }
+  }
 
-
-    /*
-     * Safety margin.
-     */
-
-    const finalAlpha =
-        applySafety(
-            alpha,
-            width,
-            height,
-            Number(padEl.value)
-        );
-
-
-    /*
-     * Create full-resolution output.
-     */
-
-    const canvas =
-        document.createElement("canvas");
-
-    canvas.width =
-        width;
-
-    canvas.height =
-        height;
-
-
-    const ctx =
-        canvas.getContext(
-            "2d",
-            {
-                willReadFrequently:true
-            }
-        );
-
-
-    ctx.clearRect(
-        0,
-        0,
-        width,
-        height
-    );
-
-
-    /*
-     * Draw ORIGINAL image.
-     */
-
-    ctx.drawImage(
-        img,
-        0,
-        0,
-        width,
-        height
-    );
-
-
-    /*
-     * Apply AI alpha mask.
-     */
-
-    const imageData =
-        ctx.getImageData(
-            0,
-            0,
-            width,
-            height
-        );
-
-
-    for(
-        let i = 0,
-            p = 0;
-
-        i < imageData.data.length;
-
-        i += 4,
-        p++
-    ){
-
-        imageData.data[i + 3] =
-            finalAlpha[p];
-
-    }
-
-
-    ctx.putImageData(
-        imageData,
-        0,
-        0
-    );
-
-
-    /*
-     * Export PNG.
-     */
-
-    const blob =
-        await new Promise(
-            (resolve,reject) => {
-
-                canvas.toBlob(
-                    result => {
-
-                        if(result){
-
-                            resolve(result);
-
-                        }else{
-
-                            reject(
-                                new Error(
-                                    "Could not create PNG."
-                                )
-                            );
-
-                        }
-
-                    },
-                    "image/png"
-                );
-
-            }
-        );
-
-
-    return {
-        blob,
-        width,
-        height
-    };
-
+  return result;
 }
 
-   </script><script>
-
-/* =========================================================
-   LIVE PREVIEW
-========================================================= */
-
-async function updatePreview(){
-
-    if(!selected.length){
-        return;
-    }
-
-
-    const token =
-        ++previewToken;
-
-
-    cropPreview.style.display =
-        "none";
-
-
-    try{
-
-        status.textContent =
-            "Generating live preview…";
-
-
-        const result =
-            await createTransparentPNG(
-                selected[0]
-            );
-
-
-        /*
-         * User changed the image/settings
-         * while the old preview was processing.
-         */
-
-        if(token !== previewToken){
-            return;
-        }
-
-
-        if(resultPreviewURL){
-
-            URL.revokeObjectURL(
-                resultPreviewURL
-            );
-
-        }
-
-
-        resultPreviewURL =
-            URL.createObjectURL(
-                result.blob
-            );
-
-
-        cropPreview.src =
-            resultPreviewURL;
-
-        cropPreview.style.display =
-            "block";
-
-
-        const empty =
-            resultFrame.querySelector(
-                ".empty-preview"
-            );
-
-
-        if(empty){
-
-            empty.style.display =
-                "none";
-
-        }
-
-
-        status.textContent =
-            "Preview ready.";
-
-    }catch(error){
-
-        console.error(
-            "PREVIEW ERROR:",
-            error
-        );
-
-
-        if(token === previewToken){
-
-            cropPreview.style.display =
-                "none";
-
-            status.textContent =
-                error.message ||
-                "Preview failed.";
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   DOWNLOAD
-========================================================= */
-
-function downloadBlob(
-    blob,
-    name
+function applyTolerance(
+  alpha,
+  tolerance,
+  aggressive
 ){
 
-    const url =
-        URL.createObjectURL(blob);
+  const result =
+    new Uint8ClampedArray(alpha);
 
-    const a =
-        document.createElement("a");
+  /*
+    Normal:
+      subtle threshold
 
-    a.href = url;
+    Aggressive:
+      much stronger threshold
+  */
 
-    a.download = name;
+  const cutoff = aggressive
+    ? Math.min(
+        130,
+        25 + tolerance*1.05
+      )
+    : Math.min(
+        55,
+        5 + tolerance*.30
+      );
 
-    document.body.appendChild(a);
+  for(let i=0;i<result.length;i++){
 
-    a.click();
+    let a = result[i];
 
-    a.remove();
+    if(a <= cutoff){
+      a = 0;
+    }
 
+    /*
+      Aggressive mode also compresses weak
+      semi-transparent pixels.
+    */
 
-    setTimeout(
-        () => {
+    if(
+      aggressive &&
+      a > cutoff &&
+      a < 150
+    ){
+      a = Math.max(
+        0,
+        a - Math.round(tolerance*.65)
+      );
+    }
 
-            URL.revokeObjectURL(url);
+    result[i] = a;
+  }
 
-        },
-        4000
+  return result;
+}
+
+function applySafety(
+  alpha,
+  width,
+  height,
+  pad
+){
+
+  if(pad <= 0){
+    return alpha;
+  }
+
+  /*
+    Safety margin only gives a tiny alpha value
+    near confident subject pixels. It does NOT
+    restore the whole background.
+  */
+
+  const result =
+    new Uint8ClampedArray(alpha);
+
+  const radius =
+    Math.min(3,pad);
+
+  for(let y=0;y<height;y++){
+
+    for(let x=0;x<width;x++){
+
+      const i = y*width+x;
+
+      if(alpha[i] > 0){
+        continue;
+      }
+
+      let near = false;
+
+      for(
+        let yy=Math.max(0,y-radius);
+        yy<=Math.min(height-1,y+radius)
+        && !near;
+        yy++
+      ){
+
+        for(
+          let xx=Math.max(0,x-radius);
+          xx<=Math.min(width-1,x+radius);
+          xx++
+        ){
+
+          if(
+            alpha[yy*width+xx] > 210
+          ){
+            near = true;
+            break;
+          }
+        }
+      }
+
+      if(near){
+        result[i] = 8;
+      }
+    }
+  }
+
+  return result;
+}
+
+async function createTransparentPNG(
+  file,
+  previewOnly=false
+){
+
+  const img = await loadImage(file);
+
+  const width = img.naturalWidth;
+  const height = img.naturalHeight;
+
+  /*
+    Large images can overwhelm mobile browsers.
+    We still export at the original resolution,
+    but preview inference can use a smaller copy.
+  */
+
+  let inferenceFile = file;
+
+  if(
+    previewOnly &&
+    Math.max(width,height) > 1600
+  ){
+
+    const scale =
+      1600/Math.max(width,height);
+
+    const iw = Math.max(
+      1,
+      Math.round(width*scale)
     );
 
+    const ih = Math.max(
+      1,
+      Math.round(height*scale)
+    );
+
+    const previewCanvas =
+      document.createElement("canvas");
+
+    previewCanvas.width = iw;
+    previewCanvas.height = ih;
+
+    const pctx =
+      previewCanvas.getContext("2d");
+
+    pctx.drawImage(
+      img,
+      0,
+      0,
+      iw,
+      ih
+    );
+
+    inferenceFile =
+      await new Promise(resolve=>{
+        previewCanvas.toBlob(
+          blob=>{
+            resolve(
+              new File(
+                [blob],
+                "preview.png",
+                {type:"image/png"}
+              )
+            );
+          },
+          "image/png"
+        );
+      });
+  }
+
+  const mask =
+    await getMask(
+      inferenceFile,
+      width,
+      height
+    );
+
+  const maskCtx =
+    mask.getContext(
+      "2d",
+      {willReadFrequently:true}
+    );
+
+  const maskData =
+    maskCtx.getImageData(
+      0,
+      0,
+      width,
+      height
+    );
+
+  const alpha =
+    new Uint8ClampedArray(
+      width*height
+    );
+
+  for(
+    let i=0,p=0;
+    i<maskData.data.length;
+    i+=4,p++
+  ){
+
+    /*
+      RMBG mask is grayscale.
+    */
+
+    alpha[p] =
+      maskData.data[i];
+  }
+
+  const aggressive =
+    cropMode === "aggressive";
+
+  let finalAlpha =
+    applyTolerance(
+      alpha,
+      Number(tolEl.value),
+      aggressive
+    );
+
+  if(selfImprove.checked){
+
+    finalAlpha =
+      refineAlpha(
+        finalAlpha,
+        width,
+        height,
+        aggressive
+      );
+  }
+
+  finalAlpha =
+    applySafety(
+      finalAlpha,
+      width,
+      height,
+      Number(padEl.value)
+    );
+
+  /*
+    If preview inference was downscaled,
+    the mask was already resized to original
+    dimensions above.
+  */
+
+  const canvas =
+    document.createElement("canvas");
+
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx =
+    canvas.getContext(
+      "2d",
+      {willReadFrequently:true}
+    );
+
+  ctx.drawImage(
+    img,
+    0,
+    0,
+    width,
+    height
+  );
+
+  const imageData =
+    ctx.getImageData(
+      0,
+      0,
+      width,
+      height
+    );
+
+  for(
+    let i=0,p=0;
+    i<imageData.data.length;
+    i+=4,p++
+  ){
+
+    imageData.data[i+3] =
+      finalAlpha[p];
+  }
+
+  ctx.putImageData(
+    imageData,
+    0,
+    0
+  );
+
+  const blob =
+    await new Promise(
+      (resolve,reject)=>{
+        canvas.toBlob(
+          b=>{
+            if(b) resolve(b);
+            else reject(
+              new Error(
+                "Could not create PNG."
+              )
+            );
+          },
+          "image/png"
+        );
+      }
+    );
+
+  return {
+    blob,
+    width,
+    height
+  };
+   }function outputName(name){
+
+  const dot = name.lastIndexOf(".");
+
+  const base =
+    dot > 0
+      ? name.slice(0,dot)
+      : name;
+
+  return base + ".png";
 }
 
+function downloadBlob(blob,name){
 
-/* =========================================================
-   FILE NAME
-========================================================= */
+  const url =
+    URL.createObjectURL(blob);
 
-function outputName(name){
+  const a =
+    document.createElement("a");
 
-    const dot =
-        name.lastIndexOf(".");
+  a.href = url;
+  a.download = name;
 
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 
-    const base =
-        dot > 0
-            ? name.slice(0,dot)
-            : name;
-
-
-    return base +
-        "-no-bg.png";
-
+  setTimeout(()=>{
+    URL.revokeObjectURL(url);
+  },3000);
 }
-
-
-/* =========================================================
-   RESULTS
-========================================================= */
 
 function renderResults(){
 
-    results.innerHTML = "";
+  results.innerHTML = "";
 
+  const pageCount =
+    Math.max(
+      1,
+      Math.ceil(
+        outputs.length/PAGE_SIZE
+      )
+    );
 
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                outputs.length /
-                PAGE_SIZE
-            )
-        );
+  const start =
+    (currentPage-1)*PAGE_SIZE;
 
+  outputs
+    .slice(
+      start,
+      start+PAGE_SIZE
+    )
+    .forEach((item,index)=>{
 
-    if(currentPage > totalPages){
+      const card =
+        document.createElement("article");
 
-        currentPage =
-            totalPages;
+      card.className = "result";
 
-    }
+      card.style.animationDelay =
+        Math.min(index*35,500) + "ms";
 
+      const img =
+        document.createElement("img");
 
-    const start =
-        (currentPage - 1) *
-        PAGE_SIZE;
+      const imageURL =
+        URL.createObjectURL(item.blob);
 
+      img.src = imageURL;
+      img.alt = item.name;
 
-    outputs
-        .slice(
-            start,
-            start + PAGE_SIZE
-        )
-        .forEach(item => {
+      img.onload = ()=>{
+        URL.revokeObjectURL(imageURL);
+      };
 
+      const done =
+        document.createElement("div");
 
-            const card =
-                document.createElement(
-                    "div"
-                );
+      done.className = "done";
+      done.textContent = "DONE";
 
-            card.className =
-                "result";
+      const button =
+        document.createElement("button");
 
+      button.type = "button";
+      button.className = "download-one";
+      button.textContent = "⇩";
 
-            const img =
-                document.createElement(
-                    "img"
-                );
+      button.addEventListener(
+        "click",
+        ()=>{
+          downloadBlob(
+            item.blob,
+            item.name
+          );
+        }
+      );
 
+      const body =
+        document.createElement("div");
 
-            const imageURL =
-                URL.createObjectURL(
-                    item.blob
-                );
+      body.className = "result-body";
 
+      const name =
+        document.createElement("div");
 
-            img.src =
-                imageURL;
+      name.className = "result-name";
+      name.textContent = item.name;
+      name.title = item.name;
 
-            img.alt =
-                item.name;
+      const size =
+        document.createElement("div");
 
+      size.className = "result-size";
 
-            img.onload =
-                () => {
+      size.textContent =
+        `${item.width} × ${item.height}`;
 
-                    URL.revokeObjectURL(
-                        imageURL
-                    );
+      body.append(
+        name,
+        size
+      );
 
-                };
+      card.append(
+        img,
+        done,
+        button,
+        body
+      );
 
+      results.appendChild(card);
+    });
 
-            const done =
-                document.createElement(
-                    "div"
-                );
-
-            done.className =
-                "done";
-
-            done.textContent =
-                "DONE";
-
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "download-one";
-
-            button.textContent =
-                "⇩";
-
-            button.title =
-                "Download image";
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    downloadBlob(
-                        item.blob,
-                        item.name
-                    );
-
-                }
-            );
-
-
-            const body =
-                document.createElement(
-                    "div"
-                );
-
-            body.className =
-                "result-body";
-
-
-            const name =
-                document.createElement(
-                    "div"
-                );
-
-            name.className =
-                "result-name";
-
-            name.textContent =
-                item.name;
-
-            name.title =
-                item.name;
-
-
-            const size =
-                document.createElement(
-                    "div"
-                );
-
-            size.className =
-                "result-size";
-
-            size.textContent =
-                `${item.width} × ${item.height}`;
-
-
-            body.append(
-                name,
-                size
-            );
-
-
-            card.append(
-                img,
-                done,
-                button,
-                body
-            );
-
-
-            results.appendChild(
-                card
-            );
-
-        });
-
-
-    renderPagination();
-
+  renderPagination(pageCount);
 }
 
+function renderPagination(totalPages){
 
-/* =========================================================
-   PAGINATION
-========================================================= */
+  /*
+    Keep pagination simple so it does not
+    add unnecessary UI on mobile.
+  */
 
-function renderPagination(){
+  let pagination =
+    document.getElementById(
+      "pagination"
+    );
 
-    pagination.innerHTML = "";
+  if(!pagination){
 
+    pagination =
+      document.createElement("div");
 
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                outputs.length /
-                PAGE_SIZE
-            )
-        );
+    pagination.id = "pagination";
+    pagination.className =
+      "pagination";
 
+    results.after(pagination);
+  }
 
-    if(totalPages <= 1){
-        return;
+  pagination.innerHTML = "";
+
+  if(totalPages <= 1){
+    return;
+  }
+
+  for(
+    let p=1;
+    p<=totalPages;
+    p++
+  ){
+
+    const button =
+      document.createElement("button");
+
+    button.type = "button";
+    button.textContent = p;
+
+    button.className =
+      "page-btn";
+
+    if(p === currentPage){
+      button.classList.add("active");
     }
 
-
-    const prev =
-        document.createElement(
-            "button"
-        );
-
-    prev.type =
-        "button";
-
-    prev.className =
-        "page-btn";
-
-    prev.textContent =
-        "‹";
-
-    prev.disabled =
-        currentPage === 1;
-
-
-    prev.addEventListener(
-        "click",
-        () => {
-
-            if(currentPage > 1){
-
-                currentPage--;
-
-                renderResults();
-
-            }
-
-        }
+    button.addEventListener(
+      "click",
+      ()=>{
+        currentPage = p;
+        renderResults();
+      }
     );
 
-
-    pagination.appendChild(
-        prev
-    );
-
-
-    const first =
-        Math.max(
-            1,
-            Math.min(
-                currentPage - 3,
-                totalPages - 6
-            )
-        );
-
-
-    const last =
-        Math.min(
-            totalPages,
-            first + 6
-        );
-
-
-    for(
-        let p = first;
-        p <= last;
-        p++
-    ){
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.type =
-            "button";
-
-        button.className =
-            "page-btn" +
-            (
-                p === currentPage
-                    ? " active"
-                    : ""
-            );
-
-        button.textContent =
-            p;
-
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                currentPage =
-                    p;
-
-                renderResults();
-
-            }
-        );
-
-
-        pagination.appendChild(
-            button
-        );
-
-    }
-
-
-    const next =
-        document.createElement(
-            "button"
-        );
-
-    next.type =
-        "button";
-
-    next.className =
-        "page-btn";
-
-    next.textContent =
-        "›";
-
-    next.disabled =
-        currentPage === totalPages;
-
-
-    next.addEventListener(
-        "click",
-        () => {
-
-            if(
-                currentPage <
-                totalPages
-            ){
-
-                currentPage++;
-
-                renderResults();
-
-            }
-
-        }
-    );
-
-
-    pagination.appendChild(
-        next
-    );
-
-
-    const info =
-        document.createElement(
-            "span"
-        );
-
-    info.className =
-        "page-info";
-
-    info.textContent =
-        `Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
-
-
-    pagination.appendChild(
-        info
-    );
-
+    pagination.appendChild(button);
+  }
 }
-
-   </script><script>
-
-/* =========================================================
-   MAIN PROCESSING
-========================================================= */
 
 cleanBtn.addEventListener(
-    "click",
-    async () => {
+  "click",
+  async()=>{
 
-        if(!selected.length){
+    if(!selected.length){
 
-            alert(
-                "Select at least one image first."
-            );
+      alert(
+        "Select at least one image first."
+      );
 
-            return;
-
-        }
-
-
-        outputs = [];
-
-        currentPage = 1;
-
-        results.innerHTML = "";
-        pagination.innerHTML = "";
-
-        downloadAll.disabled = true;
-
-        cleanBtn.disabled = true;
-
-        setLocked(true);
-
-        progressCard.style.display =
-            "block";
-
-
-        try{
-
-            /*
-             * Load model once before processing
-             * the first image.
-             */
-
-            await getRemover();
-
-
-            for(
-                let i = 0;
-                i < selected.length;
-                i++
-            ){
-
-                const file =
-                    selected[i];
-
-
-                setProgress(
-                    (i / selected.length) *
-                    100,
-                    `Processing ${i + 1} of ${selected.length}…`
-                );
-
-
-                status.textContent =
-                    file.name;
-
-
-                const result =
-                    await createTransparentPNG(
-                        file
-                    );
-
-
-                outputs.push({
-
-                    blob:
-                        result.blob,
-
-                    name:
-                        outputName(
-                            file.name
-                        ),
-
-                    width:
-                        result.width,
-
-                    height:
-                        result.height
-
-                });
-
-
-                setProgress(
-                    (
-                        (i + 1) /
-                        selected.length
-                    ) * 100,
-                    `Processing ${i + 1} of ${selected.length}…`
-                );
-
-
-                /*
-                 * Give the browser a chance
-                 * to update the UI.
-                 */
-
-                await new Promise(
-                    resolve =>
-                        setTimeout(
-                            resolve,
-                            20
-                        )
-                );
-
-            }
-
-
-            setProgress(
-                100,
-                `Finished ${selected.length} image${selected.length === 1 ? "" : "s"}`
-            );
-
-
-            status.textContent =
-                "Transparent PNGs are ready.";
-
-
-            renderResults();
-
-
-            downloadAll.disabled =
-                false;
-
-
-        }catch(error){
-
-            console.error(
-                "PROCESSING ERROR:",
-                error
-            );
-
-
-            status.textContent =
-                error.message ||
-                "Something went wrong.";
-
-
-            alert(
-                "Background removal failed.\n\n" +
-                (
-                    error.message ||
-                    "Unknown error."
-                )
-            );
-
-
-        }finally{
-
-            cleanBtn.disabled =
-                false;
-
-            setLocked(false);
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ZIP DOWNLOAD
-========================================================= */
-
-downloadAll.addEventListener(
-    "click",
-    async () => {
-
-        if(!outputs.length){
-            return;
-        }
-
-
-        downloadAll.disabled =
-            true;
-
-        downloadAll.textContent =
-            "Creating ZIP…";
-
-
-        try{
-
-            const zip =
-                await makeZip(
-                    outputs
-                );
-
-
-            downloadBlob(
-                zip,
-                "cut-it-out-background-removed.zip"
-            );
-
-
-        }catch(error){
-
-            console.error(
-                "ZIP ERROR:",
-                error
-            );
-
-
-            alert(
-                "Could not create the ZIP file."
-            );
-
-
-        }finally{
-
-            downloadAll.disabled =
-                false;
-
-            downloadAll.textContent =
-                "⇩ Download All (.ZIP)";
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   CRC32
-========================================================= */
-
-function crc32(data){
-
-    let table =
-        crc32.table;
-
-
-    if(!table){
-
-        table =
-            new Uint32Array(256);
-
-
-        for(
-            let n = 0;
-            n < 256;
-            n++
-        ){
-
-            let c = n;
-
-
-            for(
-                let k = 0;
-                k < 8;
-                k++
-            ){
-
-                c =
-                    (c & 1)
-                        ? (
-                            0xedb88320 ^
-                            (c >>> 1)
-                        )
-                        : (
-                            c >>> 1
-                        );
-
-            }
-
-
-            table[n] =
-                c >>> 0;
-
-        }
-
-
-        crc32.table =
-            table;
-
+      return;
     }
 
+    cleanBtn.disabled = true;
+    downloadAll.disabled = true;
 
-    let c =
-        0xffffffff;
+    outputs = [];
+    currentPage = 1;
 
+    results.innerHTML = "";
+
+    progressCard.style.display =
+      "block";
+
+    try{
+
+      for(
+        let i=0;
+        i<selected.length;
+        i++
+      ){
+
+        const file =
+          selected[i];
+
+        setProgress(
+          (i/selected.length)*100,
+          `Processing ${i+1} of ${selected.length}`
+        );
+
+        status.textContent =
+          file.name;
+
+        /*
+          Yield to the browser so the UI
+          remains responsive while processing.
+        */
+
+        await new Promise(
+          requestAnimationFrame
+        );
+
+        const result =
+          await createTransparentPNG(
+            file,
+            false
+          );
+
+        outputs.push({
+          blob:result.blob,
+          name:outputName(file.name),
+          width:result.width,
+          height:result.height
+        });
+
+        setProgress(
+          ((i+1)/selected.length)*100,
+          `Processing ${i+1} of ${selected.length}`
+        );
+
+        /*
+          Give mobile browsers a chance
+          to repaint.
+        */
+
+        await new Promise(
+          resolve=>setTimeout(resolve,20)
+        );
+      }
+
+      renderResults();
+
+      downloadAll.disabled = false;
+
+      setProgress(
+        100,
+        `Finished ${selected.length} image${selected.length===1?"":"s"}`
+      );
+
+      status.textContent =
+        "Transparent PNGs are ready.";
+
+      /*
+        Automatically show the result area.
+      */
+
+      results.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+
+    }catch(error){
+
+      console.error(error);
+
+      status.textContent =
+        error.message ||
+        "Background removal failed.";
+
+      alert(
+        error.message ||
+        "Background removal failed."
+      );
+
+    }finally{
+
+      cleanBtn.disabled = false;
+
+    }
+  }
+);function crc32(data){
+
+  let table = crc32.table;
+
+  if(!table){
+
+    table =
+      new Uint32Array(256);
 
     for(
-        let i = 0;
-        i < data.length;
-        i++
+      let n=0;
+      n<256;
+      n++
     ){
 
-        c =
-            table[
-                (c ^ data[i]) & 255
-            ] ^
-            (c >>> 8);
+      let c = n;
 
+      for(
+        let k=0;
+        k<8;
+        k++
+      ){
+
+        c =
+          (c&1)
+            ? 0xedb88320^(c>>>1)
+            : c>>>1;
+      }
+
+      table[n] = c>>>0;
     }
 
+    crc32.table = table;
+  }
 
-    return (
-        c ^
-        0xffffffff
-    ) >>> 0;
+  let c = 0xffffffff;
 
+  for(
+    let i=0;
+    i<data.length;
+    i++
+  ){
+
+    c =
+      table[
+        (c^data[i])&255
+      ] ^
+      (c>>>8);
+  }
+
+  return (c^0xffffffff)>>>0;
 }
-
-
-/* =========================================================
-   ZIP HELPERS
-========================================================= */
 
 function u16(a,n){
 
-    a.push(
-        n & 255,
-        (n >>> 8) & 255
-    );
-
+  a.push(
+    n&255,
+    (n>>>8)&255
+  );
 }
-
 
 function u32(a,n){
 
-    a.push(
-        n & 255,
-        (n >>> 8) & 255,
-        (n >>> 16) & 255,
-        (n >>> 24) & 255
-    );
-
+  a.push(
+    n&255,
+    (n>>>8)&255,
+    (n>>>16)&255,
+    (n>>>24)&255
+  );
 }
 
+function textBytes(text){
 
-function bytes(text){
-
-    return new TextEncoder()
-        .encode(text);
-
+  return new TextEncoder()
+    .encode(text);
 }
-
-
-/* =========================================================
-   CREATE ZIP
-========================================================= */
 
 async function makeZip(items){
 
-    const chunks = [];
-    const central = [];
+  const chunks = [];
+  const central = [];
 
-    let offset = 0;
+  let offset = 0;
 
+  for(const item of items){
 
-    for(
-        const item of items
-    ){
+    const data =
+      new Uint8Array(
+        await item.blob.arrayBuffer()
+      );
 
-        const data =
-            new Uint8Array(
-                await item.blob.arrayBuffer()
-            );
+    const name =
+      textBytes(item.name);
 
+    const crc =
+      crc32(data);
 
-        const name =
-            bytes(item.name);
+    const local = [];
 
+    u32(local,0x04034b50);
+    u16(local,20);
+    u16(local,0);
+    u16(local,0);
+    u16(local,0);
+    u16(local,0);
 
-        const crc =
-            crc32(data);
+    u32(local,crc);
+    u32(local,data.length);
+    u32(local,data.length);
 
-
-        /*
-         * Local file header.
-         */
-
-        const local = [];
-
-
-        u32(
-            local,
-            0x04034b50
-        );
-
-        u16(local,20);
-        u16(local,0);
-        u16(local,0);
-        u16(local,0);
-        u16(local,0);
-
-        u32(
-            local,
-            crc
-        );
-
-        u32(
-            local,
-            data.length
-        );
-
-        u32(
-            local,
-            data.length
-        );
-
-        u16(
-            local,
-            name.length
-        );
-
-        u16(
-            local,
-            0
-        );
-
-
-        chunks.push(
-            new Uint8Array(local),
-            name,
-            data
-        );
-
-
-        /*
-         * Central directory entry.
-         */
-
-        const cen = [];
-
-
-        u32(
-            cen,
-            0x02014b50
-        );
-
-        u16(cen,20);
-        u16(cen,20);
-        u16(cen,0);
-        u16(cen,0);
-        u16(cen,0);
-        u16(cen,0);
-
-        u32(
-            cen,
-            crc
-        );
-
-        u32(
-            cen,
-            data.length
-        );
-
-        u32(
-            cen,
-            data.length
-        );
-
-        u16(
-            cen,
-            name.length
-        );
-
-        u16(cen,0);
-        u16(cen,0);
-        u16(cen,0);
-        u16(cen,0);
-
-        u32(cen,0);
-
-        u32(
-            cen,
-            offset
-        );
-
-
-        central.push(
-            new Uint8Array(cen),
-            name
-        );
-
-
-        offset +=
-            local.length +
-            name.length +
-            data.length;
-
-    }
-
-
-    const centralOffset =
-        offset;
-
-
-    let centralSize = 0;
-
-
-    for(
-        const item of central
-    ){
-
-        chunks.push(item);
-
-        centralSize +=
-            item.length;
-
-    }
-
-
-    /*
-     * End of central directory.
-     */
-
-    const end = [];
-
-
-    u32(
-        end,
-        0x06054b50
-    );
-
-    u16(end,0);
-    u16(end,0);
-
-    u16(
-        end,
-        items.length
-    );
-
-    u16(
-        end,
-        items.length
-    );
-
-    u32(
-        end,
-        centralSize
-    );
-
-    u32(
-        end,
-        centralOffset
-    );
-
-    u16(end,0);
-
+    u16(local,name.length);
+    u16(local,0);
 
     chunks.push(
-        new Uint8Array(end)
+      new Uint8Array(local),
+      name,
+      data
     );
 
+    const cen = [];
 
-    return new Blob(
-        chunks,
-        {
-            type:
-                "application/zip"
-        }
+    u32(cen,0x02014b50);
+    u16(cen,20);
+    u16(cen,20);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+
+    u32(cen,crc);
+    u32(cen,data.length);
+    u32(cen,data.length);
+
+    u16(cen,name.length);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+
+    u32(cen,0);
+    u32(cen,offset);
+
+    central.push(
+      new Uint8Array(cen),
+      name
     );
 
+    offset +=
+      local.length +
+      name.length +
+      data.length;
+  }
+
+  const centralOffset = offset;
+  let centralSize = 0;
+
+  for(const part of central){
+
+    chunks.push(part);
+    centralSize += part.length;
+  }
+
+  const end = [];
+
+  u32(end,0x06054b50);
+  u16(end,0);
+  u16(end,0);
+  u16(end,items.length);
+  u16(end,items.length);
+  u32(end,centralSize);
+  u32(end,centralOffset);
+  u16(end,0);
+
+  chunks.push(
+    new Uint8Array(end)
+  );
+
+  return new Blob(
+    chunks,
+    {type:"application/zip"}
+  );
 }
 
+downloadAll.addEventListener(
+  "click",
+  async()=>{
 
-/* =========================================================
-   FINAL STARTUP
-========================================================= */
+    if(!outputs.length){
+      return;
+    }
 
-console.log(
-    "Cut It Out! AI Background Remover loaded."
+    downloadAll.disabled = true;
+    downloadAll.textContent =
+      "Creating ZIP…";
+
+    try{
+
+      const zip =
+        await makeZip(outputs);
+
+      downloadBlob(
+        zip,
+        "cut-it-out-background-removed.zip"
+      );
+
+    }catch(error){
+
+      console.error(error);
+
+      alert(
+        "Could not create the ZIP."
+      );
+
+    }finally{
+
+      downloadAll.disabled = false;
+
+      downloadAll.textContent =
+        "⇩ Download All (.ZIP)";
+    }
+  }
 );
 
+updateCount();
+updateSlider(tolEl);
+updateSlider(padEl);
+
 console.log(
-    "BRIA RMBG-1.4 segmentation pipeline ready to initialize."
+  "Cut It Out! AI Background Remover ready."
 );
 
 </script>
-
 </body>
 </html>
