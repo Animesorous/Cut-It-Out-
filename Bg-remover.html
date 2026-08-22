@@ -1,0 +1,1620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free Background Remover Online | Cut It Out!</title>
+<style>
+:root{
+--bg:#0b0d12;
+--panel:#13161d;
+--panel2:#171a22;
+--line:#ffffff14;
+--text:#f5f5f7;
+--muted:#9297a3;
+--gold:#f1c33b;
+--gold2:#dcae27;
+--green:#28d66f;
+--danger:#ff6464;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+background:radial-gradient(circle at 50% -20%,#20232d 0,#0b0d12 48%);
+color:var(--text);
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+main{
+width:min(1180px,calc(100% - 28px));
+margin:auto;
+padding:28px 0 50px;
+}
+h1{
+font-size:clamp(34px,5vw,50px);
+line-height:1;
+margin:0 0 12px;
+font-weight:850;
+letter-spacing:-1.5px;
+}
+h1 span{color:var(--gold)}
+.subtitle{
+font-size:16px;
+color:#c5c8d0;
+margin:0 0 14px;
+}
+.badges{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-bottom:18px;
+}
+.badge{
+background:#191c24;
+border:1px solid var(--line);
+padding:7px 11px;
+border-radius:9px;
+font-size:13px;
+color:#d8dbe2;
+}
+.badge b{color:var(--gold)}
+.card{
+background:linear-gradient(145deg,#14171e,#11141a);
+border:1px solid var(--line);
+border-radius:18px;
+padding:18px;
+box-shadow:0 12px 40px #0004;
+}
+.drop{
+min-height:220px;
+border:2px dashed #ffffff24;
+border-radius:15px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+cursor:pointer;
+transition:.18s;
+user-select:none;
+}
+.drop:hover,
+.drop.drag{
+border-color:var(--gold);
+background:#ffffff04;
+transform:translateY(-1px);
+}
+.drop-icon{
+font-size:38px;
+margin-bottom:8px;
+}
+.drop-title{
+font-size:20px;
+font-weight:800;
+}
+.drop-sub{
+font-size:14px;
+color:var(--muted);
+margin-top:5px;
+}
+.count{
+display:inline-flex;
+align-items:center;
+gap:7px;
+margin-top:15px;
+padding:8px 13px;
+border:1px solid #ffffff18;
+background:#171a21;
+border-radius:10px;
+color:var(--muted);
+}
+.count strong{color:var(--green)}
+input[type=file]{display:none}
+
+.workspace{
+display:grid;
+grid-template-columns:390px 1fr;
+gap:18px;
+margin-top:18px;
+}
+.settings{
+background:#12151c;
+border:1px solid var(--line);
+border-radius:15px;
+padding:18px;
+}
+.setting{
+margin-bottom:23px;
+}
+.setting:last-child{margin-bottom:0}
+.setting-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-weight:750;
+margin-bottom:9px;
+}
+.value{
+border:1px solid #ffffff1c;
+border-radius:8px;
+padding:6px 11px;
+min-width:52px;
+text-align:center;
+color:#f3f3f4;
+}
+.help{
+border:1px solid #ffffff22;
+border-radius:50%;
+font-size:11px;
+width:18px;
+height:18px;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+margin-left:4px;
+color:#aaa;
+}
+.desc{
+color:var(--muted);
+font-size:13px;
+line-height:1.4;
+margin-top:8px;
+}
+.mode-group{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-top:8px;
+}
+.mode-btn{
+background:#171a21;
+border:1px solid #ffffff20;
+color:#dfe2e8;
+border-radius:10px;
+padding:11px 10px;
+text-align:left;
+cursor:pointer;
+font-weight:750;
+transition:.15s;
+}
+.mode-btn:hover{
+border-color:#ffffff40;
+background:#1c2028;
+}
+.mode-btn small{
+display:block;
+color:var(--muted);
+font-size:11px;
+font-weight:500;
+margin-top:4px;
+line-height:1.35;
+}
+.mode-btn.active{
+border-color:var(--gold);
+background:#2a2413;
+box-shadow:0 0 0 1px #f1c33b33 inset;
+}
+.mode-btn:disabled{
+cursor:not-allowed;
+opacity:.5;
+}
+
+.range-wrap{
+position:relative;
+padding-top:3px;
+}
+input[type=range]{
+width:100%;
+height:8px;
+margin:0;
+appearance:none;
+-webkit-appearance:none;
+background:linear-gradient(to right,var(--gold) 0%,var(--gold) var(--fill,18%),#292d36 var(--fill,18%),#292d36 100%);
+border-radius:99px;
+outline:none;
+cursor:pointer;
+}
+input[type=range]::-webkit-slider-runnable-track{
+height:8px;
+border-radius:99px;
+background:transparent;
+}
+input[type=range]::-webkit-slider-thumb{
+appearance:none;
+-webkit-appearance:none;
+width:19px;
+height:19px;
+margin-top:-5.5px;
+border-radius:50%;
+background:var(--gold);
+border:3px solid #11141a;
+box-shadow:0 0 0 1px #f1c33b88,0 2px 7px #0008;
+cursor:pointer;
+}
+input[type=range]::-moz-range-track{
+height:8px;
+border-radius:99px;
+background:#292d36;
+}
+input[type=range]::-moz-range-progress{
+height:8px;
+border-radius:99px;
+background:var(--gold);
+}
+input[type=range]::-moz-range-thumb{
+width:19px;
+height:19px;
+border-radius:50%;
+background:var(--gold);
+border:3px solid #11141a;
+box-shadow:0 0 0 1px #f1c33b88;
+cursor:pointer;
+}
+
+.switch-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding:12px;
+background:#171a21;
+border:1px solid #ffffff18;
+border-radius:11px;
+}
+.switch-text{
+font-size:13px;
+font-weight:700;
+}
+.switch-text small{
+display:block;
+font-size:11px;
+font-weight:500;
+color:var(--muted);
+margin-top:3px;
+}
+.switch{
+position:relative;
+width:46px;
+height:25px;
+flex:0 0 auto;
+}
+.switch input{
+display:none;
+}
+.switch-slider{
+position:absolute;
+inset:0;
+border-radius:99px;
+background:#30343d;
+cursor:pointer;
+transition:.2s;
+}
+.switch-slider:before{
+content:"";
+position:absolute;
+width:19px;
+height:19px;
+left:3px;
+top:3px;
+background:#aaa;
+border-radius:50%;
+transition:.2s;
+}
+.switch input:checked+.switch-slider{
+background:#9c7b17;
+}
+.switch input:checked+.switch-slider:before{
+transform:translateX(21px);
+background:var(--gold);
+}
+
+.previewbox{
+background:#10131a;
+border:1px solid var(--line);
+border-radius:15px;
+padding:16px;
+min-width:0;
+}
+.preview-title{
+text-align:center;
+font-weight:750;
+margin-bottom:12px;
+}
+.previews{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+.pane{
+min-width:0;
+}
+.pane label{
+display:block;
+text-align:center;
+color:#aeb2bc;
+font-size:12px;
+margin-bottom:7px;
+}
+.frame{
+height:300px;
+border:1px solid #ffffff15;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+background:
+linear-gradient(45deg,#1a1d24 25%,transparent 25%) 0 0/18px 18px,
+linear-gradient(-45deg,#1a1d24 25%,transparent 25%) 0 9px/18px 18px,
+linear-gradient(45deg,transparent 75%,#1a1d24 75%) 9px -9px/18px 18px,
+linear-gradient(-45deg,transparent 75%,#1a1d24 75%) -9px 0/18px 18px,
+#11141a;
+}
+.frame img{
+max-width:100%;
+max-height:100%;
+object-fit:contain;
+display:block;
+}
+.empty-preview{
+color:#686d78;
+font-size:13px;
+text-align:center;
+padding:20px;
+}
+.actions{
+display:flex;
+gap:12px;
+justify-content:center;
+flex-wrap:wrap;
+margin-top:18px;
+}
+button{
+border:1px solid transparent;
+border-radius:10px;
+padding:12px 20px;
+font-weight:800;
+font-size:14px;
+cursor:pointer;
+transition:.15s;
+}
+.primary{
+background:var(--gold);
+color:#16120a;
+}
+.primary:hover{
+background:#ffd14e;
+transform:translateY(-1px);
+}
+.secondary{
+background:#171a21;
+border-color:#ffffff26;
+color:#f4f4f5;
+}
+.secondary:hover{
+background:#1d212a;
+border-color:#ffffff38;
+transform:translateY(-1px);
+}
+button:disabled{
+opacity:.4;
+cursor:not-allowed;
+transform:none!important;
+}
+.progress-card{
+margin-top:18px;
+display:none;
+}
+.progress-top{
+display:flex;
+justify-content:space-between;
+gap:12px;
+margin-bottom:8px;
+color:#d9dce2;
+}
+.percent{
+color:var(--gold);
+font-weight:800;
+}
+.track{
+height:9px;
+background:#242832;
+border-radius:99px;
+overflow:hidden;
+}
+.bar{
+height:100%;
+width:0;
+background:linear-gradient(90deg,var(--gold2),var(--gold));
+border-radius:99px;
+transition:width .15s;
+}
+.status{
+font-size:13px;
+color:var(--muted);
+margin-top:8px;
+}
+
+.results{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+gap:12px;
+margin-top:18px;
+}
+.result{
+background:#12151b;
+border:1px solid var(--line);
+border-radius:12px;
+overflow:hidden;
+position:relative;
+}
+.result img{
+width:100%;
+height:160px;
+object-fit:contain;
+background:#0d1015;
+display:block;
+}
+.result-body{
+padding:9px;
+}
+.result-name{
+font-size:11px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+color:#c8cbd2;
+}
+.result-size{
+font-size:11px;
+color:#707580;
+margin-top:3px;
+}
+.done{
+position:absolute;
+top:7px;
+left:7px;
+background:#0b8d43;
+color:white;
+border-radius:6px;
+padding:3px 6px;
+font-size:9px;
+font-weight:900;
+}
+.download-one{
+position:absolute;
+right:7px;
+top:7px;
+width:29px;
+height:29px;
+padding:0;
+background:#171a20;
+color:white;
+border:1px solid #ffffff22;
+}
+.download-one:hover{
+background:#242933;
+}
+.pagination{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:7px;
+flex-wrap:wrap;
+margin:18px 0 0;
+}
+.page-btn{
+min-width:38px;
+padding:9px 12px;
+background:#171a21;
+color:#ddd;
+border:1px solid #ffffff1c;
+}
+.page-btn.active{
+background:var(--gold);
+color:#17130a;
+border-color:var(--gold);
+}
+.page-info{
+font-size:12px;
+color:var(--muted);
+margin:0 8px;
+}
+.note{
+font-size:12px;
+color:#747985;
+text-align:center;
+margin-top:16px;
+line-height:1.5;
+}
+.locked{
+opacity:.6;
+}
+@media(max-width:820px){
+.workspace{
+grid-template-columns:1fr;
+}
+.frame{
+height:270px;
+}
+}
+@media(max-width:520px){
+main{
+width:min(100% - 18px,1180px);
+padding-top:18px;
+}
+.mode-group{
+grid-template-columns:1fr;
+}
+.previews{
+grid-template-columns:1fr;
+}
+.frame{
+height:250px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Cut It <span>Out!</span> ✂️</h1>
+<p class="subtitle">Remove backgrounds from images with AI — fast, private, and right in your browser.</p>
+<div class="badges">
+<div class="badge">🔒 <b>100% Private</b></div>
+<div class="badge">☁️ <b>No Uploads</b></div>
+<div class="badge">💸 <b>100% Free</b></div>
+</div>
+</header>
+
+<section class="card">
+<div class="drop" id="drop">
+<div class="drop-icon">▧</div>
+<div class="drop-title">Tap to select images</div>
+<div class="drop-sub">or drag & drop images here</div>
+<div class="count" id="count"><span>○</span><strong>0</strong> images selected</div>
+<input id="files" type="file" accept="image/*" multiple>
+</div>
+
+<div class="workspace">
+<div class="settings" id="settings">
+
+<div class="setting">
+<div class="setting-head">
+<span>Removal Mode <span class="help" title="Choose how strongly the background is removed">?</span></span>
+</div>
+<div class="mode-group">
+<button type="button" class="mode-btn active" id="modeNormal">
+Normal
+<small>Balanced removal while preserving fine subject details.</small>
+</button>
+<button type="button" class="mode-btn" id="modeAggressive">
+Aggressive
+<small>Stronger separation for difficult backgrounds.</small>
+</button>
+</div>
+</div>
+
+<div class="setting">
+<div class="setting-head">
+<span>Tolerance <span class="help" title="Controls the strength of the mask cleanup">?</span></span>
+<span class="value" id="tolVal">18</span>
+</div>
+<input id="tol" type="range" min="1" max="100" value="18">
+<div class="desc">Higher values make the removal stronger. Lower values preserve more subtle edges.</div>
+</div>
+
+<div class="setting">
+<div class="setting-head">
+<span>Safety Margin (px) <span class="help" title="Protects a small amount around subject edges">?</span></span>
+<span class="value" id="padVal">2</span>
+</div>
+<input id="pad" type="range" min="0" max="20" value="2">
+<div class="desc">Adds a small protective margin around detected subject edges.</div>
+</div>
+
+<div class="setting">
+<div class="setting-head">
+<span>Self Improvement</span>
+</div>
+<div class="switch-row">
+<div class="switch-text">
+Edge Refinement
+<small>Automatically smooths and improves uncertain subject edges.</small>
+</div>
+<label class="switch">
+<input type="checkbox" id="selfImprove" checked>
+<span class="switch-slider"></span>
+</label>
+</div>
+</div>
+
+<button type="button" class="secondary" id="reset" style="width:100%;margin-top:18px">↻ Reset Settings</button>
+
+</div>
+
+<div class="previewbox">
+<div class="preview-title">Live Preview</div>
+<div class="previews">
+<div class="pane">
+<label>Original</label>
+<div class="frame" id="originalFrame">
+<div class="empty-preview">Choose an image to preview it here.</div>
+<img id="origPreview" style="display:none">
+</div>
+</div>
+<div class="pane">
+<label>Background Removed</label>
+<div class="frame" id="resultFrame">
+<div class="empty-preview">Your transparent result will appear here.</div>
+<img id="cropPreview" style="display:none">
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="actions">
+<button type="button" class="secondary" id="clean">✣ Remove Background</button>
+<button type="button" class="primary" id="downloadAll" disabled>⇩ Download All (.ZIP)</button>
+</div>
+
+<div class="note">Processing happens on your device. Your images are not uploaded to a server.</div>
+</section>
+
+<section class="card progress-card" id="progressCard">
+<div class="progress-top">
+<span id="progressText">Preparing…</span>
+<span class="percent" id="percent">0%</span>
+</div>
+<div class="track"><div class="bar" id="bar"></div></div>
+<div class="status" id="status"></div>
+</section>
+
+<div class="results" id="results"></div>
+<div class="pagination" id="pagination"></div>
+  </main>
+  <script>
+const $=id=>document.getElementById(id);
+
+const filesEl=$("files");
+const drop=$("drop");
+const count=$("count");
+
+const modeNormal=$("modeNormal");
+const modeAggressive=$("modeAggressive");
+const tolEl=$("tol");
+const padEl=$("pad");
+const tolVal=$("tolVal");
+const padVal=$("padVal");
+const selfImprove=$("selfImprove");
+const resetBtn=$("reset");
+
+const origPreview=$("origPreview");
+const cropPreview=$("cropPreview");
+const originalFrame=$("originalFrame");
+const resultFrame=$("resultFrame");
+
+const cleanBtn=$("clean");
+const downloadAll=$("downloadAll");
+
+const progressCard=$("progressCard");
+const progressText=$("progressText");
+const percent=$("percent");
+const bar=$("bar");
+const status=$("status");
+
+const results=$("results");
+const pagination=$("pagination");
+
+let selected=[];
+let outputs=[];
+let currentPage=1;
+let cropMode="normal";
+let previewURL=null;
+let previewToken=0;
+
+const PAGE_SIZE=20;
+
+function updateSlider(el){
+const min=Number(el.min);
+const max=Number(el.max);
+const value=Number(el.value);
+const pct=((value-min)/(max-min))*100;
+el.style.setProperty("--fill",pct+"%");
+}
+
+updateSlider(tolEl);
+updateSlider(padEl);
+
+function updateCount(){
+count.innerHTML=`<span style="color:#28d66f">✓</span><strong>${selected.length}</strong> images selected`;
+}
+
+function setFiles(files){
+const valid=files.filter(f=>f&&f.type&&f.type.startsWith("image/"));
+
+selected=valid;
+
+updateCount();
+
+if(!selected.length){
+origPreview.style.display="none";
+cropPreview.style.display="none";
+return;
+}
+
+showPreview(selected[0]);
+}
+
+drop.addEventListener("click",event=>{
+if(event.target===filesEl)return;
+filesEl.click();
+});
+
+filesEl.addEventListener("change",()=>{
+setFiles(Array.from(filesEl.files||[]));
+});
+
+drop.addEventListener("dragover",event=>{
+event.preventDefault();
+drop.classList.add("drag");
+});
+
+drop.addEventListener("dragleave",event=>{
+if(!drop.contains(event.relatedTarget)){
+drop.classList.remove("drag");
+}
+});
+
+drop.addEventListener("drop",event=>{
+event.preventDefault();
+drop.classList.remove("drag");
+setFiles(Array.from(event.dataTransfer.files||[]));
+});
+
+async function showPreview(file){
+if(previewURL){
+URL.revokeObjectURL(previewURL);
+previewURL=null;
+}
+
+previewURL=URL.createObjectURL(file);
+
+origPreview.src=previewURL;
+origPreview.style.display="block";
+
+const empty=originalFrame.querySelector(".empty-preview");
+if(empty)empty.style.display="none";
+
+updatePreview();
+}
+
+function loadImage(file){
+return new Promise((resolve,reject)=>{
+const url=URL.createObjectURL(file);
+const img=new Image();
+
+img.onload=()=>{
+URL.revokeObjectURL(url);
+resolve(img);
+};
+
+img.onerror=()=>{
+URL.revokeObjectURL(url);
+reject(new Error("Could not load image."));
+};
+
+img.src=url;
+});
+}
+
+function setMode(mode){
+cropMode=mode;
+
+modeNormal.classList.toggle("active",mode==="normal");
+modeAggressive.classList.toggle("active",mode==="aggressive");
+
+updatePreview();
+}
+
+modeNormal.addEventListener("click",()=>{
+if(!modeNormal.disabled)setMode("normal");
+});
+
+modeAggressive.addEventListener("click",()=>{
+if(!modeAggressive.disabled)setMode("aggressive");
+});
+
+tolEl.addEventListener("input",()=>{
+tolVal.textContent=tolEl.value;
+updateSlider(tolEl);
+updatePreview();
+});
+
+padEl.addEventListener("input",()=>{
+padVal.textContent=padEl.value;
+updateSlider(padEl);
+updatePreview();
+});
+
+resetBtn.addEventListener("click",()=>{
+tolEl.value="18";
+padEl.value="2";
+selfImprove.checked=true;
+
+tolVal.textContent="18";
+padVal.textContent="2";
+
+updateSlider(tolEl);
+updateSlider(padEl);
+
+setMode("normal");
+});
+
+function setLocked(value){
+settings.classList.toggle("locked",value);
+
+tolEl.disabled=value;
+padEl.disabled=value;
+resetBtn.disabled=value;
+modeNormal.disabled=value;
+modeAggressive.disabled=value;
+selfImprove.disabled=value;
+}
+
+function setProgress(value,text){
+const v=Math.max(0,Math.min(100,value));
+
+bar.style.width=v+"%";
+percent.textContent=Math.round(v)+"%";
+
+if(text)progressText.textContent=text;
+}
+    <script>
+let remover=null;
+let modelLoading=null;
+
+async function getRemover(){
+if(remover)return remover;
+
+if(modelLoading)return modelLoading;
+
+modelLoading=(async()=>{
+status.textContent="Loading AI background remover…";
+
+try{
+const mod=await import(
+"https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1"
+);
+
+const pipeline=mod.pipeline;
+
+remover=await pipeline(
+"background-removal",
+"briaai/RMBG-1.4"
+);
+
+return remover;
+}catch(error){
+console.error(error);
+throw new Error(
+"AI model could not load. Open this page through GitHub Pages or localhost and try again."
+);
+}finally{
+modelLoading=null;
+}
+})();
+
+return modelLoading;
+}
+
+async function removeBackground(file){
+const pipe=await getRemover();
+
+const url=URL.createObjectURL(file);
+
+try{
+const output=await pipe(url);
+
+if(!output||!output.length){
+throw new Error("The AI model returned no result.");
+}
+
+const first=output[0];
+
+if(first&&typeof first.toCanvas==="function"){
+return first.toCanvas();
+}
+
+if(first&&typeof first.toBlob==="function"){
+const blob=await first.toBlob();
+const bitmap=await createImageBitmap(blob);
+
+const canvas=document.createElement("canvas");
+canvas.width=bitmap.width;
+canvas.height=bitmap.height;
+
+canvas.getContext("2d").drawImage(bitmap,0,0);
+
+if(bitmap.close)bitmap.close();
+
+return canvas;
+}
+
+throw new Error("Unsupported AI output.");
+}finally{
+URL.revokeObjectURL(url);
+}
+}
+
+function resizeMask(mask,width,height){
+const canvas=document.createElement("canvas");
+
+canvas.width=width;
+canvas.height=height;
+
+const ctx=canvas.getContext("2d",{
+willReadFrequently:true
+});
+
+ctx.imageSmoothingEnabled=true;
+ctx.imageSmoothingQuality="high";
+
+ctx.drawImage(
+mask,
+0,
+0,
+width,
+height
+);
+
+return canvas;
+}
+
+function refineAlpha(alpha,width,height,aggressive){
+const result=new Uint8ClampedArray(alpha);
+
+const threshold=aggressive?20:10;
+
+for(let y=1;y<height-1;y++){
+for(let x=1;x<width-1;x++){
+
+const i=y*width+x;
+
+if(alpha[i]===0)continue;
+
+let neighbors=0;
+
+if(alpha[i-1]>100)neighbors++;
+if(alpha[i+1]>100)neighbors++;
+if(alpha[i-width]>100)neighbors++;
+if(alpha[i+width]>100)neighbors++;
+
+if(neighbors===0&&alpha[i]<150){
+result[i]=0;
+}else if(
+neighbors>=3&&
+alpha[i]>40&&
+alpha[i]<220
+){
+result[i]=Math.min(
+255,
+alpha[i]+threshold
+);
+}
+}
+}
+
+return result;
+}
+
+function applySafety(alpha,width,height,pad){
+if(pad<=0)return alpha;
+
+const result=new Uint8ClampedArray(alpha);
+
+for(let y=0;y<height;y++){
+for(let x=0;x<width;x++){
+
+const i=y*width+x;
+
+if(alpha[i]>0)continue;
+
+let nearby=false;
+
+for(
+let yy=Math.max(0,y-pad);
+yy<=Math.min(height-1,y+pad)&&!nearby;
+yy++
+){
+for(
+let xx=Math.max(0,x-pad);
+xx<=Math.min(width-1,x+pad);
+xx++
+){
+if(alpha[yy*width+xx]>180){
+nearby=true;
+break;
+}
+}
+}
+
+if(nearby)result[i]=12;
+}
+}
+
+return result;
+}
+
+async function createTransparentPNG(file){
+const img=await loadImage(file);
+
+const width=img.naturalWidth;
+const height=img.naturalHeight;
+
+const mask=await removeBackground(file);
+const fitted=resizeMask(mask,width,height);
+
+const maskCtx=fitted.getContext("2d",{
+willReadFrequently:true
+});
+
+const maskData=maskCtx.getImageData(
+0,
+0,
+width,
+height
+);
+
+const alpha=new Uint8ClampedArray(width*height);
+
+for(let i=0,p=0;i<maskData.data.length;i+=4,p++){
+const r=maskData.data[i];
+const g=maskData.data[i+1];
+const b=maskData.data[i+2];
+const a=maskData.data[i+3];
+
+alpha[p]=Math.round(
+((r+g+b)/3)*(a/255)
+);
+}
+
+const aggressive=cropMode==="aggressive";
+
+let finalAlpha=alpha;
+
+const tolerance=Number(tolEl.value);
+const cutoff=aggressive
+?Math.max(0,30-tolerance/3)
+:Math.max(0,18-tolerance/5);
+
+for(let i=0;i<finalAlpha.length;i++){
+let a=finalAlpha[i];
+
+if(a<=cutoff){
+a=0;
+}
+
+finalAlpha[i]=a;
+}
+
+if(selfImprove.checked){
+finalAlpha=refineAlpha(
+finalAlpha,
+width,
+height,
+aggressive
+);
+}
+
+finalAlpha=applySafety(
+finalAlpha,
+width,
+height,
+Number(padEl.value)
+);
+
+const canvas=document.createElement("canvas");
+
+canvas.width=width;
+canvas.height=height;
+
+const ctx=canvas.getContext("2d",{
+willReadFrequently:true
+});
+
+ctx.clearRect(0,0,width,height);
+
+ctx.drawImage(
+img,
+0,
+0,
+width,
+height
+);
+
+const imageData=ctx.getImageData(
+0,
+0,
+width,
+height
+);
+
+for(let i=0,p=0;i<imageData.data.length;i+=4,p++){
+imageData.data[i+3]=finalAlpha[p];
+}
+
+ctx.putImageData(imageData,0,0);
+
+const blob=await new Promise((resolve,reject)=>{
+canvas.toBlob(blob=>{
+if(blob)resolve(blob);
+else reject(new Error("Could not create PNG."));
+},"image/png");
+});
+
+return{
+blob,
+width,
+height
+};
+}
+
+async function updatePreview(){
+if(!selected.length)return;
+
+const token=++previewToken;
+
+cropPreview.style.display="none";
+
+try{
+const result=await createTransparentPNG(
+selected[0]
+);
+
+if(token!==previewToken)return;
+
+const url=URL.createObjectURL(result.blob);
+
+cropPreview.onload=()=>{
+URL.revokeObjectURL(url);
+};
+
+cropPreview.src=url;
+cropPreview.style.display="block";
+
+const empty=resultFrame.querySelector(".empty-preview");
+if(empty)empty.style.display="none";
+
+}catch(error){
+console.error(error);
+
+if(token===previewToken){
+cropPreview.style.display="none";
+}
+}
+    }
+    <script>
+function downloadBlob(blob,name){
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+
+a.href=url;
+a.download=name;
+
+document.body.appendChild(a);
+a.click();
+a.remove();
+
+setTimeout(()=>{
+URL.revokeObjectURL(url);
+},4000);
+}
+
+function outputName(name){
+const dot=name.lastIndexOf(".");
+const base=dot>0?name.slice(0,dot):name;
+return base+".png";
+}
+
+function renderResults(){
+results.innerHTML="";
+
+const totalPages=Math.max(
+1,
+Math.ceil(outputs.length/PAGE_SIZE)
+);
+
+if(currentPage>totalPages){
+currentPage=totalPages;
+}
+
+const start=(currentPage-1)*PAGE_SIZE;
+
+outputs
+.slice(start,start+PAGE_SIZE)
+.forEach(item=>{
+const card=document.createElement("div");
+card.className="result";
+
+const img=document.createElement("img");
+img.src=URL.createObjectURL(item.blob);
+img.alt=item.name;
+
+const done=document.createElement("div");
+done.className="done";
+done.textContent="DONE";
+
+const button=document.createElement("button");
+button.type="button";
+button.className="download-one";
+button.textContent="⇩";
+
+button.addEventListener("click",()=>{
+downloadBlob(item.blob,item.name);
+});
+
+const body=document.createElement("div");
+body.className="result-body";
+
+const name=document.createElement("div");
+name.className="result-name";
+name.textContent=item.name;
+name.title=item.name;
+
+const size=document.createElement("div");
+size.className="result-size";
+size.textContent=
+`${item.width} × ${item.height}`;
+
+body.append(name,size);
+
+card.append(
+img,
+done,
+button,
+body
+);
+
+results.appendChild(card);
+});
+
+renderPagination();
+}
+
+function renderPagination(){
+pagination.innerHTML="";
+
+const totalPages=Math.max(
+1,
+Math.ceil(outputs.length/PAGE_SIZE)
+);
+
+if(totalPages<=1)return;
+
+const prev=document.createElement("button");
+
+prev.type="button";
+prev.className="page-btn";
+prev.textContent="‹";
+prev.disabled=currentPage===1;
+
+prev.addEventListener("click",()=>{
+if(currentPage>1){
+currentPage--;
+renderResults();
+}
+});
+
+pagination.appendChild(prev);
+
+const first=Math.max(
+1,
+Math.min(
+currentPage-3,
+totalPages-6
+)
+);
+
+const last=Math.min(
+totalPages,
+first+6
+);
+
+for(let p=first;p<=last;p++){
+const button=document.createElement("button");
+
+button.type="button";
+button.className=
+"page-btn"+
+(p===currentPage?" active":"");
+
+button.textContent=p;
+
+button.addEventListener("click",()=>{
+currentPage=p;
+renderResults();
+});
+
+pagination.appendChild(button);
+}
+
+const next=document.createElement("button");
+
+next.type="button";
+next.className="page-btn";
+next.textContent="›";
+next.disabled=currentPage===totalPages;
+
+next.addEventListener("click",()=>{
+if(currentPage<totalPages){
+currentPage++;
+renderResults();
+}
+});
+
+pagination.appendChild(next);
+
+const info=document.createElement("span");
+
+info.className="page-info";
+info.textContent=
+`Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
+
+pagination.appendChild(info);
+}
+
+cleanBtn.addEventListener("click",async()=>{
+if(!selected.length){
+alert("Select some images first.");
+return;
+}
+
+outputs=[];
+currentPage=1;
+
+results.innerHTML="";
+pagination.innerHTML="";
+
+downloadAll.disabled=true;
+cleanBtn.disabled=true;
+
+setLocked(true);
+
+progressCard.style.display="block";
+
+try{
+for(let i=0;i<selected.length;i++){
+
+const file=selected[i];
+
+setProgress(
+(i/selected.length)*100,
+`Processing ${i+1} of ${selected.length}…`
+);
+
+status.textContent=file.name;
+
+const result=await createTransparentPNG(file);
+
+outputs.push({
+blob:result.blob,
+name:outputName(file.name),
+width:result.width,
+height:result.height
+});
+
+setProgress(
+((i+1)/selected.length)*100,
+`Processing ${i+1} of ${selected.length}…`
+);
+
+await new Promise(r=>setTimeout(r,0));
+}
+
+setProgress(
+100,
+`Finished ${selected.length} image${selected.length===1?"":"s"}`
+);
+
+status.textContent=
+"Transparent PNGs are ready.";
+
+renderResults();
+
+downloadAll.disabled=false;
+
+}catch(error){
+
+console.error(error);
+
+status.textContent=
+error.message||
+"Something went wrong.";
+
+alert(
+"Background removal failed. If you opened the HTML directly from your device, run it through GitHub Pages or a local web server."
+);
+
+}finally{
+
+cleanBtn.disabled=false;
+setLocked(false);
+
+}
+});
+
+downloadAll.addEventListener("click",async()=>{
+if(!outputs.length)return;
+
+downloadAll.disabled=true;
+downloadAll.textContent="Creating ZIP…";
+
+try{
+const zip=await makeZip(outputs);
+
+downloadBlob(
+zip,
+"cut-it-out-background-removed.zip"
+);
+
+}catch(error){
+console.error(error);
+alert("Could not create the ZIP.");
+}finally{
+downloadAll.disabled=false;
+downloadAll.textContent=
+"⇩ Download All (.ZIP)";
+}
+});
+
+function crc32(data){
+let table=crc32.table;
+
+if(!table){
+table=new Uint32Array(256);
+
+for(let n=0;n<256;n++){
+let c=n;
+
+for(let k=0;k<8;k++){
+c=(c&1)
+?0xedb88320^(c>>>1)
+:c>>>1;
+}
+
+table[n]=c>>>0;
+}
+
+crc32.table=table;
+}
+
+let c=0xffffffff;
+
+for(let i=0;i<data.length;i++){
+c=
+table[(c^data[i])&255]^
+(c>>>8);
+}
+
+return(c^0xffffffff)>>>0;
+}
+
+function u16(a,n){
+a.push(n&255,(n>>>8)&255);
+}
+
+function u32(a,n){
+a.push(
+n&255,
+(n>>>8)&255,
+(n>>>16)&255,
+(n>>>24)&255
+);
+}
+
+function bytes(text){
+return new TextEncoder().encode(text);
+}
+
+async function makeZip(items){
+const chunks=[];
+const central=[];
+let offset=0;
+
+for(const item of items){
+
+const data=new Uint8Array(
+await item.blob.arrayBuffer()
+);
+
+const name=bytes(item.name);
+const crc=crc32(data);
+
+const local=[];
+
+u32(local,0x04034b50);
+u16(local,20);
+u16(local,0);
+u16(local,0);
+u16(local,0);
+u16(local,0);
+u32(local,crc);
+u32(local,data.length);
+u32(local,data.length);
+u16(local,name.length);
+u16(local,0);
+
+chunks.push(
+new Uint8Array(local),
+name,
+data
+);
+
+const cen=[];
+
+u32(cen,0x02014b50);
+u16(cen,20);
+u16(cen,20);
+u16(cen,0);
+u16(cen,0);
+u16(cen,0);
+u16(cen,0);
+u32(cen,crc);
+u32(cen,data.length);
+u32(cen,data.length);
+u16(cen,name.length);
+u16(cen,0);
+u16(cen,0);
+u16(cen,0);
+u16(cen,0);
+u32(cen,0);
+u32(cen,offset);
+
+central.push(
+new Uint8Array(cen),
+name
+);
+
+offset+=
+local.length+
+name.length+
+data.length;
+}
+
+const centralOffset=offset;
+let centralSize=0;
+
+for(const item of central){
+chunks.push(item);
+centralSize+=item.length;
+}
+
+const end=[];
+
+u32(end,0x06054b50);
+u16(end,0);
+u16(end,0);
+u16(end,items.length);
+u16(end,items.length);
+u32(end,centralSize);
+u32(end,centralOffset);
+u16(end,0);
+
+chunks.push(new Uint8Array(end));
+
+return new Blob(
+chunks,
+{type:"application/zip"}
+);
+}
+
+updateCount();
+setMode("normal");
+
+console.log(
+"Cut It Out! Background Remover loaded successfully."
+);
+</script>
+</body>
+</html>
