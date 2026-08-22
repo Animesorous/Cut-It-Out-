@@ -1,433 +1,174 @@
+import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+
 const $=id=>document.getElementById(id);
 
-const fileInput=$('fileInput');
-const dropZone=$('dropZone');
-const originalPreview=$('originalPreview');
-const resultPreview=$('resultPreview');
-const originalInfo=$('originalInfo');
-const resultInfo=$('resultInfo');
-const resolution=$('resolution');
+const filesEl=$("files");
+const drop=$("drop");
+const count=$("count");
+const cleanBtn=$("clean");
+const downloadAll=$("downloadAll");
 
-const normalBtn=$('normalBtn');
-const aggressiveBtn=$('aggressiveBtn');
-const strength=$('strength');
-const edge=$('edge');
-const strengthValue=$('strengthValue');
-const edgeValue=$('edgeValue');
+const results=$("results");
+const progressCard=$("progressCard");
+const progressText=$("progressText");
+const percent=$("percent");
+const bar=$("bar");
+const status=$("status");
 
-const resetBtn=$('resetBtn');
-const removeBtn=$('removeBtn');
-const downloadBtn=$('downloadBtn');
+const origPreview=$("origPreview");
+const cropPreview=$("cropPreview");
 
-const progress=$('progress');
-const progressText=$('progressText');
-const progressPercent=$('progressPercent');
-const progressBar=$('progressBar');
-const status=$('status');
+const settingsBox=$("settings");
+const resetBtn=$("reset");
 
-let currentFile=null;
-let currentImage=null;
-let outputBlob=null;
-let mode='normal';
+const tolEl=$("tol");
+const padEl=$("pad");
+const tolVal=$("tolVal");
+const padVal=$("padVal");
 
-let originalURL=null;
-let resultURL=null;
+const modeNormal=$("modeNormal");
+const modeAggressive=$("modeAggressive");
 
-fileInput.addEventListener('change',()=>{
-  if(fileInput.files&&fileInput.files.length){
-    loadFile(fileInput.files[0]);
+let selected=[];
+let outputs=[];
+let currentPage=1;
+let previewURL=null;
+let model=null;
+let loadingModel=false;
+let cropMode="normal";
+
+const PAGE_SIZE=20;
+
+function updateCount(){
+  count.innerHTML=`<span style="color:#28d66f">✓</span><strong>${selected.length}</strong> images selected`;
+}
+
+function setFiles(files){
+  selected=files.filter(file=>file&&file.type&&file.type.startsWith("image/"));
+  updateCount();
+
+  if(selected.length){
+    showOriginal(selected[0]);
+  }else{
+    origPreview.removeAttribute("src");
+    cropPreview.removeAttribute("src");
   }
+}
+
+drop.addEventListener("click",e=>{
+  if(e.target===filesEl)return;
+  filesEl.click();
 });
 
-dropZone.addEventListener('click',e=>{
-  if(e.target!==fileInput)fileInput.click();
+filesEl.addEventListener("change",()=>{
+  setFiles(Array.from(filesEl.files||[]));
 });
 
-dropZone.addEventListener('dragover',e=>{
+drop.addEventListener("dragover",e=>{
   e.preventDefault();
-  dropZone.classList.add('drag');
+  drop.classList.add("drag");
 });
 
-dropZone.addEventListener('dragleave',()=>{
-  dropZone.classList.remove('drag');
+drop.addEventListener("dragleave",()=>{
+  drop.classList.remove("drag");
 });
 
-dropZone.addEventListener('drop',e=>{
+drop.addEventListener("drop",e=>{
   e.preventDefault();
-  dropZone.classList.remove('drag');
-
-  const file=[...e.dataTransfer.files].find(f=>f.type.startsWith('image/'));
-
-  if(file)loadFile(file);
+  drop.classList.remove("drag");
+  setFiles(Array.from(e.dataTransfer.files||[]));
 });
 
-function loadFile(file){
-  if(!file.type.startsWith('image/')){
-    alert('Please select an image file.');
-    return;
-  }
+async function showOriginal(file){
+  if(previewURL)URL.revokeObjectURL(previewURL);
 
-  currentFile=file;
-  outputBlob=null;
+  previewURL=URL.createObjectURL(file);
+  origPreview.src=previewURL;
 
-  if(originalURL)URL.revokeObjectURL(originalURL);
-  if(resultURL)URL.revokeObjectURL(resultURL);
-
-  originalURL=URL.createObjectURL(file);
-
-  const img=new Image();
-
-  img.onload=()=>{
-    currentImage=img;
-
-    originalPreview.src=originalURL;
-    resultPreview.removeAttribute('src');
-
-    originalInfo.textContent=
-      `${img.naturalWidth} × ${img.naturalHeight}`;
-
-    resolution.textContent=
-      `${img.naturalWidth} × ${img.naturalHeight}`;
-
-    resultInfo.textContent='Ready to process';
-
-    removeBtn.disabled=false;
-    downloadBtn.disabled=true;
-
-    status.textContent=
-      `${file.name} loaded successfully.`;
-
-    progress.style.display='none';
-  };
-
-  img.onerror=()=>{
-    alert('This image could not be loaded.');
-  };
-
-  img.src=originalURL;
+  await updatePreview();
 }
 
-strength.addEventListener('input',()=>{
-  strengthValue.textContent=strength.value;
-});
-
-edge.addEventListener('input',()=>{
-  edgeValue.textContent=edge.value;
-});
-
-normalBtn.addEventListener('click',()=>{
-  if(normalBtn.disabled)return;
-
-  mode='normal';
-
-  normalBtn.classList.add('active');
-  aggressiveBtn.classList.remove('active');
-});
-
-aggressiveBtn.addEventListener('click',()=>{
-  if(aggressiveBtn.disabled)return;
-
-  mode='aggressive';
-
-  aggressiveBtn.classList.add('active');
-  normalBtn.classList.remove('active');
-});
-
-resetBtn.addEventListener('click',()=>{
-  strength.value=50;
-  edge.value=50;
-
-  strengthValue.textContent='50';
-  edgeValue.textContent='50';
-
-  mode='normal';
-
-  normalBtn.classList.add('active');
-  aggressiveBtn.classList.remove('active');
-
-  if(outputBlob&&resultURL){
-    URL.revokeObjectURL(resultURL);
-    resultURL=null;
-  }
-
-  outputBlob=null;
-  resultPreview.removeAttribute('src');
-
-  resultInfo.textContent=currentImage?
-    'Ready to process':
-    'Transparent PNG';
-
-  downloadBtn.disabled=true;
-});
-
-function setProgress(value,text){
-  value=Math.max(0,Math.min(100,value));
-
-  progress.style.display='block';
-  progressText.textContent=text;
-  progressPercent.textContent=Math.round(value)+'%';
-  progressBar.style.width=value+'%';
-}
-
-function sleep(){
-  return new Promise(resolve=>setTimeout(resolve,0));
-}
-async function createCanvasImage(img){
-  const canvas=document.createElement('canvas');
-  canvas.width=img.naturalWidth;
-  canvas.height=img.naturalHeight;
-
-  const ctx=canvas.getContext('2d',{willReadFrequently:true});
-  ctx.drawImage(img,0,0);
-
-  return canvas;
-}
-
-function clamp(v,min,max){
-  return Math.max(min,Math.min(max,v));
-}
-
-function smoothStep(a,b,x){
-  const t=clamp((x-a)/(b-a),0,1);
-  return t*t*(3-2*t);
-}
-
-function resizeMask(mask,width,height){
-  const src=document.createElement('canvas');
-  src.width=mask.width;
-  src.height=mask.height;
-
-  const sctx=src.getContext('2d');
-  sctx.putImageData(mask,0,0);
-
-  const dst=document.createElement('canvas');
-  dst.width=width;
-  dst.height=height;
-
-  const dctx=dst.getContext('2d');
-  dctx.imageSmoothingEnabled=true;
-  dctx.drawImage(src,0,0,width,height);
-
-  return dctx.getImageData(0,0,width,height);
-}
-
-function refineAlpha(data,width,height,mode,strength,edge){
-  const output=new Uint8ClampedArray(data.length);
-
-  const s=Number(strength)/100;
-  const e=Number(edge)/100;
-
-  for(let i=0;i<data.length;i+=4){
-    let a=data[i+3];
-
-    if(mode==='aggressive'){
-      a=a<128?
-        a*(0.55-0.25*s):
-        255-((255-a)*(0.35-0.2*s));
-    }
-
-    const edgeProtect=0.7+e*0.3;
-    a=128+(a-128)*edgeProtect;
-
-    output[i]=data[i];
-    output[i+1]=data[i+1];
-    output[i+2]=data[i+2];
-    output[i+3]=clamp(a,0,255);
-  }
-
-  return new ImageData(output,width,height);
-}
-
-function canvasToBlob(canvas){
+function loadImage(file){
   return new Promise((resolve,reject)=>{
-    canvas.toBlob(blob=>{
-      if(blob)resolve(blob);
-      else reject(new Error('PNG export failed.'));
-    },'image/png');
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+
+    img.onerror=()=>{
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not load image"));
+    };
+
+    img.src=url;
   });
 }
 
-async function exportTransparent(canvas,alphaData){
-  const ctx=canvas.getContext('2d');
+function setLocked(locked){
+  settingsBox.classList.toggle("locked",locked);
 
-  const image=ctx.getImageData(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
+  filesEl.disabled=locked;
+  cleanBtn.disabled=locked;
 
-  for(let i=0;i<image.data.length;i+=4){
-    image.data[i+3]=alphaData.data[i+3];
-  }
-
-  ctx.putImageData(image,0,0);
-
-  return canvasToBlob(canvas);
+  tolEl.disabled=locked;
+  padEl.disabled=locked;
+  resetBtn.disabled=locked;
+  modeNormal.disabled=locked;
+  modeAggressive.disabled=locked;
 }
 
-function enableProcessingControls(enabled){
-  normalBtn.disabled=!enabled;
-  aggressiveBtn.disabled=!enabled;
-  strength.disabled=!enabled;
-  edge.disabled=!enabled;
-  resetBtn.disabled=!enabled;
-}
-let remover=null;
-let modelLoading=false;
+function setMode(mode){
+  cropMode=mode;
 
-async function getRemover(){
-  if(remover)return remover;
-  if(modelLoading){
-    while(modelLoading)await sleep();
-    return remover;
-  }
+  modeNormal.classList.toggle("active",mode==="normal");
+  modeAggressive.classList.toggle("active",mode==="aggressive");
 
-  modelLoading=true;
-
-  try{
-    setProgress(5,'Loading background-removal AI…');
-
-    const options={};
-
-    if('gpu' in navigator){
-      options.device='webgpu';
-    }else{
-      options.device='wasm';
-    }
-
-    options.dtype=options.device==='webgpu'?'fp16':'q8';
-
-    remover=await pipeline(
-      'image-segmentation',
-      'briaai/RMBG-1.4',
-      options
-    );
-
-    setProgress(15,'AI model ready.');
-    return remover;
-  }catch(error){
-    console.error(error);
-    throw new Error('The background-removal AI could not be loaded.');
-  }finally{
-    modelLoading=false;
-  }
-}
-async function runBackgroundRemoval(){
-  if(!currentImage)return;
-
-  removeBtn.disabled=true;
-  downloadBtn.disabled=true;
-  enableProcessingControls(false);
-
-  try{
-    setProgress(0,'Preparing image…');
-    await sleep();
-
-    const pipe=await getRemover();
-
-    setProgress(20,'Analysing foreground…');
-    await sleep();
-
-    const result=await pipe(currentImage);
-
-    setProgress(65,'Building transparency mask…');
-    await sleep();
-
-    let mask=null;
-
-    if(Array.isArray(result)){
-      mask=result[0]?.mask||result[0];
-    }else if(result&&result.mask){
-      mask=result.mask;
-    }else{
-      mask=result;
-    }
-
-    if(!mask){
-      throw new Error('No segmentation mask was returned.');
-    }
-
-    const canvas=await createCanvasImage(currentImage);
-
-    const maskCanvas=document.createElement('canvas');
-    maskCanvas.width=mask.width;
-    maskCanvas.height=mask.height;
-
-    const maskCtx=maskCanvas.getContext('2d');
-    maskCtx.drawImage(mask,0,0);
-
-    const smallMask=maskCtx.getImageData(
-      0,
-      0,
-      maskCanvas.width,
-      maskCanvas.height
-    );
-
-    const fullMask=resizeMask(
-      smallMask,
-      canvas.width,
-      canvas.height
-    );
-
-    setProgress(80,'Refining edges…');
-    await sleep();
-
-    const refined=refineAlpha(
-      fullMask.data,
-      canvas.width,
-      canvas.height,
-      mode,
-      strength.value,
-      edge.value
-    );
-
-    setProgress(90,'Creating transparent PNG…');
-    await sleep();
-
-    outputBlob=await exportTransparent(canvas,refined);
-
-    if(resultURL)URL.revokeObjectURL(resultURL);
-
-    resultURL=URL.createObjectURL(outputBlob);
-    resultPreview.src=resultURL;
-
-    resultInfo.textContent=
-      `${canvas.width} × ${canvas.height} • PNG`;
-
-    setProgress(100,'Background removed!');
-    status.textContent=
-      'Your transparent PNG is ready.';
-
-    downloadBtn.disabled=false;
-
-  }catch(error){
-    console.error(error);
-
-    progressText.textContent='Processing failed';
-    progressPercent.textContent='0%';
-    progressBar.style.width='0%';
-
-    status.textContent=
-      error.message||'Something went wrong while removing the background.';
-
-  }finally{
-    removeBtn.disabled=!currentImage;
-    enableProcessingControls(true);
-  }
+  updatePreview();
 }
 
-removeBtn.addEventListener('click',runBackgroundRemoval);
+modeNormal.addEventListener("click",()=>{
+  if(!modeNormal.disabled)setMode("normal");
+});
 
-downloadBtn.addEventListener('click',()=>{
-  if(!outputBlob)return;
+modeAggressive.addEventListener("click",()=>{
+  if(!modeAggressive.disabled)setMode("aggressive");
+});
 
-  const name=currentFile?
-    currentFile.name.replace(/\.[^.]+$/,'')+'_no-bg.png':
-    'cut-it-out-no-background.png';
+tolEl.addEventListener("input",()=>{
+  tolVal.textContent=tolEl.value;
+  updatePreview();
+});
 
-  const url=URL.createObjectURL(outputBlob);
-  const a=document.createElement('a');
+padEl.addEventListener("input",()=>{
+  padVal.textContent=padEl.value;
+  updatePreview();
+});
+
+resetBtn.addEventListener("click",()=>{
+  tolEl.value=18;
+  padEl.value=2;
+
+  tolVal.textContent="18";
+  padVal.textContent="2";
+
+  setMode("normal");
+});
+
+function setProgress(value,text){
+  const v=Math.max(0,Math.min(100,value));
+
+  bar.style.width=v+"%";
+  percent.textContent=Math.round(v)+"%";
+
+  if(text)progressText.textContent=text;
+}
+
+function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
 
   a.href=url;
   a.download=name;
@@ -436,302 +177,726 @@ downloadBtn.addEventListener('click',()=>{
   a.click();
   a.remove();
 
-  setTimeout(()=>URL.revokeObjectURL(url),5000);
-});
-async function runBackgroundRemoval(){
-  if(!currentImage)return;
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+                                }async function getModel(){
+  if(model)return model;
 
-  removeBtn.disabled=true;
-  downloadBtn.disabled=true;
-  setLocked(true);
+  if(loadingModel){
+    while(loadingModel){
+      await new Promise(r=>setTimeout(r,100));
+    }
+
+    if(model)return model;
+  }
+
+  loadingModel=true;
 
   try{
-    setProgress(5,"Preparing image…");
-    await sleep();
+    status.textContent="Loading background-removal AI…";
 
-    const pipe=await getRemover();
-
-    setProgress(25,"Detecting subject…");
-    await sleep();
-
-    const result=await pipe(currentImage);
-
-    setProgress(60,"Creating transparency mask…");
-    await sleep();
-
-    let mask=null;
-
-    if(Array.isArray(result)){
-      mask=result[0]?.mask||result[0];
-    }else if(result?.mask){
-      mask=result.mask;
-    }else{
-      mask=result;
-    }
-
-    if(!mask)throw new Error("The background-removal model did not return a mask.");
-
-    const source=await createCanvasImage(currentImage);
-    const w=source.width;
-    const h=source.height;
-
-    const maskCanvas=document.createElement("canvas");
-    maskCanvas.width=mask.width;
-    maskCanvas.height=mask.height;
-
-    const maskCtx=maskCanvas.getContext("2d");
-    maskCtx.drawImage(mask,0,0);
-
-    const maskData=maskCtx.getImageData(
-      0,
-      0,
-      maskCanvas.width,
-      maskCanvas.height
+    model=await pipeline(
+      "background-removal",
+      "Xenova/modnet",
+      {dtype:"fp32"}
     );
 
-    setProgress(72,"Refining edges…");
-    await sleep();
-
-    const alpha=resizeMask(
-      maskData,
-      w,
-      h
-    );
-
-    const strengthValue=Number(strength?.value||50);
-    const edgeValue=Number(edge?.value||50);
-
-    const refined=refineAlpha(
-      alpha.data,
-      w,
-      h,
-      mode,
-      strengthValue,
-      edgeValue
-    );
-
-    setProgress(88,"Generating transparent PNG…");
-    await sleep();
-
-    outputBlob=await exportTransparent(
-      source,
-      refined
-    );
-
-    if(resultURL){
-      URL.revokeObjectURL(resultURL);
-    }
-
-    resultURL=URL.createObjectURL(outputBlob);
-    resultPreview.src=resultURL;
-
-    resultInfo.textContent=
-      `${w} × ${h} • Transparent PNG`;
-
-    setProgress(100,"Done!");
-    status.textContent=
-      "Background removed successfully.";
-
-    downloadBtn.disabled=false;
-
-  }catch(err){
-    console.error(err);
-
-    progressText.textContent="Processing failed";
-    progressPercent.textContent="0%";
-    progressBar.style.width="0%";
-
-    status.textContent=
-      err?.message||
-      "Something went wrong while removing the background.";
-
+    status.textContent="AI model ready.";
+    return model;
+  }catch(error){
+    model=null;
+    console.error(error);
+    throw error;
   }finally{
-    removeBtn.disabled=!currentImage;
-    setLocked(false);
+    loadingModel=false;
   }
 }
 
-function resizeMask(imageData,targetW,targetH){
-  const src=document.createElement("canvas");
-  src.width=imageData.width;
-  src.height=imageData.height;
+async function createMask(file){
+  const pipe=await getModel();
 
-  src.getContext("2d").putImageData(
-    imageData,
-    0,
-    0
-  );
+  const url=URL.createObjectURL(file);
 
-  const dst=document.createElement("canvas");
-  dst.width=targetW;
-  dst.height=targetH;
+  try{
+    const output=await pipe(url);
 
-  const ctx=dst.getContext("2d");
+    if(!output||!output.length){
+      throw new Error("The AI model returned no mask.");
+    }
+
+    const mask=output[0];
+
+    if(typeof mask.toCanvas==="function"){
+      return mask.toCanvas();
+    }
+
+    if(typeof mask.toBlob==="function"){
+      const blob=await mask.toBlob();
+      const bitmap=await createImageBitmap(blob);
+
+      const canvas=document.createElement("canvas");
+      canvas.width=bitmap.width;
+      canvas.height=bitmap.height;
+
+      canvas.getContext("2d").drawImage(bitmap,0,0);
+
+      if(bitmap.close)bitmap.close();
+
+      return canvas;
+    }
+
+    throw new Error("Unsupported mask output.");
+  }finally{
+    URL.revokeObjectURL(url);
+  }
+}
+
+function fitMaskToImage(mask,width,height){
+  const canvas=document.createElement("canvas");
+
+  canvas.width=width;
+  canvas.height=height;
+
+  const ctx=canvas.getContext("2d",{willReadFrequently:true});
+
   ctx.imageSmoothingEnabled=true;
   ctx.imageSmoothingQuality="high";
 
   ctx.drawImage(
-    src,
+    mask,
     0,
     0,
-    targetW,
-    targetH
+    width,
+    height
   );
+
+  return canvas;
+}
+
+function getMaskPixels(maskCanvas){
+  const ctx=maskCanvas.getContext("2d",{willReadFrequently:true});
 
   return ctx.getImageData(
     0,
     0,
-    targetW,
-    targetH
+    maskCanvas.width,
+    maskCanvas.height
   );
 }
 
-function refineAlpha(data,w,h,mode,strengthValue,edgeValue){
-  const out=new Uint8ClampedArray(w*h);
-
-  const aggressive=mode==="aggressive";
-
-  const strength=aggressive
-    ? 0.70+(strengthValue/100)*0.30
-    : 0.45+(strengthValue/100)*0.35;
-
-  const edge=aggressive
-    ? 0.70+(edgeValue/100)*0.30
-    : 0.35+(edgeValue/100)*0.35;
+function maskToAlpha(maskData){
+  const data=maskData.data;
+  const alpha=new Uint8ClampedArray(maskData.width*maskData.height);
 
   for(let i=0,p=0;i<data.length;i+=4,p++){
-    let a=data[i];
+    const r=data[i];
+    const g=data[i+1];
+    const b=data[i+2];
+    const a=data[i+3];
 
-    if(a<255){
-      a=Math.pow(a/255,1/strength)*255;
-    }
+    const value=(r+g+b)/3;
 
-    if(a<18)a=0;
-    else if(a>238)a=255;
-
-    if(edge!==1){
-      const center=128;
-      a=center+(a-center)*edge;
-    }
-
-    out[p]=Math.max(0,Math.min(255,a));
+    alpha[p]=Math.min(
+      255,
+      Math.round(value*(a/255))
+    );
   }
 
-  const passes=aggressive?2:1;
+  return alpha;
+}
 
-  for(let pass=0;pass<passes;pass++){
-    const copy=new Uint8ClampedArray(out);
+function processAlpha(alpha,width,height,tolerance,aggressive){
+  const out=new Uint8ClampedArray(alpha.length);
 
-    for(let y=1;y<h-1;y++){
-      for(let x=1;x<w-1;x++){
-        const p=y*w+x;
+  const low=aggressive
+    ? Math.max(0,tolerance-18)
+    : Math.max(0,tolerance-5);
 
-        const a=copy[p];
-        const n=copy[p-1];
-        const s=copy[p+1];
-        const u=copy[p-w];
-        const d=copy[p+w];
+  const high=aggressive
+    ? Math.min(255,175+tolerance)
+    : Math.min(255,205+tolerance);
 
-        const avg=(n+s+u+d)/4;
+  for(let i=0;i<alpha.length;i++){
+    let a=alpha[i];
 
-        if(a<30&&avg>120){
-          out[p]=aggressive
-            ?Math.min(255,avg)
-            :Math.min(255,a+Math.round((avg-a)*0.25));
-        }else if(a>225&&avg<100){
-          out[p]=aggressive
-            ?Math.max(0,avg)
-            :Math.max(0,a-Math.round((a-avg)*0.15));
-        }
-      }
+    if(a<=low){
+      a=0;
+    }else if(a>=high){
+      a=255;
+    }else{
+      a=(a-low)/(high-low);
+      a=a*a*(3-2*a);
+      a*=255;
     }
+
+    out[i]=Math.round(a);
   }
 
   return out;
 }
 
-async function exportTransparent(source,alpha){
-  const w=source.width;
-  const h=source.height;
+function applySafetyMargin(alpha,width,height,pad){
+  if(!pad)return alpha;
+
+  const result=new Uint8ClampedArray(alpha);
+
+  for(let y=0;y<height;y++){
+    for(let x=0;x<width;x++){
+      const index=y*width+x;
+
+      if(alpha[index]>0)continue;
+
+      let found=false;
+
+      for(let yy=Math.max(0,y-pad);yy<=Math.min(height-1,y+pad)&&!found;yy++){
+        for(let xx=Math.max(0,x-pad);xx<=Math.min(width-1,x+pad);xx++){
+          if(alpha[yy*width+xx]>150){
+            found=true;
+            break;
+          }
+        }
+      }
+
+      if(found)result[index]=Math.max(result[index],20);
+    }
+  }
+
+  return result;
+  }async function makeTransparentPNG(file){
+  const img=await loadImage(file);
+
+  const width=img.naturalWidth;
+  const height=img.naturalHeight;
+
+  const mask=await createMask(file);
+  const fittedMask=fitMaskToImage(mask,width,height);
+  const maskData=getMaskPixels(fittedMask);
+
+  let alpha=maskToAlpha(maskData);
+
+  const tolerance=Math.max(
+    1,
+    Math.min(100,Number(tolEl.value)||18)
+  );
+
+  const pad=Math.max(
+    0,
+    Math.min(20,Number(padEl.value)||2)
+  );
+
+  alpha=processAlpha(
+    alpha,
+    width,
+    height,
+    tolerance,
+    cropMode==="aggressive"
+  );
+
+  alpha=applySafetyMargin(
+    alpha,
+    width,
+    height,
+    pad
+  );
 
   const canvas=document.createElement("canvas");
-  canvas.width=w;
-  canvas.height=h;
+
+  canvas.width=width;
+  canvas.height=height;
 
   const ctx=canvas.getContext("2d",{
     willReadFrequently:true
   });
 
-  ctx.drawImage(source,0,0);
+  ctx.clearRect(0,0,width,height);
 
-  const image=ctx.getImageData(
+  ctx.drawImage(
+    img,
     0,
     0,
-    w,
-    h
+    width,
+    height
   );
 
-  for(let p=0,i=0;p<alpha.length;p++,i+=4){
-    image.data[i+3]=alpha[p];
+  const imageData=ctx.getImageData(
+    0,
+    0,
+    width,
+    height
+  );
+
+  for(let i=0,p=0;i<imageData.data.length;i+=4,p++){
+    imageData.data[i+3]=alpha[p];
   }
 
-  ctx.putImageData(
-    image,
-    0,
-    0
-  );
+  ctx.putImageData(imageData,0,0);
 
-  return new Promise((resolve,reject)=>{
+  const blob=await new Promise((resolve,reject)=>{
     canvas.toBlob(
-      blob=>{
-        if(blob)resolve(blob);
-        else reject(new Error("PNG export failed."));
+      b=>{
+        if(b)resolve(b);
+        else reject(new Error("PNG creation failed."));
       },
       "image/png"
     );
   });
+
+  return {
+    blob,
+    width,
+    height
+  };
 }
 
-function sleep(){
-  return new Promise(resolve=>setTimeout(resolve,0));
+async function updatePreview(){
+  if(!selected.length)return;
+
+  try{
+    cropPreview.style.opacity="0.5";
+
+    const result=await makeTransparentPNG(selected[0]);
+
+    const url=URL.createObjectURL(result.blob);
+
+    cropPreview.onload=()=>{
+      URL.revokeObjectURL(url);
+      cropPreview.style.opacity="1";
+    };
+
+    cropPreview.src=url;
+  }catch(error){
+    console.error(error);
+    cropPreview.style.opacity="1";
+  }
 }
 
-function setProgress(value,text){
-  const v=Math.max(0,Math.min(100,value));
+function cleanFileName(name){
+  const dot=name.lastIndexOf(".");
 
-  if(progressBar){
-    progressBar.style.width=v+"%";
+  if(dot>0){
+    return name.slice(0,dot);
   }
 
-  if(progressPercent){
-    progressPercent.textContent=Math.round(v)+"%";
-  }
-
-  if(progressText&&text){
-    progressText.textContent=text;
-  }
+  return name;
 }
 
-removeBtn.addEventListener("click",runBackgroundRemoval);
+function outputName(file){
+  return cleanFileName(file.name)+".png";
+}
 
-downloadBtn.addEventListener("click",()=>{
-  if(!outputBlob)return;
+function createResultCard(item){
+  const div=document.createElement("div");
+  div.className="result";
 
-  const filename=currentFile
-    ?currentFile.name.replace(/\.[^.]+$/,"")+"_no-bg.png"
-    :"cut-it-out-no-background.png";
+  const img=document.createElement("img");
+  img.src=URL.createObjectURL(item.blob);
+  img.alt=item.name;
 
-  const url=URL.createObjectURL(outputBlob);
-  const a=document.createElement("a");
+  const done=document.createElement("div");
+  done.className="done";
+  done.textContent="DONE";
 
-  a.href=url;
-  a.download=filename;
+  const download=document.createElement("button");
+  download.type="button";
+  download.className="download-one";
+  download.textContent="⇩";
 
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  download.addEventListener("click",()=>{
+    downloadBlob(item.blob,item.name);
+  });
 
-  setTimeout(()=>{
-    URL.revokeObjectURL(url);
-  },5000);
+  const body=document.createElement("div");
+  body.className="result-body";
+
+  const name=document.createElement("div");
+  name.className="result-name";
+  name.textContent=item.name;
+  name.title=item.name;
+
+  const size=document.createElement("div");
+  size.className="result-size";
+  size.textContent=`${item.width} × ${item.height}`;
+
+  body.append(name,size);
+
+  div.append(
+    img,
+    done,
+    download,
+    body
+  );
+
+  return div;
+}
+
+function renderResults(){
+  results.innerHTML="";
+
+  const start=(currentPage-1)*PAGE_SIZE;
+  const end=start+PAGE_SIZE;
+
+  outputs
+    .slice(start,end)
+    .forEach(item=>{
+      results.appendChild(
+        createResultCard(item)
+      );
+    });
+
+  renderPagination();
+}
+
+function renderPagination(){
+  const pagination=$("pagination");
+
+  if(!pagination)return;
+
+  pagination.innerHTML="";
+
+  const totalPages=Math.max(
+    1,
+    Math.ceil(outputs.length/PAGE_SIZE)
+  );
+
+  if(totalPages<=1)return;
+
+  const previous=document.createElement("button");
+
+  previous.type="button";
+  previous.className="page-btn";
+  previous.textContent="‹";
+  previous.disabled=currentPage<=1;
+
+  previous.addEventListener("click",()=>{
+    if(currentPage>1){
+      currentPage--;
+      renderResults();
+    }
+  });
+
+  pagination.appendChild(previous);
+
+  for(let page=1;page<=totalPages;page++){
+    if(
+      totalPages>7 &&
+      page>3 &&
+      page<totalPages-2 &&
+      Math.abs(page-currentPage)>1
+    ){
+      if(page===4){
+        const dots=document.createElement("span");
+        dots.className="page-info";
+        dots.textContent="…";
+        pagination.appendChild(dots);
+      }
+      continue;
+    }
+
+    const button=document.createElement("button");
+
+    button.type="button";
+    button.className=
+      "page-btn"+
+      (page===currentPage?" active":"");
+
+    button.textContent=page;
+
+    button.addEventListener("click",()=>{
+      currentPage=page;
+      renderResults();
+    });
+
+    pagination.appendChild(button);
+  }
+
+  const next=document.createElement("button");
+
+  next.type="button";
+  next.className="page-btn";
+  next.textContent="›";
+  next.disabled=currentPage>=totalPages;
+
+  next.addEventListener("click",()=>{
+    if(currentPage<totalPages){
+      currentPage++;
+      renderResults();
+    }
+  });
+
+  pagination.appendChild(next);
+
+  const info=document.createElement("span");
+
+  info.className="page-info";
+  info.textContent=
+    `Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
+
+  pagination.appendChild(info);
+}cleanBtn.addEventListener("click",async()=>{
+  if(!selected.length){
+    alert("Select some images first.");
+    return;
+  }
+
+  outputs=[];
+  currentPage=1;
+
+  results.innerHTML="";
+
+  if($("pagination")){
+    $("pagination").innerHTML="";
+  }
+
+  downloadAll.disabled=true;
+  cleanBtn.disabled=true;
+
+  setLocked(true);
+
+  progressCard.style.display="block";
+
+  setProgress(
+    0,
+    "Preparing background-removal AI…"
+  );
+
+  try{
+    await getModel();
+
+    for(let i=0;i<selected.length;i++){
+      const file=selected[i];
+
+      setProgress(
+        (i/selected.length)*100,
+        `Processing ${i+1} of ${selected.length}…`
+      );
+
+      status.textContent=file.name;
+
+      const result=await makeTransparentPNG(file);
+
+      outputs.push({
+        blob:result.blob,
+        name:outputName(file),
+        width:result.width,
+        height:result.height
+      });
+
+      setProgress(
+        ((i+1)/selected.length)*100,
+        `Processing ${i+1} of ${selected.length}…`
+      );
+
+      await new Promise(r=>setTimeout(r,0));
+    }
+
+    setProgress(
+      100,
+      `Finished ${selected.length} image${selected.length===1?"":"s"}`
+    );
+
+    status.textContent=
+      "Transparent PNG files are ready.";
+
+    renderResults();
+
+    downloadAll.disabled=false;
+
+  }catch(error){
+    console.error(error);
+
+    status.textContent=
+      error?.message||
+      "Something went wrong while removing the background.";
+
+    alert(
+      "Background removal failed. Check the browser console for details."
+    );
+  }finally{
+    cleanBtn.disabled=false;
+    setLocked(false);
+  }
 });
+
+downloadAll.addEventListener("click",async()=>{
+  if(!outputs.length)return;
+
+  downloadAll.disabled=true;
+  downloadAll.textContent="Creating ZIP…";
+
+  try{
+    const files=outputs.map(item=>({
+      name:item.name,
+      blob:item.blob
+    }));
+
+    const zip=await makeZip(files);
+
+    downloadBlob(
+      zip,
+      "cut-it-out-background-removed.zip"
+    );
+
+  }catch(error){
+    console.error(error);
+    alert("Could not create the ZIP file.");
+  }finally{
+    downloadAll.disabled=false;
+    downloadAll.textContent="⇩ Download All (.ZIP)";
+  }
+});
+
+function crc32(data){
+  let table=crc32.table;
+
+  if(!table){
+    table=new Uint32Array(256);
+
+    for(let n=0;n<256;n++){
+      let c=n;
+
+      for(let k=0;k<8;k++){
+        c=(c&1)
+          ?0xedb88320^(c>>>1)
+          :c>>>1;
+      }
+
+      table[n]=c>>>0;
+    }
+
+    crc32.table=table;
+  }
+
+  let c=0xffffffff;
+
+  for(let i=0;i<data.length;i++){
+    c=
+      table[(c^data[i])&255]^
+      (c>>>8);
+  }
+
+  return (c^0xffffffff)>>>0;
+}
+
+function u16(arr,n){
+  arr.push(
+    n&255,
+    (n>>>8)&255
+  );
+}
+
+function u32(arr,n){
+  arr.push(
+    n&255,
+    (n>>>8)&255,
+    (n>>>16)&255,
+    (n>>>24)&255
+  );
+}
+
+function textBytes(text){
+  return new TextEncoder().encode(text);
+}
+
+async function makeZip(items){
+  const chunks=[];
+  const central=[];
+
+  let offset=0;
+
+  for(const item of items){
+    const data=new Uint8Array(
+      await item.blob.arrayBuffer()
+    );
+
+    const name=textBytes(item.name);
+    const crc=crc32(data);
+
+    const local=[];
+
+    u32(local,0x04034b50);
+    u16(local,20);
+    u16(local,0);
+    u16(local,0);
+    u16(local,0);
+    u16(local,0);
+    u32(local,crc);
+    u32(local,data.length);
+    u32(local,data.length);
+    u16(local,name.length);
+    u16(local,0);
+
+    chunks.push(
+      new Uint8Array(local),
+      name,
+      data
+    );
+
+    const cen=[];
+
+    u32(cen,0x02014b50);
+    u16(cen,20);
+    u16(cen,20);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u32(cen,crc);
+    u32(cen,data.length);
+    u32(cen,data.length);
+    u16(cen,name.length);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u16(cen,0);
+    u32(cen,0);
+    u32(cen,offset);
+
+    central.push(
+      new Uint8Array(cen),
+      name
+    );
+
+    offset+=
+      local.length+
+      name.length+
+      data.length;
+  }
+
+  const centralOffset=offset;
+  let centralSize=0;
+
+  for(const part of central){
+    chunks.push(part);
+    centralSize+=part.length;
+  }
+
+  const end=[];
+
+  u32(end,0x06054b50);
+  u16(end,0);
+  u16(end,0);
+  u16(end,items.length);
+  u16(end,items.length);
+  u32(end,centralSize);
+  u32(end,centralOffset);
+  u16(end,0);
+
+  chunks.push(
+    new Uint8Array(end)
+  );
+
+  return new Blob(
+    chunks,
+    {type:"application/zip"}
+  );
+}
+
+updateCount();
+
+if(tolVal)tolVal.textContent=tolEl.value;
+if(padVal)padVal.textContent=padEl.value;
+
+setMode("normal");
+
+console.log(
+  "Cut It Out! background remover loaded."
+);
