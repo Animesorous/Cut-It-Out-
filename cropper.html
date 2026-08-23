@@ -187,7 +187,7 @@ input[type=file]{display:none}
 .mode-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .range-wrap{padding:4px 0}
 input[type=range]{
-  --fill:50%;appearance:none;width:100%;height:7px;margin:0;
+  --fill:18%;appearance:none;width:100%;height:7px;margin:0;
   background:linear-gradient(90deg,var(--cyan) 0,var(--blue) var(--fill),rgba(255,255,255,.09) var(--fill),rgba(255,255,255,.09) 100%);
   border-radius:99px;outline:none;cursor:pointer;
   box-shadow:0 0 16px rgba(77,232,255,.08);
@@ -416,295 +416,98 @@ function getImage(file){
   });
 }
 
-// Samples corner pixels to detect the image's background color dynamically
 function detectBgColor(data, w, h) {
-  const corners = [
-    0, // Top-Left
-    (w - 1) * 4, // Top-Right
-    (h - 1) * w * 4, // Bottom-Left
-    ((h - 1) * w + (w - 1)) * 4 // Bottom-Right
-  ];
-  let r = 0, g = 0, b = 0, a = 0;
-  corners.forEach(idx => {
-    r += data[idx];
-    g += data[idx + 1];
-    a += data[idx + 3];
-    b += data[idx + 2];
-  });
-  return [r / 4, g / 4, b / 4, a / 4];
+  let r = 0, g = 0, b = 0, a = 0, count = 0;
+  
+  for (let x = 0; x < w; x += 2) {
+    const iTop = x * 4;
+    const iBot = ((h - 1) * w + x) * 4;
+    r += data[iTop] + data[iBot];
+    g += data[iTop + 1] + data[iBot + 1];
+    b += data[iTop + 2] + data[iBot + 2];
+    a += data[iTop + 3] + data[iBot + 3];
+    count += 2;
+  }
+  for (let y = 0; y < h; y += 2) {
+    const iLeft = (y * w) * 4;
+    const iRight = (y * w + (w - 1)) * 4;
+    r += data[iLeft] + data[iRight];
+    g += data[iLeft + 1] + data[iRight + 1];
+    b += data[iLeft + 2] + data[iRight + 2];
+    a += data[iLeft + 3] + data[iRight + 3];
+    count += 2;
+  }
+  return [r / count, g / count, b / count, a / count];
 }
 
 function isBgPixel(data, idx, bg, maxDist) {
-  if (data[idx + 3] < 10) return true; // Treat transparent as background
+  if (data[idx + 3] < 15) return true;
   const dr = data[idx] - bg[0];
   const dg = data[idx + 1] - bg[1];
   const db = data[idx + 2] - bg[2];
   return Math.sqrt(dr * dr + dg * dg + db * db) <= maxDist;
 }
 
-function cropImageNormal(img,tol,pad){
-  const w=img.naturalWidth,h=img.naturalHeight;
-  const c=document.createElement('canvas');c.width=w;c.height=h;
-  const ctx=c.getContext('2d',{willReadFrequently:true});
-  ctx.drawImage(img,0,0);
-  const d=ctx.getImageData(0,0,w,h).data;
+function cropImageOuter(img, tol, pad, aggressiveMode = false) {
+  const w = img.naturalWidth, h = img.naturalHeight;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0);
+  const d = ctx.getImageData(0, 0, w, h).data;
 
   const bg = detectBgColor(d, w, h);
-  const maxDist = (tol / 100) * 255 * 1.732;
+  const maxDist = (tol / 100) * 180;
 
-  const isNonBgAt=(x,y)=>{
-    const i=(y*w+x)*4;
-    return !isBgPixel(d, i, bg, maxDist);
+  const threshold = aggressiveMode ? 0.005 : 0.02;
+
+  const isRowBackground = (y) => {
+    let bgPixels = 0;
+    const step = Math.max(1, Math.floor(w / 300));
+    let total = 0;
+    for (let x = 0; x < w; x += step) {
+      total++;
+      if (isBgPixel(d, (y * w + x) * 4, bg, maxDist)) bgPixels++;
+    }
+    return (bgPixels / total) >= (1 - threshold);
   };
 
-  const sx=Math.max(1,Math.ceil(w/240));
-  const sy=Math.max(1,Math.ceil(h/240));
-  const gw=Math.ceil(w/sx), gh=Math.ceil(h/sy);
-  const grid=new Uint8Array(gw*gh);
-
-  for(let gy=0;gy<gh;gy++){
-    const y0=gy*sy, y1=Math.min(h,y0+sy);
-    for(let gx=0;gx<gw;gx++){
-      const x0=gx*sx, x1=Math.min(w,x0+sx);
-      let dark=0,total=0;
-      for(let y=y0;y<y1;y++){
-        for(let x=x0;x<x1;x++){
-          total++;
-          if(isNonBgAt(x,y))dark++;
-        }
-      }
-      grid[gy*gw+gx]=dark/Math.max(1,total)>0.035?1:0;
+  const isColBackground = (x) => {
+    let bgPixels = 0;
+    const step = Math.max(1, Math.floor(h / 300));
+    let total = 0;
+    for (let y = 0; y < h; y += step) {
+      total++;
+      if (isBgPixel(d, (y * w + x) * 4, bg, maxDist)) bgPixels++;
     }
-  }
-
-  const rowDensity=new Float32Array(gh);
-  const colDensity=new Float32Array(gw);
-  for(let gy=0;gy<gh;gy++){
-    let n=0;
-    for(let gx=0;gx<gw;gx++)n+=grid[gy*gw+gx];
-    rowDensity[gy]=n/gw;
-  }
-  for(let gx=0;gx<gw;gx++){
-    let n=0;
-    for(let gy=0;gy<gh;gy++)n+=grid[gy*gw+gx];
-    colDensity[gx]=n/gh;
-  }
-
-  function smooth(arr,r){
-    const out=new Float32Array(arr.length);
-    let sum=0;
-    for(let i=0;i<arr.length;i++){
-      sum+=arr[i];
-      if(i-r-1>=0)sum-=arr[i-r-1];
-      const a=Math.max(0,i-r),b=Math.min(arr.length-1,i+r);
-      if(i<r){let q=0;for(let j=a;j<=b;j++)q+=arr[j];out[i]=q/(b-a+1)}
-      else out[i]=sum/Math.min(arr.length,2*r+1);
-    }
-    return out;
-  }
-
-  const rs=smooth(rowDensity,Math.max(2,Math.round(gh*0.015)));
-  const cs=smooth(colDensity,Math.max(2,Math.round(gw*0.015)));
-
-  const threshold=0.075;
-
-  function longestRun(arr){
-    let bestStart=0,bestEnd=-1,bestScore=-1;
-    let start=-1,score=0;
-    for(let i=0;i<arr.length;i++){
-      if(arr[i]>=threshold){
-        if(start<0){start=i;score=0}
-        score+=arr[i];
-      }else if(start>=0){
-        const end=i-1;
-        const len=end-start+1;
-        const value=len*0.65+score*0.35;
-        if(value>bestScore){bestScore=value;bestStart=start;bestEnd=end}
-        start=-1;score=0;
-      }
-    }
-    if(start>=0){
-      const end=arr.length-1,len=end-start+1,value=len*0.65+score*0.35;
-      if(value>bestScore){bestStart=start;bestEnd=end}
-    }
-    return {start:bestStart,end:bestEnd};
-  }
-
-  let yr=longestRun(rs),xr=longestRun(cs);
-
-  if(yr.end<yr.start || xr.end<xr.start){
-    let top=0,bottom=h-1,left=0,right=w-1;
-    const rowHas=(y)=>{let hits=0;for(let x=0;x<w;x+=Math.max(1,Math.floor(w/180))){if(isNonBgAt(x,y))hits++}return hits/Math.ceil(w/Math.max(1,Math.floor(w/180)))>0.006};
-    const colHas=(x)=>{let hits=0;for(let y=0;y<h;y+=Math.max(1,Math.floor(h/180))){if(isNonBgAt(x,y))hits++}return hits/Math.ceil(h/Math.max(1,Math.floor(h/180)))>0.006};
-    while(top<h&&!rowHas(top))top++;
-    while(bottom>=0&&!rowHas(bottom))bottom--;
-    while(left<w&&!colHas(left))left++;
-    while(right>=0&&!colHas(right))right--;
-    if(top>bottom||left>right)return c;
-    left=Math.max(0,left-pad);top=Math.max(0,top-pad);right=Math.min(w-1,right+pad);bottom=Math.min(h-1,bottom+pad);
-    const out=document.createElement('canvas');out.width=right-left+1;out.height=bottom-top+1;
-    out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
-    return out;
-  }
-
-  let top=yr.start*sy;
-  let bottom=Math.min(h-1,(yr.end+1)*sy-1);
-  let left=xr.start*sx;
-  let right=Math.min(w-1,(xr.end+1)*sx-1);
-
-  const rowReal=(y)=>{
-    const step=Math.max(1,Math.floor(w/220));let hits=0,total=0;
-    for(let x=left;x<=right;x+=step){total++;if(isNonBgAt(x,y))hits++}
-    return hits/Math.max(1,total)>=0.012;
-  };
-  const colReal=(x)=>{
-    const step=Math.max(1,Math.floor(h/220));let hits=0,total=0;
-    for(let y=top;y<=bottom;y+=step){total++;if(isNonBgAt(x,y))hits++}
-    return hits/Math.max(1,total)>=0.012;
+    return (bgPixels / total) >= (1 - threshold);
   };
 
-  while(top<bottom&&!rowReal(top))top++;
-  while(bottom>top&&!rowReal(bottom))bottom--;
-  while(left<right&&!colReal(left))left++;
-  while(right>left&&!colReal(right))right--;
+  let top = 0, bottom = h - 1, left = 0, right = w - 1;
 
-  left=Math.max(0,left-pad);
-  top=Math.max(0,top-pad);
-  right=Math.min(w-1,right+pad);
-  bottom=Math.min(h-1,bottom+pad);
+  while (top < h && isRowBackground(top)) top++;
+  while (bottom > top && isRowBackground(bottom)) bottom--;
+  while (left < w && isColBackground(left)) left++;
+  while (right > left && isColBackground(right)) right--;
 
-  const out=document.createElement('canvas');
-  out.width=Math.max(1,right-left+1);
-  out.height=Math.max(1,bottom-top+1);
-  out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
+  if (top >= bottom || left >= right) return c;
+
+  left = Math.max(0, left - pad);
+  top = Math.max(0, top - pad);
+  right = Math.min(w - 1, right + pad);
+  bottom = Math.min(h - 1, bottom + pad);
+
+  const outWidth = right - left + 1;
+  const outHeight = bottom - top + 1;
+
+  const out = document.createElement('canvas');
+  out.width = outWidth;
+  out.height = outHeight;
+  out.getContext('2d').drawImage(c, left, top, outWidth, outHeight, 0, 0, outWidth, outHeight);
   return out;
 }
 
-function cropImageAggressive(img,tol,pad){
-  const w=img.naturalWidth,h=img.naturalHeight;
-  const c=document.createElement('canvas');c.width=w;c.height=h;
-  const ctx=c.getContext('2d',{willReadFrequently:true});
-  ctx.drawImage(img,0,0);
-  const d=ctx.getImageData(0,0,w,h).data;
-
-  const bg = detectBgColor(d, w, h);
-  const maxDist = (tol / 100) * 255 * 1.732;
-
-  const isNonBgAt=(x,y)=>{
-    const i=(y*w+x)*4;
-    return !isBgPixel(d, i, bg, maxDist);
-  };
-
-  const sx=Math.max(1,Math.ceil(w/300));
-  const sy=Math.max(1,Math.ceil(h/300));
-  const gw=Math.ceil(w/sx), gh=Math.ceil(h/sy);
-  const rowDensity=new Float32Array(gh);
-  const colDensity=new Float32Array(gw);
-
-  for(let gy=0;gy<gh;gy++){
-    const y0=gy*sy,y1=Math.min(h,y0+sy);
-    let dark=0,total=0;
-    for(let y=y0;y<y1;y++){
-      for(let x=0;x<w;x+=Math.max(1,Math.floor(w/260))){
-        total++; if(isNonBgAt(x,y))dark++;
-      }
-    }
-    rowDensity[gy]=dark/Math.max(1,total);
-  }
-  for(let gx=0;gx<gw;gx++){
-    const x0=gx*sx,x1=Math.min(w,x0+sx);
-    let dark=0,total=0;
-    for(let x=x0;x<x1;x++){
-      for(let y=0;y<h;y+=Math.max(1,Math.floor(h/260))){
-        total++; if(isNonBgAt(x,y))dark++;
-      }
-    }
-    colDensity[gx]=dark/Math.max(1,total);
-  }
-
-  function smooth(arr,r){
-    const out=new Float32Array(arr.length);
-    for(let i=0;i<arr.length;i++){
-      let sum=0,n=0;
-      for(let j=Math.max(0,i-r);j<=Math.min(arr.length-1,i+r);j++){sum+=arr[j];n++;}
-      out[i]=sum/n;
-    }
-    return out;
-  }
-
-  const rs=smooth(rowDensity,Math.max(2,Math.round(gh*0.012)));
-  const cs=smooth(colDensity,Math.max(2,Math.round(gw*0.012)));
-  const ART_DENSITY=0.025;
-  const MIN_RUN=Math.max(2,Math.round(Math.min(gh,gw)*0.025));
-
-  function findStart(arr){
-    let start=-1,run=0;
-    for(let i=0;i<arr.length;i++){
-      if(arr[i]>=ART_DENSITY){
-        if(start<0)start=i;
-        if(++run>=MIN_RUN)return start;
-      }else{
-        start=-1;run=0;
-      }
-    }
-    return 0;
-  }
-  function findEnd(arr){
-    let end=-1,run=0;
-    for(let i=arr.length-1;i>=0;i--){
-      if(arr[i]>=ART_DENSITY){
-        if(end<0)end=i;
-        if(++run>=MIN_RUN)return end;
-      }else{
-        end=-1;run=0;
-      }
-    }
-    return arr.length-1;
-  }
-
-  let top=findStart(rs),bottom=findEnd(rs),left=findStart(cs),right=findEnd(cs);
-  if(bottom<=top||right<=left)return c;
-
-  top*=sy;
-  bottom=Math.min(h-1,(bottom+1)*sy-1);
-  left*=sx;
-  right=Math.min(w-1,(xr=right+1)*sx-1);
-
-  const rowDensityReal=(y)=>{
-    const step=Math.max(1,Math.floor(w/320));
-    let dark=0,total=0;
-    for(let x=left;x<=right;x+=step){total++;if(isNonBgAt(x,y))dark++;}
-    return dark/Math.max(1,total);
-  };
-  const colDensityReal=(x)=>{
-    const step=Math.max(1,Math.floor(h/320));
-    let dark=0,total=0;
-    for(let y=top;y<=bottom;y+=step){total++;if(isNonBgAt(x,y))dark++;}
-    return dark/Math.max(1,total);
-  };
-
-  const realThreshold=0.018;
-  let guard=0;
-  while(top<bottom && rowDensityReal(top)<realThreshold && guard++<h)top++;
-  guard=0;
-  while(bottom>top && rowDensityReal(bottom)<realThreshold && guard++<h)bottom--;
-  guard=0;
-  while(left<right && colDensityReal(left)<realThreshold && guard++<w)left++;
-  guard=0;
-  while(right>left && colDensityReal(right)<realThreshold && guard++<w)right--;
-
-  left=Math.max(0,left-pad);top=Math.max(0,top-pad);
-  right=Math.min(w-1,right+pad);bottom=Math.min(h-1,bottom+pad);
-
-  const out=document.createElement('canvas');
-  out.width=Math.max(1,right-left+1);
-  out.height=Math.max(1,bottom-top+1);
-  out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
-  return out;
-}
-
-function cropImage(img,tol,pad,mode=cropMode){
-  return mode==='aggressive' ? cropImageAggressive(img,tol,pad) : cropImageNormal(img,tol,pad);
+function cropImage(img, tol, pad, mode = cropMode) {
+  return cropImageOuter(img, tol, pad, mode === 'aggressive');
 }
 
 async function showPreview(file){
