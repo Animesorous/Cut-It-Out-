@@ -416,36 +416,17 @@ function getImage(file){
   });
 }
 
-function detectBgColor(data, w, h) {
-  let r = 0, g = 0, b = 0, a = 0, count = 0;
-  
-  for (let x = 0; x < w; x += 2) {
-    const iTop = x * 4;
-    const iBot = ((h - 1) * w + x) * 4;
-    r += data[iTop] + data[iBot];
-    g += data[iTop + 1] + data[iBot + 1];
-    b += data[iTop + 2] + data[iBot + 2];
-    a += data[iTop + 3] + data[iBot + 3];
-    count += 2;
-  }
-  for (let y = 0; y < h; y += 2) {
-    const iLeft = (y * w) * 4;
-    const iRight = (y * w + (w - 1)) * 4;
-    r += data[iLeft] + data[iRight];
-    g += data[iLeft + 1] + data[iRight + 1];
-    b += data[iLeft + 2] + data[iRight + 2];
-    a += data[iLeft + 3] + data[iRight + 3];
-    count += 2;
-  }
-  return [r / count, g / count, b / count, a / count];
+function getPixelRGB(data, x, y, w) {
+  const i = (y * w + x) * 4;
+  return [data[i], data[i + 1], data[i + 2], data[i + 3]];
 }
 
-function isBgPixel(data, idx, bg, maxDist) {
-  if (data[idx + 3] < 15) return true;
-  const dr = data[idx] - bg[0];
-  const dg = data[idx + 1] - bg[1];
-  const db = data[idx + 2] - bg[2];
-  return Math.sqrt(dr * dr + dg * dg + db * db) <= maxDist;
+function colorDistance(c1, c2) {
+  if (c1[3] < 15 || c2[3] < 15) return c1[3] === c2[3] ? 0 : 255;
+  const dr = c1[0] - c2[0];
+  const dg = c1[1] - c2[1];
+  const db = c1[2] - c2[2];
+  return Math.sqrt(dr * dr + dg * dg + db * db);
 }
 
 function cropImageOuter(img, tol, pad, aggressiveMode = false) {
@@ -455,39 +436,78 @@ function cropImageOuter(img, tol, pad, aggressiveMode = false) {
   ctx.drawImage(img, 0, 0);
   const d = ctx.getImageData(0, 0, w, h).data;
 
-  const bg = detectBgColor(d, w, h);
   const maxDist = (tol / 100) * 180;
-
-  const threshold = aggressiveMode ? 0.005 : 0.02;
-
-  const isRowBackground = (y) => {
-    let bgPixels = 0;
-    const step = Math.max(1, Math.floor(w / 300));
-    let total = 0;
-    for (let x = 0; x < w; x += step) {
-      total++;
-      if (isBgPixel(d, (y * w + x) * 4, bg, maxDist)) bgPixels++;
-    }
-    return (bgPixels / total) >= (1 - threshold);
-  };
-
-  const isColBackground = (x) => {
-    let bgPixels = 0;
-    const step = Math.max(1, Math.floor(h / 300));
-    let total = 0;
-    for (let y = 0; y < h; y += step) {
-      total++;
-      if (isBgPixel(d, (y * w + x) * 4, bg, maxDist)) bgPixels++;
-    }
-    return (bgPixels / total) >= (1 - threshold);
-  };
+  const maxNoiseRatio = aggressiveMode ? 0.005 : 0.02;
 
   let top = 0, bottom = h - 1, left = 0, right = w - 1;
 
-  while (top < h && isRowBackground(top)) top++;
-  while (bottom > top && isRowBackground(bottom)) bottom--;
-  while (left < w && isColBackground(left)) left++;
-  while (right > left && isColBackground(right)) right--;
+  // Scan Top
+  while (top < h) {
+    const edgeColor = getPixelRGB(d, Math.floor(w / 2), top, w);
+    let nonBgCount = 0;
+    const step = Math.max(1, Math.floor(w / 400));
+    let totalSamples = 0;
+
+    for (let x = 0; x < w; x += step) {
+      totalSamples++;
+      const px = getPixelRGB(d, x, top, w);
+      if (colorDistance(px, edgeColor) > maxDist) nonBgCount++;
+    }
+
+    if ((nonBgCount / totalSamples) > maxNoiseRatio) break;
+    top++;
+  }
+
+  // Scan Bottom
+  while (bottom > top) {
+    const edgeColor = getPixelRGB(d, Math.floor(w / 2), bottom, w);
+    let nonBgCount = 0;
+    const step = Math.max(1, Math.floor(w / 400));
+    let totalSamples = 0;
+
+    for (let x = 0; x < w; x += step) {
+      totalSamples++;
+      const px = getPixelRGB(d, x, bottom, w);
+      if (colorDistance(px, edgeColor) > maxDist) nonBgCount++;
+    }
+
+    if ((nonBgCount / totalSamples) > maxNoiseRatio) break;
+    bottom--;
+  }
+
+  // Scan Left
+  while (left < w) {
+    const edgeColor = getPixelRGB(d, left, Math.floor(h / 2), w);
+    let nonBgCount = 0;
+    const step = Math.max(1, Math.floor(h / 400));
+    let totalSamples = 0;
+
+    for (let y = 0; y < h; y += step) {
+      totalSamples++;
+      const px = getPixelRGB(d, left, y, w);
+      if (colorDistance(px, edgeColor) > maxDist) nonBgCount++;
+    }
+
+    if ((nonBgCount / totalSamples) > maxNoiseRatio) break;
+    left++;
+  }
+
+  // Scan Right
+  while (right > left) {
+    const edgeColor = getPixelRGB(d, right, Math.floor(h / 2), w);
+    let nonBgCount = 0;
+    const step = Math.max(1, Math.floor(h / 400));
+    let totalSamples = 0;
+
+    for (let y = 0; y < h; y += step) {
+      totalSamples++;
+      const px = getPixelRGB(d, right, y, w);
+      if (colorDistance(px, edgeColor) > maxDist) nonBgCount++;
+    }
+
+    if ((nonBgCount / totalSamples) > maxNoiseRatio) break;
+    right--;
+  }
 
   if (top >= bottom || left >= right) return c;
 
