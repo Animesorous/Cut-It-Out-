@@ -46,6 +46,11 @@ body:after{
   border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,rgba(77,232,255,.08),transparent 68%);
   filter:blur(8px);
+  animation:pulseGlow 6s ease-in-out infinite alternate;
+}
+@keyframes pulseGlow{
+  0%{transform:scale(1);opacity:.5}
+  100%{transform:scale(1.2);opacity:.9}
 }
 main{width:min(1220px,calc(100% - 28px));margin:auto;padding:30px 0 55px;position:relative;z-index:1}
 .hero{
@@ -58,7 +63,15 @@ main{width:min(1220px,calc(100% - 28px));margin:auto;padding:30px 0 55px;positio
   color:#a9b8d0;font-size:11px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;
   box-shadow:0 0 30px rgba(77,232,255,.06);
 }
-.kicker i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
+.kicker i{
+  width:7px;height:7px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 14px var(--cyan);
+  animation:blinkLight 1.8s infinite ease-in-out;
+}
+@keyframes blinkLight{
+  0%,100%{opacity:1;box-shadow:0 0 14px var(--cyan)}
+  50%{opacity:.3;box-shadow:0 0 4px var(--cyan)}
+}
 h1{
   margin:15px 0 10px;font-size:clamp(42px,7vw,72px);line-height:.92;
   letter-spacing:-3px;font-weight:950;
@@ -108,6 +121,11 @@ h1 span{
   width:58px;height:58px;border-radius:17px;display:grid;place-items:center;margin-bottom:11px;
   border:1px solid rgba(77,232,255,.25);background:rgba(77,232,255,.07);
   color:var(--cyan);font-size:27px;box-shadow:0 0 30px rgba(77,232,255,.08);
+  animation:floatIcon 3s ease-in-out infinite alternate;
+}
+@keyframes floatIcon{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(-5px)}
 }
 .drop-title{font-size:19px;font-weight:900}
 .drop-sub{font-size:13px;color:var(--muted);margin-top:4px}
@@ -133,12 +151,21 @@ input[type=file]{display:none}
 }
 .section-title:before{content:"";display:inline-block;width:3px;height:14px;border-radius:4px;background:var(--cyan);margin-right:8px;vertical-align:-2px;box-shadow:0 0 12px var(--cyan)}
 .signal{font-size:10px;color:#6f819d;display:flex;gap:6px;align-items:center}
-.signal i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.signal i{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 10px var(--green);
+  animation:pulseSignal 1.5s infinite;
+}
+@keyframes pulseSignal{
+  0%{transform:scale(1);box-shadow:0 0 10px var(--green)}
+  50%{transform:scale(1.4);box-shadow:0 0 18px var(--green)}
+  100%{transform:scale(1);box-shadow:0 0 10px var(--green)}
+}
 .setting{margin-bottom:21px}.setting:last-child{margin-bottom:0}
 .setting-head{display:flex;justify-content:space-between;align-items:center;font-weight:850;margin-bottom:9px}
 .help{color:#6f8099;border:1px solid #ffffff16;border-radius:50%;font-size:10px;width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}
 .value{
-  min-width:50px;text-align:center;padding:6px 9px;border-radius:9px;
+  min-width:50px;text-align:center;padding:6px 9px;border-radius:999px;
   border:1px solid rgba(77,232,255,.16);background:rgba(77,232,255,.055);color:#d9f8ff;font-size:12px;font-weight:900;
 }
 .desc{color:#71819a;font-size:12px;line-height:1.45;margin-top:8px}
@@ -173,16 +200,9 @@ input[type=range]::-webkit-slider-thumb{
 input[type=range]::-moz-range-track{height:7px;border-radius:99px;background:rgba(255,255,255,.09)}
 input[type=range]::-moz-range-progress{height:7px;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
 input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#dffbff;border:4px solid #10243a;box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(77,232,255,.6)}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #ffffff0d;background:rgba(255,255,255,.025);border-radius:14px}
-.toggle{position:relative;width:48px;height:27px;flex:none}.toggle input{display:none}
-.toggle-track{position:absolute;inset:0;background:#172237;border:1px solid #ffffff14;border-radius:99px;cursor:pointer;transition:.2s}
-.toggle-track:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:#6f8198;transition:.2s}
-.toggle input:checked+.toggle-track{background:rgba(77,232,255,.18);border-color:var(--cyan);box-shadow:0 0 18px rgba(77,232,255,.12)}
-.toggle input:checked+.toggle-track:before{transform:translateX(21px);background:#dffbff;box-shadow:0 0 12px var(--cyan)}
 .previewbox{min-width:0;contain:layout paint}
 .preview-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .preview-title strong{font-size:13px;letter-spacing:.12em;text-transform:uppercase}
-.preview-meta{font-size:10px;color:#65758f}
 .previews{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .pane{min-width:0}.pane label{display:flex;justify-content:space-between;color:#71839d;font-size:10px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px;padding:0 2px}
 .frame{
@@ -196,7 +216,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 }
 .frame:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(transparent 50%,rgba(77,232,255,.025) 50%);background-size:100% 4px;mix-blend-mode:screen}
 .frame img{max-width:100%;max-height:100%;object-fit:contain;display:block;position:relative;z-index:1}
-.empty{color:#566781;font-size:12px;text-align:center;padding:20px}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 button.action{
   border:1px solid transparent;border-radius:14px;padding:14px 18px;font-weight:950;font-size:13px;cursor:pointer;
@@ -213,7 +232,18 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .progress-top{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:#9badc6}
 .percent{color:var(--cyan);font-weight:950}
 .track{height:8px;background:#111a2a;border:1px solid #ffffff0b;border-radius:999px;overflow:hidden}
-.bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));border-radius:999px;box-shadow:0 0 18px rgba(77,232,255,.5);transition:width .12s}
+.bar{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));
+  background-size:200% 100%;
+  border-radius:999px;box-shadow:0 0 18px rgba(77,232,255,.5);
+  transition:width .12s;
+  animation:barGlow 2s linear infinite;
+}
+@keyframes barGlow{
+  0%{background-position:0% 0%}
+  100%{background-position:200% 0%}
+}
 .status{font-size:11px;color:#63748e;margin-top:8px}
 .results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:14px}
 .result{
@@ -245,162 +275,111 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 <body>
 
 <main>
-<header class="hero">
-  <div class="kicker"><i></i> CROP · LOCAL IMAGE ENGINE</div>
-  <h1>Image Border <span>Cropper</span>
-  <p> class="subtitle">Adaptive border detection for manga panels, screenshots and artwork — preserving the original pixels while trimming the outer background.</p>
-  <div class="badges">
-    <div class="badge">🔒 <b> LOCAL </b> processing </div>
-    <div class="badge">⚡ <b> HIGH-RES </b> export </div>
-    <div class="badge">🌈 <b> ADAPTIVE </b> color analysis </div>
-  </div>
-</header>
+  <header class="hero">
+    <div class="kicker"><i></i> CROP · LOCAL IMAGE ENGINE</div>
+    <h1>Cut It <span>Out!</span> ✂️</h1>
+    <p class="subtitle">Remove unwanted borders from any images — fast, free, and right in your browser.</p>
+    <div class="badges">
+      <div class="badge">🔒 <b>100% Private</b></div>
+      <div class="badge">☁️ <b>No Uploads</b></div>
+      <div class="badge">🪙 <b>100% Free</b></div>
+    </div>
+  </header>
 
-<section class="card workspace">
-  <div class="drop" id="drop">
-    <div class="drop-icon">⌁</div>
-    <div class="drop-title">Import image into the scan core</div>
-    <div class="drop-sub">Tap here or drag &amp; drop an image</div>
-    <div class="count" id="count"><span>◌</span><strong>0</strong> images selected</div>
-    <input id="files" type="file" accept="image/*" multiple>
-  </div>
-
-  <div class="settings-preview">
-    <div class="settings" id="settings">
-      <div class="section-head">
-        <div class="section-title">Detection Core</div>
-        <div class="signal"><i></i> ONLINE</div>
-      </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Crop Mode <span class="help" title="Normal is conservative. Aggressive pushes deeper into connected outer background.">?</span></span>
-        </div>
-        <div class="mode-group">
-          <button type="button" class="mode-btn active" id="modeNormal">
-            NORMAL
-            <small>Balanced border segmentation with stronger artwork protection.</small>
-          </button>
-          <button type="button" class="mode-btn" id="modeAggressive">
-            AGGRESSIVE
-            <small>Stronger region growth and tighter boundary decisions.</small>
-          </button>
-        </div>
-      </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Adaptive Tolerance <span class="help" title="Controls how much local color variation can remain connected to the outside background.">?</span></span>
-          <span class="value" id="tolVal">34</span>
-        </div>
-        <div class="range-wrap"><input id="tol" type="range" min="1" max="100" value="34"></div>
-        <div class="desc">Higher values follow noisier borders and gradients. Lower values protect fine artwork edges.</div>
-      </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Safety Margin <span class="help" title="Adds pixels around the detected content box.">?</span></span>
-          <span class="value" id="padVal">2 px</span>
-        </div>
-        <div class="range-wrap"><input id="pad" type="range" min="0" max="30" value="2"></div>
-        <div class="desc">Keep a little breathing room when important artwork touches the detected boundary.</div>
-      </div>
-
-      <div class="setting">
-        <div class="setting-head">
-          <span>Edge Learning</span>
-          <span id="selfState" class="value">ON</span>
-        </div>
-        <div class="toggle-row">
-          <div class="desc" style="margin:0">Learns the outer color/texture profile before growing the background region.</div>
-          <label class="toggle">
-            <input id="selfImprove" type="checkbox" checked>
-            <span class="toggle-track"></span>
-          </label>
-        </div>
-      </div>
-
-      <button type="button" class="action secondary" id="reset" style="width:100%;margin-top:18px">↻ RESET CORE</button>
+  <section class="card workspace">
+    <div class="drop" id="drop">
+      <div class="drop-icon">▧</div>
+      <div class="drop-title">Tap to select images</div>
+      <div class="drop-sub">or drag &amp; drop here</div>
+      <div class="count" id="count"><span>○</span><strong>0</strong> images selected</div>
+      <input id="files" type="file" accept="image/*" multiple>
     </div>
 
-    <div class="previewbox">
-      <div class="preview-title">
-        <strong>Live Preview</strong>
-        <span class="preview-meta" id="previewMeta">WAITING FOR IMAGE</span>
-      </div>
-      <div class="previews">
-        <div class="pane">
-          <label><span>Original</span><span id="originalMeta">—</span></label>
-          <div class="frame"><div class="empty" id="origEmpty">Choose an image to begin.</div><img id="origPreview" alt="" style="display:none"></div>
+    <div class="settings-preview">
+      <div class="settings" id="settings">
+        <div class="section-head">
+          <div class="section-title">Detection Core</div>
+          <div class="signal"><i></i> ONLINE</div>
         </div>
-        <div class="pane">
-          <label><span>Detected Content</span><span id="cropMeta">—</span></label>
-          <div class="frame"><div class="empty" id="cropEmpty">The detected crop will appear here.</div><img id="cropPreview" alt="" style="display:none"></div>
+
+        <div class="setting">
+          <div class="setting-head">
+            <span>Crop Mode <span class="help" title="Choose how aggressively white background is removed">?</span></span>
+          </div>
+          <div class="mode-group">
+            <button type="button" class="mode-btn active" id="modeNormal">
+              Safe / Normal
+              <small>Targets the outer white border while protecting light artwork.</small>
+            </button>
+            <button type="button" class="mode-btn" id="modeAggressive">
+              Aggressive / All White
+              <small>Trims white background more aggressively, including very light areas.</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="setting-head">
+            <span>Tolerance <span class="help" title="How close a pixel must be to white before it is treated as background">?</span></span>
+            <span class="value" id="tolVal">18</span>
+          </div>
+          <div class="range-wrap"><input id="tol" type="range" min="1" max="100" value="18"></div>
+          <div class="desc">Higher removes more near-white background.<br>Lower preserves more very light artwork.</div>
+        </div>
+
+        <div class="setting">
+          <div class="setting-head">
+            <span>Safety Margin (px) <span class="help" title="Adds a small border back around the detected artwork">?</span></span>
+            <span class="value" id="padVal">2 px</span>
+          </div>
+          <div class="range-wrap"><input id="pad" type="range" min="0" max="20" value="2"></div>
+          <div class="desc">Keeps a small margin around the content so important details don't get cut off.</div>
+        </div>
+
+        <button type="button" class="action secondary" id="reset" style="width:100%;margin-top:18px">↻ RESET SETTINGS</button>
+      </div>
+
+      <div class="previewbox">
+        <div class="preview-title">
+          <strong>Live Preview</strong>
+        </div>
+        <div class="previews">
+          <div class="pane"><label>Original</label><div class="frame"><img id="origPreview"></div></div>
+          <div class="pane"><label>Preview (Current Settings)</label><div class="frame"><img id="cropPreview"></div></div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="actions">
-    <button type="button" class="action secondary" id="clean">✦ RUN HIGH-QUALITY CROP</button>
-    <button type="button" class="action primary" id="downloadAll" disabled>⇩ DOWNLOAD ALL (.ZIP)</button>
-  </div>
-  <div class="note">Analysis is local and resolution-preserving. The exported image is cropped directly from the original source.</div>
-</section>
+    <div class="actions">
+      <button type="button" class="action secondary" id="clean">✣ CLEAN IMAGES</button>
+      <button type="button" class="action primary" id="downloadAll" disabled>⇩ DOWNLOAD ALL (.ZIP)</button>
+    </div>
+    <div class="note">The processing happens on your device. Your images are not sent anywhere.</div>
+  </section>
 
-<section class="card progress-card" id="progressCard">
-  <div class="progress-top"><span id="progressText">Processing…</span><span class="percent" id="percent">0%</span></div>
-  <div class="track"><div class="bar" id="bar"></div></div>
-  <div class="status" id="status"></div>
-</section>
+  <section class="card progress-card" id="progressCard">
+    <div class="progress-top"><span id="progressText">Processing…</span><span class="percent" id="percent">0%</span></div>
+    <div class="track"><div class="bar" id="bar"></div></div>
+    <div class="status" id="status"></div>
+  </section>
 
-<div class="results" id="results"></div>
-<div class="pagination" id="pagination"></div>
+  <div class="results" id="results"></div>
+  <div class="pagination" id="pagination"></div>
 </main>
 
 <script>
 const $=id=>document.getElementById(id);
+const filesEl=$('files'),drop=$('drop'),count=$('count');
+const tolEl=$('tol'),padEl=$('pad'),tolVal=$('tolVal');
+const padVal=$('padVal'),cleanBtn=$('clean'),downloadAll=$('downloadAll');
+const modeNormal=$('modeNormal'),modeAggressive=$('modeAggressive');
+const resetBtn=$('reset'),settingsBox=$('settings');
+const origPreview=$('origPreview'),cropPreview=$('cropPreview');
+const results=$('results'),pagination=$('pagination');
+const progressCard=$('progressCard'),bar=$('bar'),percent=$('percent');
+const progressText=$('progressText'),status=$('status');
 
-const filesEl=$('files');
-const drop=$('drop');
-const count=$('count');
-const tolEl=$('tol');
-const padEl=$('pad');
-const tolVal=$('tolVal');
-const padVal=$('padVal');
-const cleanBtn=$('clean');
-const downloadAll=$('downloadAll');
-const modeNormal=$('modeNormal');
-const modeAggressive=$('modeAggressive');
-const resetBtn=$('reset');
-const settingsBox=$('settings');
-const origPreview=$('origPreview');
-const cropPreview=$('cropPreview');
-const origEmpty=$('origEmpty');
-const cropEmpty=$('cropEmpty');
-const originalMeta=$('originalMeta');
-const cropMeta=$('cropMeta');
-const previewMeta=$('previewMeta');
-const results=$('results');
-const pagination=$('pagination');
-const progressCard=$('progressCard');
-const bar=$('bar');
-const percent=$('percent');
-const progressText=$('progressText');
-const status=$('status');
-const selfImprove=$('selfImprove');
-const selfState=$('selfState');
-
-let selected=[];
-let outputs=[];
-let previewUrl=null;
-let currentPage=1;
-let cropMode='normal';
-let previewToken=0;
-let busy=false;
-let previewTimer=null;
-let previewRunning=false;
-
+let selected=[],outputs=[],previewUrl=null,currentPage=1,cropMode='normal';
 const PAGE_SIZE=20;
 
 function updateSlider(el){
@@ -413,582 +392,361 @@ function updateSlider(el){
 updateSlider(tolEl);
 updateSlider(padEl);
 
-function setCount(){
-  count.innerHTML='<span style="color:var(--green)">✓</span><strong>'+selected.length+'</strong> image'+(selected.length===1?'':'s')+' selected';
-}
-function setPreviewMeta(text){previewMeta.textContent=text}
-function yieldUI(){return new Promise(r=>setTimeout(r,0))}
-
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-drop.addEventListener('click',e=>{if(e.target!==filesEl&&!busy)filesEl.click()});
-drop.addEventListener('keydown',e=>{
-  if((e.key==='Enter'||e.key===' ')&&!busy){e.preventDefault();filesEl.click()}
-});
-drop.setAttribute('role','button');
-drop.setAttribute('tabindex','0');
-drop.addEventListener('dragover',e=>{e.preventDefault();if(!busy)drop.classList.add('drag')});
+drop.addEventListener('click',()=>filesEl.click());
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag')});
 drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
 drop.addEventListener('drop',e=>{
   e.preventDefault();drop.classList.remove('drag');
-  if(!busy)setFiles(Array.from(e.dataTransfer.files||[]));
+  setFiles([...e.dataTransfer.files]);
 });
-filesEl.addEventListener('change',()=>setFiles(Array.from(filesEl.files||[])));
+filesEl.addEventListener('change',()=>setFiles([...filesEl.files]));
 
 function setFiles(arr){
-  selected=arr.filter(f=>f&&f.type&&f.type.startsWith('image/'));
-  setCount();
-  outputs=[];
-  results.innerHTML='';
-  pagination.innerHTML='';
-  downloadAll.disabled=true;
-  if(!selected.length){
-    origPreview.style.display='none';cropPreview.style.display='none';
-    origEmpty.style.display='block';cropEmpty.style.display='block';
-    originalMeta.textContent='—';cropMeta.textContent='—';setPreviewMeta('WAITING FOR IMAGE');
-    return;
-  }
-  showPreview(selected[0]);
+  selected=arr.filter(f=>f.type.startsWith('image/'));
+  count.innerHTML=`<span style="color:var(--green)">✓</span><strong>${selected.length}</strong> images selected`;
+  if(selected.length)showPreview(selected[0]);
 }
 
 function getImage(file){
   return new Promise((resolve,reject)=>{
     const img=new Image();
-    const url=URL.createObjectURL(file);
-    img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};
-    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Could not load image'))};
-    img.src=url;
+    img.onload=()=>resolve(img);
+    img.onerror=reject;
+    img.src=URL.createObjectURL(file);
   });
 }
 
-function rgbDist(r1,g1,b1,r2,g2,b2){
-  const dr=r1-r2,dg=g1-g2,db=b1-b2;
-  return Math.sqrt(dr*dr+dg*dg+db*db);
-}
-function lum(r,g,b){return .2126*r+.7152*g+.0722*b}
-function clamp(v,a,b){return v<a?a:v>b?b:v}
-function median(a){
-  if(!a.length)return 0;
-  const b=Array.from(a).sort((x,y)=>x-y);
-  return b[(b.length-1)>>1];
-}
-function percentile(a,p){
-  if(!a.length)return 0;
-  const b=Array.from(a).sort((x,y)=>x-y);
-  return b[Math.min(b.length-1,Math.max(0,Math.floor((b.length-1)*p)))];
-}
-
-function buildAnalysis(img,maxSide=900){
-  const ow=img.naturalWidth||img.width,oh=img.naturalHeight||img.height;
-  const scale=Math.min(1,maxSide/Math.max(ow,oh));
-  const w=Math.max(2,Math.round(ow*scale)),h=Math.max(2,Math.round(oh*scale));
+function cropImageNormal(img,tol,pad){
+  const w=img.naturalWidth,h=img.naturalHeight;
   const c=document.createElement('canvas');c.width=w;c.height=h;
   const ctx=c.getContext('2d',{willReadFrequently:true});
-  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  ctx.drawImage(img,0,0,w,h);
+  ctx.drawImage(img,0,0);
   const d=ctx.getImageData(0,0,w,h).data;
-  return {w,h,d,ow,oh,sx:ow/w,sy:oh/h};
-}
 
-function outerProfile(d,w,h){
-  const band=Math.max(3,Math.floor(Math.min(w,h)*.055));
-  const samples=[];
-  const sideMeans={top:[],right:[],bottom:[],left:[]};
-
-  function pix(x,y){
-    const p=(y*w+x)*4;
-    return [d[p],d[p+1],d[p+2],d[p+3]];
-  }
-  function collect(side){
-    const arr=sideMeans[side];
-    const count=side==='top'||side==='bottom'?w:h;
-    const stride=Math.max(1,Math.floor(count/180));
-    for(let q=0;q<count;q+=stride){
-      let x,y;
-      if(side==='top'){x=q;y=Math.min(h-1,Math.floor(band*.5))}
-      if(side==='bottom'){x=q;y=Math.max(0,h-1-Math.floor(band*.5))}
-      if(side==='left'){x=Math.min(w-1,Math.floor(band*.5));y=q}
-      if(side==='right'){x=Math.max(0,w-1-Math.floor(band*.5));y=q}
-      const p=pix(x,y);arr.push(p);
-      samples.push(p);
-    }
-  }
-  collect('top');collect('right');collect('bottom');collect('left');
-
-  for(let y=0;y<h;y+=Math.max(1,Math.floor(h/90))){
-    for(let x=0;x<w;x+=Math.max(1,Math.floor(w/90))){
-      if(x<band||x>=w-band||y<band||y>=h-band){
-        const p=(y*w+x)*4;
-        samples.push([d[p],d[p+1],d[p+2],d[p+3]]);
-      }
-    }
-  }
-
-  const rs=samples.map(p=>p[0]),gs=samples.map(p=>p[1]),bs=samples.map(p=>p[2]);
-  const lumv=samples.map(p=>lum(p[0],p[1],p[2]));
-  return {
-    median:[median(rs),median(gs),median(bs)],
-    spread:[percentile(rs,.9)-percentile(rs,.1),percentile(gs,.9)-percentile(gs,.1),percentile(bs,.9)-percentile(bs,.1)],
-    lumaSpread:percentile(lumv,.9)-percentile(lumv,.1),
-    sides:sideMeans
+  const cutoff=Math.max(70,255-tol);
+  const lumAt=(x,y)=>{
+    const i=(y*w+x)*4;
+    if(d[i+3]<10)return 255;
+    return 0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2];
   };
-}
 
-function buildEdgeMap(d,w,h){
-  const edge=new Uint8Array(w*h);
-  const texture=new Uint8Array(w*h);
-  for(let y=0;y<h;y++){
-    for(let x=0;x<w;x++){
-      const i=(y*w+x)*4;
-      const r=d[i],g=d[i+1],b=d[i+2];
-      let sum=0,n=0,maxv=0;
-      if(x>0){
-        const q=i-4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
+  const sx=Math.max(1,Math.ceil(w/240));
+  const sy=Math.max(1,Math.ceil(h/240));
+  const gw=Math.ceil(w/sx), gh=Math.ceil(h/sy);
+  const grid=new Uint8Array(gw*gh);
+
+  for(let gy=0;gy<gh;gy++){
+    const y0=gy*sy, y1=Math.min(h,y0+sy);
+    for(let gx=0;gx<gw;gx++){
+      const x0=gx*sx, x1=Math.min(w,x0+sx);
+      let dark=0,total=0;
+      for(let y=y0;y<y1;y++){
+        for(let x=x0;x<x1;x++){
+          total++;
+          if(lumAt(x,y)<cutoff)dark++;
+        }
       }
-      if(x<w-1){
-        const q=i+4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
-      }
-      if(y>0){
-        const q=i-w*4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
-      }
-      if(y<h-1){
-        const q=i+w*4,v=rgbDist(r,g,b,d[q],d[q+1],d[q+2]);
-        sum+=v;n++;if(v>maxv)maxv=v;
-      }
-      edge[y*w+x]=Math.round(clamp((sum/Math.max(1,n))*.9+maxv*.35,0,255));
-      texture[y*w+x]=Math.round(clamp(sum/Math.max(1,n),0,255));
-    }
-  }
-  return {edge,texture};
-}
-
-function localColor(d,i,j){
-  return rgbDist(d[i],d[i+1],d[i+2],d[j],d[j+1],d[j+2]);
-}
-
-function growOuterBackground(info,features,tol,mode,learning){
-  const {w,h,d}=info;
-  const {edge,texture}=features;
-  const aggressive=mode==='aggressive';
-  const profile=outerProfile(d,w,h);
-
-  const borderNoise=Math.max(
-    2,
-    percentile(Array.from(texture).filter(v=>v>0),.72)
-  );
-  const edgeBase=Math.max(7,percentile(Array.from(edge),.78));
-
-  const colorLimit=(aggressive?18:12)+tol*.72+(profile.lumaSpread*.025);
-  const edgeLimit=(aggressive?42:30)+tol*.48+edgeBase*.35;
-  const noisyLimit=borderNoise*.95+tol*.55;
-
-  const state=new Uint8Array(w*h);
-  const q=new Int32Array(w*h);
-  const seedCost=new Float32Array(w*h);
-  let head=0,tail=0;
-
-  function push(i,cost){
-    if(state[i]!==0)return;
-    state[i]=2;q[tail]=i;seedCost[i]=cost;tail++;
-  }
-
-  for(let x=0;x<w;x++){push(x,0);if(h>1)push((h-1)*w+x,0)}
-  for(let y=1;y<h-1;y++){push(y*w,0);if(w>1)push(y*w+w-1,0)}
-
-  let learnedR=profile.median[0],learnedG=profile.median[1],learnedB=profile.median[2];
-  let learnedN=0;
-  const learnCap=Math.max(120,Math.floor(w*h*.035));
-
-  function accept(cur,next){
-    const ci=cur*4,ni=next*4;
-    const cd=localColor(d,ci,ni);
-    const e=Math.max(edge[cur],edge[next]);
-    const t=Math.max(texture[cur],texture[next]);
-
-    if(cd>colorLimit*1.75 && t>noisyLimit)return false;
-    if(e>edgeLimit && cd>colorLimit*.72)return false;
-
-    if(learning&&learnedN>24){
-      const drift=rgbDist(d[ni],d[ni+1],d[ni+2],learnedR,learnedG,learnedB);
-      const driftLimit=colorLimit*(aggressive?4.8:3.6);
-      if(drift>driftLimit && e>edgeLimit*.7)return false;
-    }
-    return true;
-  }
-
-  while(head<tail){
-    const cur=q[head++];state[cur]=1;
-    const y=Math.floor(cur/w),x=cur-y*w;
-    const ns=[];
-    if(x>0)ns.push(cur-1);
-    if(x<w-1)ns.push(cur+1);
-    if(y>0)ns.push(cur-w);
-    if(y<h-1)ns.push(cur+w);
-
-    for(const next of ns){
-      if(state[next]!==0||!accept(cur,next))continue;
-      push(next,0);
-      if(learning&&learnedN<learnCap){
-        const p=next*4;
-        learnedR=(learnedR*learnedN+d[p])/(learnedN+1);
-        learnedG=(learnedG*learnedN+d[p+1])/(learnedN+1);
-        learnedB=(learnedB*learnedN+d[p+2])/(learnedN+1);
-        learnedN++;
-      }
+      grid[gy*gw+gx]=dark/Math.max(1,total)>0.035?1:0;
     }
   }
 
-  return {
-    mask:state,
-    colorLimit,
-    edgeLimit,
-    profile,
-    backgroundCount:state.reduce((n,v)=>n+(v===1?1:0),0)
+  const rowDensity=new Float32Array(gh);
+  const colDensity=new Float32Array(gw);
+  for(let gy=0;gy<gh;gy++){
+    let n=0;
+    for(let gx=0;gx<gw;gx++)n+=grid[gy*gw+gx];
+    rowDensity[gy]=n/gw;
+  }
+  for(let gx=0;gx<gw;gx++){
+    let n=0;
+    for(let gy=0;gy<gh;gy++)n+=grid[gy*gw+gx];
+    colDensity[gx]=n/gh;
+  }
+
+  function smooth(arr,r){
+    const out=new Float32Array(arr.length);
+    let sum=0;
+    for(let i=0;i<arr.length;i++){
+      sum+=arr[i];
+      if(i-r-1>=0)sum-=arr[i-r-1];
+      const a=Math.max(0,i-r),b=Math.min(arr.length-1,i+r);
+      if(i<r){let q=0;for(let j=a;j<=b;j++)q+=arr[j];out[i]=q/(b-a+1)}
+      else out[i]=sum/Math.min(arr.length,2*r+1);
+    }
+    return out;
+  }
+
+  const rs=smooth(rowDensity,Math.max(2,Math.round(gh*0.015)));
+  const cs=smooth(colDensity,Math.max(2,Math.round(gw*0.015)));
+
+  const threshold=0.075;
+
+  function longestRun(arr){
+    let bestStart=0,bestEnd=-1,bestScore=-1;
+    let start=-1,score=0;
+    for(let i=0;i<arr.length;i++){
+      if(arr[i]>=threshold){
+        if(start<0){start=i;score=0}
+        score+=arr[i];
+      }else if(start>=0){
+        const end=i-1;
+        const len=end-start+1;
+        const value=len*0.65+score*0.35;
+        if(value>bestScore){bestScore=value;bestStart=start;bestEnd=end}
+        start=-1;score=0;
+      }
+    }
+    if(start>=0){
+      const end=arr.length-1,len=end-start+1,value=len*0.65+score*0.35;
+      if(value>bestScore){bestStart=start;bestEnd=end}
+    }
+    return {start:bestStart,end:bestEnd};
+  }
+
+  let yr=longestRun(rs),xr=longestRun(cs);
+
+  if(yr.end<yr.start || xr.end<xr.start){
+    const darkAt=(x,y)=>lumAt(x,y)<cutoff;
+    let top=0,bottom=h-1,left=0,right=w-1;
+    const rowHas=(y)=>{let hits=0;for(let x=0;x<w;x+=Math.max(1,Math.floor(w/180))){if(darkAt(x,y))hits++}return hits/Math.ceil(w/Math.max(1,Math.floor(w/180)))>0.006};
+    const colHas=(x)=>{let hits=0;for(let y=0;y<h;y+=Math.max(1,Math.floor(h/180))){if(darkAt(x,y))hits++}return hits/Math.ceil(h/Math.max(1,Math.floor(h/180)))>0.006};
+    while(top<h&&!rowHas(top))top++;
+    while(bottom>=0&&!rowHas(bottom))bottom--;
+    while(left<w&&!colHas(left))left++;
+    while(right>=0&&!colHas(right))right--;
+    if(top>bottom||left>right)return c;
+    left=Math.max(0,left-pad);top=Math.max(0,top-pad);right=Math.min(w-1,right+pad);bottom=Math.min(h-1,bottom+pad);
+    const out=document.createElement('canvas');out.width=right-left+1;out.height=bottom-top+1;
+    out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
+    return out;
+  }
+
+  let top=yr.start*sy;
+  let bottom=Math.min(h-1,(yr.end+1)*sy-1);
+  let left=xr.start*sx;
+  let right=Math.min(w-1,(xr.end+1)*sx-1);
+
+  const rowReal=(y)=>{
+    const step=Math.max(1,Math.floor(w/220));let hits=0,total=0;
+    for(let x=left;x<=right;x+=step){total++;if(lumAt(x,y)<cutoff)hits++}
+    return hits/Math.max(1,total)>=0.012;
   };
-}
-
-function sideScore(mask,w,h,side,offset){
-  let bg=0,total=0;
-  const span=side==='top'||side==='bottom'?w:h;
-  const step=Math.max(1,Math.floor(span/500));
-  if(side==='top'||side==='bottom'){
-    const y=side==='top'?offset:h-1-offset;
-    for(let x=0;x<w;x+=step){total++;if(mask[y*w+x]===1)bg++}
-  }else{
-    const x=side==='left'?offset:w-1-offset;
-    for(let y=0;y<h;y+=step){total++;if(mask[y*w+x]===1)bg++}
-  }
-  return bg/Math.max(1,total);
-}
-
-function sideEdgeProfile(d,w,h,side,depth){
-  let sum=0, strong=0, total=0;
-  const span=side==='top'||side==='bottom'?w:h;
-  const stride=Math.max(1,Math.floor(span/420));
-
-  if(side==='top'||side==='bottom'){
-    const y=side==='top'?depth:h-1-depth;
-    if(y<1||y>=h-1)return {mean:0,strong:0};
-    for(let x=1;x<w-1;x+=stride){
-      const p=(y*w+x)*4;
-      const q1=((y-1)*w+x)*4;
-      const q2=((y+1)*w+x)*4;
-      const v=(rgbDist(d[p],d[p+1],d[p+2],d[q1],d[q1+1],d[q1+2])+
-               rgbDist(d[p],d[p+1],d[p+2],d[q2],d[q2+1],d[q2+2]))*.5;
-      sum+=v;
-      if(v>24)strong++;
-      total++;
-    }
-  }else{
-    const x=side==='left'?depth:w-1-depth;
-    if(x<1||x>=w-1)return {mean:0,strong:0};
-    for(let y=1;y<h-1;y+=stride){
-      const p=(y*w+x)*4;
-      const q1=(y*w+x-1)*4;
-      const q2=(y*w+x+1)*4;
-      const v=(rgbDist(d[p],d[p+1],d[p+2],d[q1],d[q1+1],d[q1+2])+
-               rgbDist(d[p],d[p+1],d[p+2],d[q2],d[q2+1],d[q2+2]))*.5;
-      sum+=v;
-      if(v>24)strong++;
-      total++;
-    }
-  }
-
-  return {
-    mean:sum/Math.max(1,total),
-    strong:strong/Math.max(1,total)
+  const colReal=(x)=>{
+    const step=Math.max(1,Math.floor(h/220));let hits=0,total=0;
+    for(let y=top;y<=bottom;y+=step){total++;if(lumAt(x,y)<cutoff)hits++}
+    return hits/Math.max(1,total)>=0.012;
   };
-}
 
-function aggressiveBoundary(mask,info,side,tol){
-  const {w,h,d}=info;
-  const span=side==='top'||side==='bottom'?h:w;
-  const maxDepth=Math.floor(span*.44);
+  while(top<bottom&&!rowReal(top))top++;
+  while(bottom>top&&!rowReal(bottom))bottom--;
+  while(left<right&&!colReal(left))left++;
+  while(right>left&&!colReal(right))right--;
 
-  let best=-1;
-  let bestScore=0;
-
-  const baseNeed=Math.max(.56,Math.min(.82,.74-tol*.0025));
-
-  for(let depth=2;depth<maxDepth;depth++){
-    const bg0=sideScore(mask,w,h,side,Math.max(0,depth-2));
-    const bg1=sideScore(mask,w,h,side,depth);
-    const bg2=sideScore(mask,w,h,side,Math.min(maxDepth,depth+2));
-
-    const transition=Math.max(
-      0,
-      bg0-Math.min(bg1,bg2)
-    );
-
-    const edge=sideEdgeProfile(d,w,h,side,depth);
-    const persistence=Math.max(0,bg0-bg2);
-
-    const score=
-      transition*1.55+
-      persistence*0.75+
-      Math.min(1,edge.strong*2.4)*0.85+
-      Math.min(1,edge.mean/80)*0.45;
-
-    if(bg0>=baseNeed &&
-       transition>=.11 &&
-       (edge.strong>=.12 || edge.mean>=30) &&
-       bg2<=bg0-.07 &&
-       score>bestScore){
-      bestScore=score;
-      best=depth;
-    }
-  }
-
-  if(best<0)return 0;
-
-  let confirmations=0;
-  for(let d=Math.max(2,best-3);d<=Math.min(maxDepth,best+3);d++){
-    const s=sideScore(mask,w,h,side,d);
-    if(s<baseNeed-.03)confirmations++;
-  }
-
-  if(confirmations<3)return 0;
-
-  return best;
-}
-
-function persistentBoundary(mask,w,h,side,mode,info,tol){
-  const aggressive=mode==='aggressive';
-  const span=side==='top'||side==='bottom'?h:w;
-  const maxDepth=Math.floor(span*.48);
-
-  let previous=sideScore(mask,w,h,side,0);
-  let bestDepth=0;
-  let bestDrop=0;
-
-  for(let d=1;d<=maxDepth;d++){
-    const s=sideScore(mask,w,h,side,d);
-    const drop=previous-s;
-    if(drop>bestDrop){
-      bestDrop=drop;
-      bestDepth=d;
-    }
-    previous=s;
-  }
-
-  if(aggressive && info){
-    const strong=aggressiveBoundary(mask,info,side,tol);
-    if(strong>0){
-      const cap=Math.min(
-        Math.floor(span*.44),
-        Math.max(strong,Math.floor(bestDepth*1.55)+3)
-      );
-      return Math.min(strong,cap);
-    }
-  }
-
-  const threshold=aggressive?.58:.70;
-  let run=0;
-
-  for(let d=0;d<=maxDepth;d++){
-    const s=sideScore(mask,w,h,side,d);
-    if(s<threshold){
-      run++;
-      if(run>=Math.max(2,Math.floor(span*.006))){
-        return Math.max(0,d-run+1);
-      }
-    }else{
-      run=0;
-    }
-  }
-
-  if(bestDrop>0.18)return bestDepth;
-  return 0;
-}
-
-async function refineBounds(info,grown,pad,mode){
-  const {w,h,ow,oh}=info;
-  const mask=grown.mask;
-
-  const leftA=persistentBoundary(mask,w,h,'left',mode,info,info._tol);
-  const rightA=persistentBoundary(mask,w,h,'right',mode,info,info._tol);
-  const topA=persistentBoundary(mask,w,h,'top',mode,info,info._tol);
-  const bottomA=persistentBoundary(mask,w,h,'bottom',mode,info,info._tol);
-
-  let left=Math.floor(Math.max(0,leftA-1)*ow/w);
-  let right=Math.ceil(Math.min(w-1,w-1-rightA+1)*ow/w)-1;
-  let top=Math.floor(Math.max(0,topA-1)*oh/h);
-  let bottom=Math.ceil(Math.min(h-1,h-1-bottomA+1)*oh/h)-1;
-
-  left=clamp(left,0,ow-1);right=clamp(right,0,ow-1);
-  top=clamp(top,0,oh-1);bottom=clamp(bottom,0,oh-1);
-
-  left=Math.max(0,left-pad);top=Math.max(0,top-pad);
-  right=Math.min(ow-1,right+pad);bottom=Math.min(oh-1,bottom+pad);
-
-  const cw=right-left+1,ch=bottom-top+1;
-  const area=cw*ch/(ow*oh);
-
-  if(cw<Math.max(8,ow*.035)||ch<Math.max(8,oh*.035)||area<.035){
-    return {left:0,top:0,right:ow-1,bottom:oh-1,confidence:'low',removed:0};
-  }
-
-  const removed=(left)+(ow-1-right)+(top)+(oh-1-bottom);
-  const maxSideRemoved=Math.max(left,ow-1-right,top,oh-1-bottom);
-  const confidence=removed===0?'none':maxSideRemoved>Math.max(ow,oh)*.42?'medium':'high';
-
-  return {
-    left,top,right,bottom,confidence,
-    removed,
-    sides:{left,right:ow-1-right,top,bottom:oh-1-bottom}
-  };
-}
-
-async function analyzeCrop(img,tol,pad,mode,maxSide=900){
-  const info=buildAnalysis(img,maxSide);
-  info._tol=tol;
-  if(info.w<2||info.h<2){
-    return {left:0,top:0,right:info.ow-1,bottom:info.oh-1,confidence:'low',removed:0};
-  }
-
-  const features=buildEdgeMap(info.d,info.w,info.h);
-  const grown=growOuterBackground(info,features,tol,mode,selfImprove.checked);
-  const bounds=await refineBounds(info,grown,pad,mode);
-
-  bounds.analysis={
-    width:info.w,height:info.h,
-    backgroundRatio:grown.backgroundCount/(info.w*info.h),
-    colorLimit:grown.colorLimit,
-    edgeLimit:grown.edgeLimit
-  };
-  return bounds;
-}
-
-async function cropImage(img,tol,pad,mode,maxSide=900){
-  const bounds=await analyzeCrop(img,tol,pad,mode,maxSide);
+  left=Math.max(0,left-pad);
+  top=Math.max(0,top-pad);
+  right=Math.min(w-1,right+pad);
+  bottom=Math.min(h-1,bottom+pad);
 
   const out=document.createElement('canvas');
-  out.width=Math.max(1,bounds.right-bounds.left+1);
-  out.height=Math.max(1,bounds.bottom-bounds.top+1);
-
-  const ctx=out.getContext('2d');
-  ctx.imageSmoothingEnabled=true;
-  ctx.imageSmoothingQuality='high';
-  ctx.drawImage(
-    img,
-    bounds.left,bounds.top,out.width,out.height,
-    0,0,out.width,out.height
-  );
-  out._bounds=bounds;
+  out.width=Math.max(1,right-left+1);
+  out.height=Math.max(1,bottom-top+1);
+  out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
   return out;
 }
 
-function schedulePreview(delay=160){
-  if(previewTimer)clearTimeout(previewTimer);
-  previewTimer=setTimeout(()=>refreshPreview(),delay);
+function cropImageAggressive(img,tol,pad){
+  const w=img.naturalWidth,h=img.naturalHeight;
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(img,0,0);
+  const d=ctx.getImageData(0,0,w,h).data;
+
+  const cutoff=Math.max(70,255-tol);
+  const isNonWhite=(x,y)=>{
+    const i=(y*w+x)*4;
+    if(d[i+3]<10)return false;
+    return !(d[i]>=cutoff && d[i+1]>=cutoff && d[i+2]>=cutoff);
+  };
+
+  const sx=Math.max(1,Math.ceil(w/300));
+  const sy=Math.max(1,Math.ceil(h/300));
+  const gw=Math.ceil(w/sx), gh=Math.ceil(h/sy);
+  const rowDensity=new Float32Array(gh);
+  const colDensity=new Float32Array(gw);
+
+  for(let gy=0;gy<gh;gy++){
+    const y0=gy*sy,y1=Math.min(h,y0+sy);
+    let dark=0,total=0;
+    for(let y=y0;y<y1;y++){
+      for(let x=0;x<w;x+=Math.max(1,Math.floor(w/260))){
+        total++; if(isNonWhite(x,y))dark++;
+      }
+    }
+    rowDensity[gy]=dark/Math.max(1,total);
+  }
+  for(let gx=0;gx<gw;gx++){
+    const x0=gx*sx,x1=Math.min(w,x0+sx);
+    let dark=0,total=0;
+    for(let x=x0;x<x1;x++){
+      for(let y=0;y<h;y+=Math.max(1,Math.floor(h/260))){
+        total++; if(isNonWhite(x,y))dark++;
+      }
+    }
+    colDensity[gx]=dark/Math.max(1,total);
+  }
+
+  function smooth(arr,r){
+    const out=new Float32Array(arr.length);
+    for(let i=0;i<arr.length;i++){
+      let sum=0,n=0;
+      for(let j=Math.max(0,i-r);j<=Math.min(arr.length-1,i+r);j++){sum+=arr[j];n++;}
+      out[i]=sum/n;
+    }
+    return out;
+  }
+
+  const rs=smooth(rowDensity,Math.max(2,Math.round(gh*0.012)));
+  const cs=smooth(colDensity,Math.max(2,Math.round(gw*0.012)));
+  const ART_DENSITY=0.025;
+  const MIN_RUN=Math.max(2,Math.round(Math.min(gh,gw)*0.025));
+
+  function findStart(arr){
+    let start=-1,run=0;
+    for(let i=0;i<arr.length;i++){
+      if(arr[i]>=ART_DENSITY){
+        if(start<0)start=i;
+        if(++run>=MIN_RUN)return start;
+      }else{
+        start=-1;run=0;
+      }
+    }
+    return 0;
+  }
+  function findEnd(arr){
+    let end=-1,run=0;
+    for(let i=arr.length-1;i>=0;i--){
+      if(arr[i]>=ART_DENSITY){
+        if(end<0)end=i;
+        if(++run>=MIN_RUN)return end;
+      }else{
+        end=-1;run=0;
+      }
+    }
+    return arr.length-1;
+  }
+
+  let top=findStart(rs),bottom=findEnd(rs),left=findStart(cs),right=findEnd(cs);
+  if(bottom<=top||right<=left)return c;
+
+  top*=sy;
+  bottom=Math.min(h-1,(bottom+1)*sy-1);
+  left*=sx;
+  right=Math.min(w-1,(right+1)*sx-1);
+
+  const rowDensityReal=(y)=>{
+    const step=Math.max(1,Math.floor(w/320));
+    let dark=0,total=0;
+    for(let x=left;x<=right;x+=step){total++;if(isNonWhite(x,y))dark++;}
+    return dark/Math.max(1,total);
+  };
+  const colDensityReal=(x)=>{
+    const step=Math.max(1,Math.floor(h/320));
+    let dark=0,total=0;
+    for(let y=top;y<=bottom;y+=step){total++;if(isNonWhite(x,y))dark++;}
+    return dark/Math.max(1,total);
+  };
+
+  const realThreshold=0.018;
+  let guard=0;
+  while(top<bottom && rowDensityReal(top)<realThreshold && guard++<h)top++;
+  guard=0;
+  while(bottom>top && rowDensityReal(bottom)<realThreshold && guard++<h)bottom--;
+  guard=0;
+  while(left<right && colDensityReal(left)<realThreshold && guard++<w)left++;
+  guard=0;
+  while(right>left && colDensityReal(right)<realThreshold && guard++<w)right--;
+
+  left=Math.max(0,left-pad);top=Math.max(0,top-pad);
+  right=Math.min(w-1,right+pad);bottom=Math.min(h-1,bottom+pad);
+
+  const out=document.createElement('canvas');
+  out.width=Math.max(1,right-left+1);
+  out.height=Math.max(1,bottom-top+1);
+  out.getContext('2d').drawImage(c,left,top,out.width,out.height,0,0,out.width,out.height);
+  return out;
+}
+
+function cropImage(img,tol,pad,mode=cropMode){
+  return mode==='aggressive' ? cropImageNormal(img,tol,pad) : cropImageAggressive(img,tol,pad);
 }
 
 async function showPreview(file){
-  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
+  if(previewUrl)URL.revokeObjectURL(previewUrl);
   previewUrl=URL.createObjectURL(file);
-  origPreview.src=previewUrl;origPreview.style.display='block';origEmpty.style.display='none';
-  const img=await getImage(file);
-  originalMeta.textContent=(img.naturalWidth||img.width)+' × '+(img.naturalHeight||img.height);
-  setPreviewMeta('READY');schedulePreview(20);
+  origPreview.src=previewUrl;
+  previewCrop();
 }
 
-async function refreshPreview(){
-  if(!selected.length||busy)return;
-  const token=++previewToken;
-  if(previewRunning)return;
-  previewRunning=true;
-  setPreviewMeta('FAST SCAN');
+async function previewCrop(){
+  if(!selected.length)return;
   try{
-    await yieldUI();
     const img=await getImage(selected[0]);
-    if(token!==previewToken)return;
-    const result=await cropImage(img,Number(tolEl.value),Number(padEl.value),cropMode,640);
-    if(token!==previewToken)return;
-    const max=1000,scale=Math.min(1,max/Math.max(result.width,result.height));
-    const pw=Math.max(1,Math.round(result.width*scale)),ph=Math.max(1,Math.round(result.height*scale));
-    const pc=document.createElement('canvas');pc.width=pw;pc.height=ph;
-    const ctx=pc.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-    ctx.drawImage(result,0,0,result.width,result.height,0,0,pw,ph);
-    const blob=await new Promise(r=>pc.toBlob(r,'image/jpeg',.86));
-    if(!blob||token!==previewToken)return;
-    const url=URL.createObjectURL(blob);
-    cropPreview.onload=()=>URL.revokeObjectURL(url);
-    cropPreview.src=url;cropPreview.style.display='block';cropEmpty.style.display='none';
-    cropMeta.textContent=result.width+' × '+result.height;
-    setPreviewMeta(result._bounds&&result._bounds.confidence?'BOUNDARY '+result._bounds.confidence.toUpperCase():'READY');
-  }catch(e){
-    console.error(e);
-    if(token===previewToken){setPreviewMeta('SCAN ERROR');cropMeta.textContent='—'}
-  }finally{previewRunning=false}
+    const out=cropImage(img,+tolEl.value,+padEl.value);
+    const url=out.toDataURL('image/png');
+    cropPreview.src=url;
+  }catch(e){}
 }
 
 function setLocked(locked){
   settingsBox.classList.toggle('locked',locked);
-  filesEl.disabled=locked;
   tolEl.disabled=locked;
   padEl.disabled=locked;
   resetBtn.disabled=locked;
   modeNormal.disabled=locked;
   modeAggressive.disabled=locked;
-  selfImprove.disabled=locked;
-  busy=locked;
-  drop.style.pointerEvents=locked?'none':'';
 }
 
 function setMode(mode){
   cropMode=mode;
   modeNormal.classList.toggle('active',mode==='normal');
   modeAggressive.classList.toggle('active',mode==='aggressive');
-  schedulePreview(80);
+  previewCrop();
 }
+modeNormal.onclick=()=>{if(!modeNormal.disabled)setMode('normal')};
+modeAggressive.onclick=()=>{if(!modeAggressive.disabled)setMode('aggressive')};
 
-modeNormal.addEventListener('click',()=>{if(!modeNormal.disabled)setMode('normal')});
-modeAggressive.addEventListener('click',()=>{if(!modeAggressive.disabled)setMode('aggressive')});
-
-tolEl.addEventListener('input',()=>{
+tolEl.oninput=()=>{
   tolVal.textContent=tolEl.value;
   updateSlider(tolEl);
-  schedulePreview(180);
-});
-padEl.addEventListener('input',()=>{
+  previewCrop();
+};
+padEl.oninput=()=>{
   padVal.textContent=padEl.value+' px';
   updateSlider(padEl);
-  schedulePreview(180);
-});
-selfImprove.addEventListener('change',()=>{
-  selfState.textContent=selfImprove.checked?'ON':'OFF';
-  schedulePreview(140);
-});
+  previewCrop();
+};
+resetBtn.onclick=()=>{
+  tolEl.value=18;
+  padEl.value=2;
+  tolVal.textContent='18';
+  padVal.textContent='2 px';
+  updateSlider(tolEl);
+  updateSlider(padEl);
+  previewCrop();
+};
 
-resetBtn.addEventListener('click',()=>{
-  tolEl.value='34';padEl.value='2';selfImprove.checked=true;cropMode='normal';
-  tolVal.textContent='34';padVal.textContent='2 px';selfState.textContent='ON';
-  updateSlider(tolEl);updateSlider(padEl);
-  modeNormal.classList.add('active');modeAggressive.classList.remove('active');
-  schedulePreview(60);
-});
-
-setCount();
+function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
 
 function renderPage(){
   results.innerHTML='';
   const totalPages=Math.max(1,Math.ceil(outputs.length/PAGE_SIZE));
-
-  if(currentPage>totalPages){
-    currentPage=totalPages;
-  }
+  if(currentPage>totalPages)currentPage=totalPages;
 
   const start=(currentPage-1)*PAGE_SIZE;
   const pageItems=outputs.slice(start,start+PAGE_SIZE);
@@ -999,157 +757,85 @@ function renderPage(){
 
     const im=document.createElement('img');
     im.src=URL.createObjectURL(item.blob);
-    im.alt=item.name;
 
     const done=document.createElement('div');
     done.className='done';
     done.textContent='DONE';
 
     const one=document.createElement('button');
-    one.type='button';
     one.className='download-one';
     one.textContent='⇩';
-
-    one.addEventListener('click',function(e){
-      e.stopPropagation();
-      downloadBlob(item.blob,item.name);
-    });
+    one.onclick=()=>downloadBlob(item.blob,item.name);
 
     const body=document.createElement('div');
     body.className='result-body';
+    body.innerHTML=
+      `<div class="result-name" title="${item.name.replace(/"/g,'&quot;')}">${item.name}</div>`+
+      `<div class="result-size">${item.width} × ${item.height}</div>`;
 
-    const nameDiv=document.createElement('div');
-    nameDiv.className='result-name';
-    nameDiv.title=item.name;
-    nameDiv.textContent=item.name;
-
-    const sizeDiv=document.createElement('div');
-    sizeDiv.className='result-size';
-    sizeDiv.textContent=item.width+' × '+item.height;
-
-    body.append(nameDiv,sizeDiv);
     div.append(im,done,one,body);
     results.append(div);
   }
 
   pagination.innerHTML='';
-
   if(totalPages<=1)return;
 
   const prev=document.createElement('button');
-  prev.type='button';
   prev.className='page-btn';
   prev.textContent='‹';
   prev.disabled=currentPage===1;
-
-  prev.addEventListener('click',function(){
-    if(currentPage>1){
-      currentPage--;
-      renderPage();
-      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-    }
-  });
-
+  prev.onclick=()=>{currentPage--;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
   pagination.append(prev);
 
   const maxButtons=7;
-  let first=1;
-  let last=totalPages;
-
+  let first=1,last=totalPages;
   if(totalPages>maxButtons){
     first=Math.max(1,currentPage-3);
     last=Math.min(totalPages,first+6);
-
-    if(last-first<6){
-      first=Math.max(1,last-6);
-    }
+    if(last-first<6)first=last-6;
   }
 
   for(let p=first;p<=last;p++){
     const btn=document.createElement('button');
-
-    btn.type='button';
     btn.className='page-btn'+(p===currentPage?' active':'');
     btn.textContent=p;
-
-    btn.addEventListener('click',function(){
-      currentPage=p;
-      renderPage();
-      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-    });
-
+    btn.onclick=()=>{currentPage=p;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
     pagination.append(btn);
   }
 
   const next=document.createElement('button');
-  next.type='button';
   next.className='page-btn';
   next.textContent='›';
   next.disabled=currentPage===totalPages;
-
-  next.addEventListener('click',function(){
-    if(currentPage<totalPages){
-      currentPage++;
-      renderPage();
-      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-    }
-  });
-
+  next.onclick=()=>{currentPage++;renderPage();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})};
   pagination.append(next);
 
   const info=document.createElement('span');
   info.className='page-info';
-  info.textContent='Page '+currentPage+' of '+totalPages+' • '+outputs.length+' images';
-
+  info.textContent=`Page ${currentPage} of ${totalPages} • ${outputs.length} images`;
   pagination.append(info);
 }
 
 function crc32(buf){
   let table=crc32.table;
-
   if(!table){
     table=crc32.table=new Uint32Array(256);
-
     for(let n=0;n<256;n++){
       let c=n;
-
-      for(let k=0;k<8;k++){
-        c=(c&1)?0xedb88320^(c>>>1):c>>>1;
-      }
-
+      for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;
       table[n]=c>>>0;
     }
   }
-
   let c=0xffffffff;
-
-  for(let i=0;i<buf.length;i++){
-    c=table[(c^buf[i])&255]^(c>>>8);
-  }
-
-  return(c^0xffffffff)>>>0;
+  for(let i=0;i<buf.length;i++)c=table[(c^buf[i])&255]^(c>>>8);
+  return (c^0xffffffff)>>>0;
 }
-
-function u16(a,n){
-  a.push(n&255,(n>>>8)&255);
-}
-
-function u32(a,n){
-  a.push(
-    n&255,
-    (n>>>8)&255,
-    (n>>>16)&255,
-    (n>>>24)&255
-  );
-}
-
-function strBytes(s){
-  return new TextEncoder().encode(s);
-}
+function u16(a,n){a.push(n&255,(n>>>8)&255)}
+function u32(a,n){a.push(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255)}
+function strBytes(s){return new TextEncoder().encode(s)}
 
 async function makeZip(items){
-  const chunks=[];
-  const central=[];
+  const chunks=[],central=[];
   let offset=0;
 
   for(const item of items){
@@ -1158,75 +844,38 @@ async function makeZip(items){
     const crc=crc32(data);
     const local=[];
 
-    u32(local,0x04034b50);
-    u16(local,20);
-    u16(local,0);
-    u16(local,0);
-    u16(local,0);
-    u16(local,0);
-    u32(local,crc);
-    u32(local,data.length);
-    u32(local,data.length);
-    u16(local,name.length);
-    u16(local,0);
+    u32(local,0x04034b50);u16(local,20);u16(local,0);u16(local,0);
+    u16(local,0);u16(local,0);u32(local,crc);
+    u32(local,data.length);u32(local,data.length);
+    u16(local,name.length);u16(local,0);
 
-    const localBytes=new Uint8Array(local);
-
-    chunks.push(localBytes);
-    chunks.push(name);
-    chunks.push(data);
+    chunks.push(new Uint8Array(local),name,data);
 
     const cen=[];
+    u32(cen,0x02014b50);u16(cen,20);u16(cen,20);u16(cen,0);u16(cen,0);
+    u16(cen,0);u16(cen,0);u32(cen,crc);
+    u32(cen,data.length);u32(cen,data.length);
+    u16(cen,name.length);u16(cen,0);u16(cen,0);u16(cen,0);u16(cen,0);
+    u32(cen,0);u32(cen,offset);
 
-    u32(cen,0x02014b50);
-    u16(cen,20);
-    u16(cen,20);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u32(cen,crc);
-    u32(cen,data.length);
-    u32(cen,data.length);
-    u16(cen,name.length);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u16(cen,0);
-    u32(cen,0);
-    u32(cen,offset);
-
-    central.push(new Uint8Array(cen));
-    central.push(name);
-
-    offset+=localBytes.length+name.length+data.length;
+    central.push(new Uint8Array(cen),name);
+    offset+=local.length+name.length+data.length;
   }
 
   const centralOffset=offset;
   let centralSize=0;
-
-  for(const c of central){
-    chunks.push(c);
-    centralSize+=c.length;
-  }
+  for(const c of central){chunks.push(c);centralSize+=c.length}
 
   const end=[];
-
-  u32(end,0x06054b50);
-  u16(end,0);
-  u16(end,0);
-  u16(end,items.length);
-  u16(end,items.length);
-  u32(end,centralSize);
-  u32(end,centralOffset);
-  u16(end,0);
-
+  u32(end,0x06054b50);u16(end,0);u16(end,0);
+  u16(end,items.length);u16(end,items.length);
+  u32(end,centralSize);u32(end,centralOffset);u16(end,0);
   chunks.push(new Uint8Array(end));
 
   return new Blob(chunks,{type:'application/zip'});
 }
 
-cleanBtn.addEventListener('click',async function(){
+cleanBtn.onclick=async()=>{
   if(!selected.length){
     alert('Select some images first.');
     return;
@@ -1234,75 +883,53 @@ cleanBtn.addEventListener('click',async function(){
 
   outputs=[];
   currentPage=1;
-
   results.innerHTML='';
   pagination.innerHTML='';
-
   downloadAll.disabled=true;
   cleanBtn.disabled=true;
-
   setLocked(true);
 
   progressCard.style.display='block';
   bar.style.width='0%';
   percent.textContent='0%';
 
-  const tol=Number(tolEl.value);
-  const pad=Number(padEl.value);
-  const mode=cropMode;
+  const tol=+tolEl.value,pad=+padEl.value,mode=cropMode;
 
   try{
     for(let i=0;i<selected.length;i++){
-      progressText.textContent='Processing '+(i+1)+' of '+selected.length+' images…';
+      progressText.textContent=`Processing ${i+1} of ${selected.length} images…`;
       status.textContent=selected[i].name;
 
       const img=await getImage(selected[i]);
-      const out=await cropImage(img,tol,pad,mode,900);
-
-      const blob=await new Promise(function(resolve,reject){
-        out.toBlob(function(result){
-          if(result)resolve(result);
-          else reject(new Error('Could not create PNG'));
-        },'image/png');
-      });
-
+      const out=cropImage(img,tol,pad,mode);
+      const blob=await new Promise(r=>out.toBlob(r,'image/png'));
       const name=selected[i].name.replace(/\.[^.]+$/,'')+'_clean.png';
 
       outputs.push({
-        blob:blob,
-        name:name,
-        width:out.width,
-        height:out.height
+        blob,name,width:out.width,height:out.height
       });
 
       const p=((i+1)/selected.length)*100;
-
       bar.style.width=p+'%';
       percent.textContent=Math.round(p)+'%';
 
-      await new Promise(function(resolve){
-        setTimeout(resolve,0);
-      });
+      await new Promise(r=>setTimeout(r,0));
     }
 
-    progressText.textContent='Finished '+selected.length+' images';
+    progressText.textContent=`Finished ${selected.length} images`;
     status.textContent='All processed images are ready.';
-
     renderPage();
-
     downloadAll.disabled=false;
-
   }catch(err){
-    console.error(err);
     status.textContent='Something went wrong while processing an image.';
-    alert('Something went wrong while processing an image. Check the browser console for details.');
+    console.error(err);
   }finally{
     cleanBtn.disabled=false;
     setLocked(false);
   }
-});
+};
 
-downloadAll.addEventListener('click',async function(){
+downloadAll.onclick=async()=>{
   if(!outputs.length)return;
 
   downloadAll.disabled=true;
@@ -1311,19 +938,11 @@ downloadAll.addEventListener('click',async function(){
   try{
     const zip=await makeZip(outputs);
     downloadBlob(zip,'cut-it-out-cleaned-images.zip');
-  }catch(err){
-    console.error(err);
-    alert('Could not create the ZIP file.');
   }finally{
     downloadAll.disabled=false;
     downloadAll.textContent='⇩ Download All (.ZIP)';
   }
-});
-
-setLocked(false);
-updateSlider(tolEl);
-updateSlider(padEl);
-selfState.textContent=selfImprove.checked?'ON':'OFF';
+};
 </script>
 </body>
 </html>
